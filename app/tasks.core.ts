@@ -285,7 +285,7 @@ Milestone 1 (POC)
     - [+] Click on checkbox in a running task -> stops timer (persisting that data), mark task as done and updates the finished date
     Finished Today
     - [+] Add a 'View Finished' button, that toggles display of the 'Today' section
-    - [ ] Add a 'Today' section, it must contain: Total tasks done today, total time spent (even in tasks not finished yet)
+    - [x] Add an 'Info' section, it must contain: Total tasks done today, total time spent (even in tasks not finished yet)
     - [+] Display a list of done tasks today, each task must be striked and has a checkbox marked indicating task is done, total time spent must be shown
     - [+] When the checkbox is clicked, the task is marked as not done and moved to open tasks
     - [ ] User can edit task finished date, data is persisted automatically when a valid date is captured

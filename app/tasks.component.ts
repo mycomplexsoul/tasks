@@ -37,8 +37,9 @@ import { TasksCore } from '../app/tasks.core';
                     <span>{{taskAge(t)}}</span>
                 </div>
             </div>
-            <div>
-                Total Time Estimated: {{formatTime(state.totalTimeEstimated * 60)}} ({{state.totalTimeEstimated}})
+            <div id="Info">
+                Done Today: {{state.closedTodayTasks.length}} / Time Spent: {{formatTime(state.totalTimeSpentToday)}} <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> => {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} (closed) + {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}} (open)</span>
+                <br/>Total Time Estimated: {{formatTime(state.totalTimeEstimated * 60)}} ({{state.totalTimeEstimated}})
             </div>
             <hr/>
         </div>
@@ -168,6 +169,10 @@ export class TasksComponent implements OnInit {
         this.tasks.filter((t) => t.tsk_ctg_status == 1).forEach((t: any) => {
             this.state.totalTimeEstimated += parseInt(t.tsk_estimated_duration);
         });
+
+        // Info
+        // Total time spent today
+        this.calculateTotalTimeSpentToday();
 
         setTimeout(() => this.showTimersOnLoad(), 100);
     }
@@ -324,6 +329,7 @@ export class TasksComponent implements OnInit {
             // hide timer
             this.hideTimer(task,dom);
             this.services.tasksCore.stopTimeTracking(task);
+            this.calculateTotalTimeSpentToday();
         }
     }
 
@@ -397,6 +403,7 @@ export class TasksComponent implements OnInit {
 
         t.tsk_time_history.splice(h.tsh_num_secuential-1,1);
         t.tsk_total_time_spent = spent;
+        this.calculateTotalTimeSpentToday();
     }
 
     editTimeTracking(h: any, which: number, event: KeyboardEvent){
@@ -422,6 +429,7 @@ export class TasksComponent implements OnInit {
             this.hideTimer(task,dom);
             this.showTimer(task,dom);
         }
+        this.calculateTotalTimeSpentToday();
     }
 
     updateTaskTimeTracking(tsh_id: string, tsh_num_secuential: number, newData: any){
@@ -467,5 +475,37 @@ export class TasksComponent implements OnInit {
     deleteTasks(){
         this.services.tasksCore.deleteTasks();
         this.updateState();
+    }
+
+    calculateTotalTimeSpentToday(){
+        let today = new Date();
+        let today0 = new Date(today.getFullYear(),today.getMonth(),today.getDate());
+        let tomorrow0 = new Date(today.getFullYear(),today.getMonth(),today.getDate()+1);
+        this.state.allClosedTimeTrackingToday = <any>[];
+        this.state.allOpenTimeTrackingToday = <any>[];
+        this.tasks.filter((t) => {
+            t.tsk_time_history.filter((h: any) => {
+                if (today0 <= new Date(h.tsh_date_start) && new Date(h.tsh_date_start) <= tomorrow0){
+                    if (t.tsk_ctg_status === 2){
+                        this.state.allClosedTimeTrackingToday.push(h);
+                    } else {
+                        this.state.allOpenTimeTrackingToday.push(h);
+                    }
+                }
+            });
+        });
+        let spent = 0;
+        this.state.allClosedTimeTrackingToday.forEach((h: any) => {
+            spent += h.tsh_time_spent;
+        });
+        this.state.totalTimeSpentTodayOnClosedTasks = spent;
+        this.state.totalTimeSpentToday = 0;
+        this.state.totalTimeSpentToday += spent;
+        spent = 0;
+        this.state.allOpenTimeTrackingToday.forEach((h: any) => {
+            spent += h.tsh_time_spent;
+        });
+        this.state.totalTimeSpentTodayOnOpenTasks = spent;
+        this.state.totalTimeSpentToday += spent;
     }
 }
