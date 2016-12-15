@@ -300,10 +300,11 @@ Milestone 1 (POC)
     - [+] Add an 'Options' section, it must contain a button 'delete all tasks'
     - [+] When user clicks 'delete all tasks' all tasks should be deleted and the view should be cleared
     Preventing Overload / Prioritizing
-    - [ ] When adding a new task, it will be in state BACKLOG
-    - [ ] In the buttons section will appear a button 'Show Backlog' / 'Hide Backog' which toggles the Backlog section
-    - [ ] A new section 'Backlog' will contain a group of tasks in BACKLOG state grouped by list
-    - [ ] Each task in BACKLOG state will have a button 'Promote to Open', clicking this button will change state of task to OPEN
+    - [x] When adding a new task, it will be in state BACKLOG
+    - [x] In the buttons section will appear a button 'Show Backlog' / 'Hide Backog' which toggles the Backlog section
+    - [x] A new section 'Backlog' will contain a group of tasks in BACKLOG state grouped by list
+    - [x] Each task in BACKLOG state will have a button 'Move to Open', clicking this button will change state of the task to OPEN
+    - [x] In the 'Info' Section will appear a backlog task counter
     Parsing Estimated Duration of Task from task text
     - [+] If task contains '%', the text between '%' and ' ' or end of text should be interpreted as the estimated duration of the task in the notation %#h##m
     - [+] The notation %#h#m could be any of the following cases: (# = any number of any digits)

@@ -14,11 +14,28 @@ import { TasksCore } from '../app/tasks.core';
                 [(ngModel)]="tsk_name" />
             <button type="submit" (click)="addTask(tasksForm)">Add task</button>
             <button (click)="toggleViewFinishedToday()">{{viewFinishedToday ? 'hide': 'show'}} finished today</button>
+            <button (click)="toggleViewBacklog()">{{viewBacklog ? 'hide': 'show'}} backlog</button>
             <button (click)="toggleViewAll()">{{viewAll ? 'hide': 'show'}} all</button>
             <button (click)="toggleViewOptions()">{{viewOptions ? 'hide': 'show'}} options</button>
         </form>
         <div *ngIf="viewOptions">
             <button (click)="deleteTasks()">delete all tasks</button>
+            <hr/>
+        </div>
+        <div id="backlogTaskList" *ngIf="viewBacklog">
+            <strong>Backlog</strong>
+            <div *ngFor="let item of state.backlogTasks">
+                <div>
+                    <strong>{{item.header}}</strong>
+                </div>
+                <div *ngFor="let t of item.tasks" data-id="{{t.tsk_id}}">
+                    - <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
+                    <span contenteditable="true" (keyup)="taskEdit(t,$event)"
+                        class="editable">{{t.tsk_name}}</span>
+                    <span>{{taskAge(t)}}</span>
+                    <button (click)="setOpen(t)">Move to open</button>
+                </div>
+            </div>
             <hr/>
         </div>
         <div id="openTaskList">
@@ -32,13 +49,16 @@ import { TasksCore } from '../app/tasks.core';
                     <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
                     <span>{{(timers[t.tsk_id]) ? '[' + timers[t.tsk_id].timerString + ']' : ''}}</span>
                     <span contenteditable="true" (keyup)="taskEdit(t,$event)"
-                        [ngClass]="{'task-done': (t.tsk_ctg_status === 2), 'task-in-process': (t.tsk_ctg_in_process === 2)}"
+                        [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2)}"
                         class="editable">{{t.tsk_name}}</span>
+                    <span>{{formatTime(t.tsk_estimated_duration * 60)}}</span>
                     <span>{{taskAge(t)}}</span>
                 </div>
             </div>
             <div id="Info">
-                Done Today: {{state.closedTodayTasks.length}} / Time Spent: {{formatTime(state.totalTimeSpentToday)}} <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> => {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} (closed) + {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}} (open)</span>
+                Done Today: {{state.closedTodayTasks.length}} / Time Spent: {{formatTime(state.totalTimeSpentToday)}}
+                <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> => {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} (closed) + {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}} (open)</span>
+                <br/>Total Tasks: {{tasks.length}} | Open: {{state.openTasksCount}} | Backlog: {{state.backlogTasksCount}}
                 <br/>Total Time Estimated: {{formatTime(state.totalTimeEstimated * 60)}} ({{state.totalTimeEstimated}})
             </div>
             <hr/>
@@ -46,7 +66,7 @@ import { TasksCore } from '../app/tasks.core';
         <div id="taskDetails" *ngIf="state.selected">
             <button (click)="state.selected=null">hide</button>
             <br/>
-            Task Details
+            <strong>Task Details</strong>
             <div>Id: {{state.selected.tsk_id}}</div>
             <div>Container: {{state.selected.tsk_id_container}}</div>
             <div>Record: {{state.selected.tsk_id_record}}</div>
@@ -99,21 +119,21 @@ import { TasksCore } from '../app/tasks.core';
             <hr/>
         </div>
         <div *ngIf="viewFinishedToday">
-            Finished Today
+            <strong>Finished Today</strong>
             <div *ngFor="let item of state.closedTodayTasks">
                 <input type="checkbox" id="{{item.tsk_id}}" checked
                     (click)="taskCheckboxHandler(item,$event)" />
                 <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
-                <span [ngClass]="{'task-done': (item.tsk_ctg_status === 2)}"
+                <span [ngClass]="{'task-done': (item.tsk_ctg_status === this.taskStatus.CLOSED)}"
                     >{{item.tsk_name}}</span>
                 <button (click)="setSelected(item)">details</button>
             </div>
             <hr/>
         </div>
         <div id="closedTaskList" *ngIf="viewAll">
-            Closed Tasks
+            <strong>Closed Tasks</strong>
             <div *ngFor="let item of state.closedTasks">
-                <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
+                - <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
                 <span>{{item.tsk_name}}</span>
                 <button (click)="setSelected(item)">details</button>
             </div>
@@ -132,7 +152,13 @@ export class TasksComponent implements OnInit {
     public timers: any = {};
     public viewAll: boolean = false;
     public viewFinishedToday: boolean = false;
+    public viewBacklog: boolean = false;
     public viewOptions: boolean = false;
+    public taskStatus = {
+        'BACKLOG': 1,
+        'OPEN': 2,
+        'CLOSED': 3
+    };
 
     constructor(tasksCore: TasksCore){
         this.services.tasksCore = tasksCore;
@@ -157,29 +183,32 @@ export class TasksComponent implements OnInit {
         let today = new Date();
         let yesterday = new Date(today.getFullYear(),today.getMonth(),today.getDate()-1);
         this.tasks = this.services.tasksCore.tasks();
-        this.state.openTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == 1).sort(this.sortByGroup));
-        this.state.closedTasks = this.tasks.filter((t) => t.tsk_ctg_status == 2).sort((a: any,b: any) => {
+        this.state.backlogTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.BACKLOG).sort(this.sortByGroup));
+        this.state.openTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN).sort(this.sortByGroup));
+        this.state.closedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED).sort((a: any,b: any) => {
             let res = new Date(a.tsk_date_done) > new Date(b.tsk_date_done);
             return res ? -1 : 1;
         });
-        this.state.closedTodayTasks = this.tasks.filter((t) => t.tsk_ctg_status == 2 && new Date(t.tsk_date_done) >= yesterday && new Date(t.tsk_date_done) <= today);
+        this.state.closedTodayTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED && new Date(t.tsk_date_done) >= yesterday && new Date(t.tsk_date_done) <= today);
 
         // Estimated Total
         this.state.totalTimeEstimated = 0;
-        this.tasks.filter((t) => t.tsk_ctg_status == 1).forEach((t: any) => {
+        this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN).forEach((t: any) => {
             this.state.totalTimeEstimated += parseInt(t.tsk_estimated_duration);
         });
 
         // Info
         // Total time spent today
         this.calculateTotalTimeSpentToday();
+        this.state.openTasksCount = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN).length;
+        this.state.backlogTasksCount = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.BACKLOG).length;
 
         setTimeout(() => this.showTimersOnLoad(), 100);
     }
 
     showTimersOnLoad(){
         this.tasks.filter(t => {
-            return t.tsk_ctg_status == 1 && t.tsk_ctg_in_process === 2;
+            return t.tsk_ctg_status == this.taskStatus.OPEN && t.tsk_ctg_in_process === 2;
         }).forEach(t => {
             if (!this.timers[t.tsk_id]){
                 this.showTimer(t,this.getTaskDOMElement(t.tsk_id));
@@ -250,7 +279,7 @@ export class TasksComponent implements OnInit {
             this.taskToggleTimeTracking(t,this.getTaskDOMElement(t.tsk_id));
         }
         this.updateTask(t.tsk_id,{
-            tsk_ctg_status: event.target['checked'] ? 2 : 1
+            tsk_ctg_status: event.target['checked'] ? this.taskStatus.CLOSED : this.taskStatus.OPEN
             , tsk_date_done: new Date()
         });
         setTimeout(() => {
@@ -348,7 +377,7 @@ export class TasksComponent implements OnInit {
         // dom.querySelector("span[contenteditable=true]").classList.add("task-in-process");
 
         let watch = setInterval(() => {
-            this.timers[task.tsk_id].timerString = this.formatTime(timer++);
+            this.timers[task.tsk_id].timerString = this.formatTime(++timer);
         }, 1000);
 
         this.timers[task.tsk_id] = {};
@@ -454,6 +483,10 @@ export class TasksComponent implements OnInit {
     toggleViewFinishedToday(){
         this.viewFinishedToday = !this.viewFinishedToday;
     }
+    
+    toggleViewBacklog(){
+        this.viewBacklog = !this.viewBacklog;
+    }
 
     toggleViewAll(){
         this.viewAll = !this.viewAll;
@@ -486,7 +519,7 @@ export class TasksComponent implements OnInit {
         this.tasks.filter((t) => {
             t.tsk_time_history.filter((h: any) => {
                 if (today0 <= new Date(h.tsh_date_start) && new Date(h.tsh_date_start) <= tomorrow0){
-                    if (t.tsk_ctg_status === 2){
+                    if (t.tsk_ctg_status === this.taskStatus.CLOSED){
                         this.state.allClosedTimeTrackingToday.push(h);
                     } else {
                         this.state.allOpenTimeTrackingToday.push(h);
@@ -507,5 +540,12 @@ export class TasksComponent implements OnInit {
         });
         this.state.totalTimeSpentTodayOnOpenTasks = spent;
         this.state.totalTimeSpentToday += spent;
+    }
+
+    setOpen(t: any){
+        this.updateTask(t.tsk_id,{
+            tsk_ctg_status: this.taskStatus.OPEN
+        });
+        this.updateState();
     }
 }
