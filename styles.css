@@ -178,3 +178,25 @@ input.task{
 input[type=checkbox] {
   vertical-align: middle;
 }
+textarea.task-multiple {
+  width: 50%;
+  min-width: 100px;
+  height: 120px;
+  vertical-align: text-top;
+}
+.task-eta {
+  color: gray;
+  font-weight: bold;
+}
+.task-no-eta {
+  color: red;
+}
+.task-age-1 {
+  color: gray;
+}
+.task-age-2 {
+  color: brown;
+}
+.task-age-10 {
+  color: red;
+}

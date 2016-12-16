@@ -10,8 +10,15 @@ import { TasksCore } from '../app/tasks.core';
                 class="task"
                 autocomplete="off"
                 autofocus="true"
+                *ngIf="!showBatchAdd"
                 (keyup)="inputKeyUpHandler($event)"
                 [(ngModel)]="tsk_name" />
+            <textarea name="tsk_multiple_name"
+                placeholder="Write a task per line..."
+                class="task-multiple"
+                (keyup)="inputKeyUpHandler($event)"
+                [(ngModel)]="tsk_multiple_name"
+                *ngIf="showBatchAdd"></textarea>
             <button type="submit" (click)="addTask(tasksForm)">Add task</button>
             <button (click)="toggleViewFinishedToday()">{{viewFinishedToday ? 'hide': 'show'}} finished today</button>
             <button (click)="toggleViewBacklog()">{{viewBacklog ? 'hide': 'show'}} backlog</button>
@@ -32,7 +39,11 @@ import { TasksCore } from '../app/tasks.core';
                     - <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
                     <span contenteditable="true" (keyup)="taskEdit(t,$event)"
                         class="editable">{{t.tsk_name}}</span>
-                    <span>{{taskAge(t)}}</span>
+                    <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
+                        [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
+                        class="task-eta"
+                        >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
+                    <span [ngClass]="taskAgeClass(t)">{{taskAge(t)}}</span>
                     <button (click)="setOpen(t)">Move to open</button>
                 </div>
             </div>
@@ -51,15 +62,18 @@ import { TasksCore } from '../app/tasks.core';
                     <span contenteditable="true" (keyup)="taskEdit(t,$event)"
                         [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2)}"
                         class="editable">{{t.tsk_name}}</span>
-                    <span>{{formatTime(t.tsk_estimated_duration * 60)}}</span>
-                    <span>{{taskAge(t)}}</span>
+                    <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
+                        [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
+                        class="task-eta"
+                        >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
+                    <span [ngClass]="taskAgeClass(t)">{{taskAge(t)}}</span>
                 </div>
             </div>
             <div id="Info">
-                Done Today: {{state.closedTodayTasks.length}} / Time Spent: {{formatTime(state.totalTimeSpentToday)}}
+                Done Today: {{state.closedTodayTasks.length}} | Time Spent: {{formatTime(state.totalTimeSpentToday)}}
                 <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> => {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} (closed) + {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}} (open)</span>
                 <br/>Total Tasks: {{tasks.length}} | Open: {{state.openTasksCount}} | Backlog: {{state.backlogTasksCount}}
-                <br/>Total Time Estimated: {{formatTime(state.totalTimeEstimated * 60)}} ({{state.totalTimeEstimated}})
+                <br/>Total Time Estimated: {{formatTime(state.totalTimeEstimated * 60)}}
             </div>
             <hr/>
         </div>
@@ -159,6 +173,7 @@ export class TasksComponent implements OnInit {
         'OPEN': 2,
         'CLOSED': 3
     };
+    public showBatchAdd: boolean = false;
 
     constructor(tasksCore: TasksCore){
         this.services.tasksCore = tasksCore;
@@ -170,13 +185,31 @@ export class TasksComponent implements OnInit {
     }
 
     addTask(form: any){
-        this.services.tasksCore.addTask({
-            'tsk_date_add': new Date(),
-            'tsk_name': form.value.tsk_name
-        });
-        this.tasks = this.services.tasksCore.tasks();
-        this.updateState();
-        form.controls.tsk_name.reset();
+        if (!this.showBatchAdd){
+            if (form.value.tsk_name){
+                this.services.tasksCore.addTask({
+                    'tsk_date_add': new Date(),
+                    'tsk_name': form.value.tsk_name
+                });
+                this.tasks = this.services.tasksCore.tasks();
+                this.updateState();
+                form.controls.tsk_name.reset();
+            }
+        } else {
+            // Batch add
+            if (form.value.tsk_multiple_name){
+                form.value.tsk_multiple_name.split('\n').forEach((text: string) => {
+                    this.services.tasksCore.addTask({
+                        'tsk_date_add': new Date(),
+                        'tsk_name': text
+                    });
+                    this.tasks = this.services.tasksCore.tasks();
+                    this.updateState();
+                    form.controls.tsk_multiple_name.reset();
+                    this.showBatchAdd = false;
+                });
+            }
+        }
     }
 
     updateState(){
@@ -413,8 +446,19 @@ export class TasksComponent implements OnInit {
                 str += ":" + ((min > 9) ? min : "0" + min);
                 str += ":" + ((sec > 9) ? sec : "0" + sec);
             }
-            return str;
         }
+        if (format === "#h#m"){
+            if (hr === 0){
+                str = `${min}m`;
+            } else {
+                if (min === 0){
+                    str = `${hr}h`;
+                } else {
+                    str = `${hr}h${min}m`;
+                }
+            }
+        }
+        return str;
     }
 
     deleteTimeTracking(t: any, h: any){
@@ -478,6 +522,11 @@ export class TasksComponent implements OnInit {
         if (event.keyCode === 40){
             document.querySelector("span[contenteditable=true]")['focus']();
         }
+        if (event.keyCode==113){ // detect "F2" = toggle Batch Add
+            this.showBatchAdd = !this.showBatchAdd;
+            setTimeout(() => document.querySelector("textarea[name=tsk_multiple_name]")["focus"](), 100);
+        }
+        // TODO: Ctrl + Enter is same as click button 'Add task'
     }
 
     toggleViewFinishedToday(){
@@ -497,12 +546,23 @@ export class TasksComponent implements OnInit {
     }
 
     taskAge(t: any){
-        let temp = new Date();
-        let today = new Date(temp.getFullYear(),temp.getMonth(),temp.getDate());
-        let taskDate = new Date(t.tsk_date_add);
-        taskDate = new Date(taskDate.getFullYear(),taskDate.getMonth(),taskDate.getDate())
-        let diff = Math.floor(this.services.tasksCore.elapsedTime(taskDate,today) / (60 * 60 * 24)); 
-        return `(${(diff > 1 ? diff + ' days ago' : (diff === 1 ? 'yesterday' : 'today'))})`;
+        let diff = this.services.tasksCore.elapsedDays(new Date(t.tsk_date_add),new Date());
+        return `${(diff > 1 ? '(' + diff + ' days ago)' : (diff === 1 ? '(yesterday)' : ''))}`;
+    }
+
+    taskAgeClass(t: any){
+        let diff = this.services.tasksCore.elapsedDays(new Date(t.tsk_date_add),new Date());
+        let classes = ['task-age-0','task-age-1','task-age-2','task-age-10'];
+        if (diff <= 2){
+            return classes[diff];
+        }
+        if (2 < diff && diff < 10){
+            return classes[2];
+        }
+        if (diff >= 10){
+            return classes[3];
+        }
+        return '';
     }
 
     deleteTasks(){
@@ -548,4 +608,15 @@ export class TasksComponent implements OnInit {
         });
         this.updateState();
     }
+
+    taskEstimatedDurationEdit(t: any, event: KeyboardEvent){
+        let newDuration = this.services.tasksCore.parseTime(event.target['textContent']);
+        if (newDuration !== t.tsk_estimated_duration){
+            this.updateTask(t.tsk_id,{
+                tsk_estimated_duration: newDuration
+            });
+        }
+    }
+
+    
 }

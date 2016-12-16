@@ -62,38 +62,31 @@ export class TasksCore {
             task.tsk_name = task.tsk_name.replace(`[${task.tsk_id_record}] `,'');
         }
 
+        // Parse special tokens
+        // [DATE]
+        let tokens = [{
+            'tokenStr': '[DATE]',
+            'replaceMethod': () => this.dateWithFormat(this.dateOnly(new Date())).substring(0,10)
+        },{
+            'tokenStr': '[DATETIME]',
+            'replaceMethod': () => this.dateWithFormat(this.dateOnly(new Date()))
+        }];
+        tokens.forEach((token) => {
+            task.tsk_name = this.replaceAll(task.tsk_name,token.tokenStr,token.replaceMethod())
+        });
+
         // detect duration
         if (task.tsk_name.indexOf('%') !== -1 && task.tsk_name.indexOf('%%') === -1){
             let endPosition = task.tsk_name.indexOf(' ',task.tsk_name.indexOf('%')) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(' ',task.tsk_name.indexOf('%'));
             let duration = task.tsk_name.substring(task.tsk_name.indexOf('%') + 1,endPosition);
-            let hours = 0, min = 0;
-            // console.log('duration',duration);
+            
             task.tsk_name = task.tsk_name.replace('%' + duration + ' ','');
             task.tsk_name = task.tsk_name.replace(' %' + duration,'');
             task.tsk_name = task.tsk_name.replace('%' + duration,'');
 
-            if (duration.indexOf('h') !== -1){
-                hours = parseInt(duration.substring(0,duration.indexOf('h')));
-                duration = duration.replace(hours + 'h','');
-            }
-            if (duration.indexOf(':') !== -1){
-                hours = parseInt(duration.substring(0,duration.indexOf(':')));
-                duration = duration.replace(hours + ':','');
-            }
-            if (duration.indexOf('m') !== -1){
-                min = parseInt(duration.substring(0,duration.indexOf('m')));
-                duration = duration.replace(min + 'm','');
-            } else {
-                if (duration !== ''){
-                    min = parseInt(duration);
-                    duration = duration.replace(min + '','');
-                }
-            }
-            if (duration === ''){
-                duration = hours * 60 + min;
-            }
+            duration = this.parseTime(duration);
+
             task.tsk_estimated_duration = parseInt(duration);
-            // console.log('duration',duration);
         }
 
         T.push(this.newTaskTemplate(task));
@@ -232,6 +225,10 @@ export class TasksCore {
         return Math.abs(date1.getTime() - date2.getTime()) / 1000;
     }
 
+    elapsedDays(date1: Date, date2: Date) :number{
+        return Math.floor(this.elapsedTime(this.dateOnly(date1),this.dateOnly(date2)) / (60 * 60 * 24));
+    }
+
     updateTaskTimeTracking(taskTimeTracking: any, newData: any){
         Object.keys(newData).forEach(k => {
             taskTimeTracking[k] = newData[k];
@@ -249,6 +246,49 @@ export class TasksCore {
     deleteTasks(){
         this.data.taskList = [];
         this.tasksToStorage();
+    }
+
+    dateOnly(base: Date){
+        return new Date(base.getFullYear(),base.getMonth(),base.getDate(),0,0,0);
+    }
+
+    dateWithFormat(date: Date){
+        var str = date.getFullYear() + "-" + (date.getMonth()+1>9?date.getMonth()+1:"0"+(date.getMonth()+1)) + "-" + (date.getDate()>9?date.getDate():"0"+date.getDate());
+        str += " " + (date.getHours()>9?date.getHours():"0"+date.getHours()) + ":" + (date.getMinutes()>9?date.getMinutes():"0"+date.getMinutes()) + ":" + (date.getSeconds()>9?date.getSeconds():"0"+date.getSeconds());
+        return str;
+    }
+
+    replaceAll(str: string, find: string, replace: string){
+        return str.replace(new RegExp(this.escapeRegExp(find), "g"), replace);
+    }
+
+    escapeRegExp(str: string){
+        return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    }
+
+    parseTime(duration: string){
+        let hours = 0, min = 0;
+        if (duration.indexOf('h') !== -1){
+            hours = parseInt(duration.substring(0,duration.indexOf('h')));
+            duration = duration.replace(hours + 'h','');
+        }
+        if (duration.indexOf(':') !== -1){
+            hours = parseInt(duration.substring(0,duration.indexOf(':')));
+            duration = duration.replace(hours + ':','');
+        }
+        if (duration.indexOf('m') !== -1){
+            min = parseInt(duration.substring(0,duration.indexOf('m')));
+            duration = duration.replace(min + 'm','');
+        } else {
+            if (duration !== ''){
+                min = parseInt(duration);
+                duration = duration.replace(min + '','');
+            }
+        }
+        if (duration === ''){
+            return hours * 60 + min;
+        }
+        return parseInt(duration);
     }
 
     /*
@@ -323,10 +363,18 @@ Milestone 1 (POC)
     - [ ] The estimated duration should be displayed alongside the time tracking in running state as '[##:##] / [##h##m]' (first block: time tracking, second: ETA)
     - [ ] When a task has estimated duration 0 it should be displayed a message indicating this 'no ETA' alongside the task text
     - [ ] In running state, if the elapsed time + total time spent is greater than the estimated duration, it must show a browser notification 'Estimated time exceeded ##h##m for task: [TASK]'
+    - [ ] Total time estimated should be displayed in 'Info' section, it will show two values: total ETA remaining (for OPEN tasks), total ETA today (for OPEN and CLOSED today tasks)
+    - [ ] Estimated duration can be edited after task is added, it is not saved unless it has a valid value in same format as when task creation
     Backup & Restore
     - [ ] In the 'Options' section, a button 'Backup' and a button 'Restore' are shown
     - [ ] If user clicks 'Backup' the complete JSON of tasks should be copied to clipboard in stringified format, a message is shown below 'Backup copied to clipboard'
     - [ ] If user clicks 'Restore' it will try to get clipboard data, parse it as JSON, get tasks and add them to existent ones, and save to storage, a message is shown below 'Added tasks from restore process'
+    Parse special tokens
+    - [x] If task has token '[DATE]' when adding, it should be replaced with today's date in format 'yyyy-MM-dd'
+    - [x] If task has token '[DATETIME]' when adding, it should be replaced with today's date in format 'yyyy-MM-dd HH:mm:ss'
+    Batch Add tasks
+    - [x] If user press F2 when focused on task text input, it should toggle into a textarea, where the user could add multiple tasks, one per row, when added it should be trated each the same as individual input
+    - [x] After adding batch tasks
 
 Milestone 2 (MVP)
     Working on tasks
