@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer } from '@angular/core';
 import { TasksCore } from '../app/tasks.core';
 
 @Component({
@@ -19,7 +19,7 @@ import { TasksCore } from '../app/tasks.core';
                 (keyup)="inputKeyUpHandler($event)"
                 [(ngModel)]="tsk_multiple_name"
                 *ngIf="showBatchAdd"></textarea>
-            <button type="submit" (click)="addTask(tasksForm)">Add task</button>
+            <button type="submit" (click)="addTask(tasksForm)" id="btnAddTask">Add task</button>
             <button (click)="toggleViewFinishedToday()">{{viewFinishedToday ? 'hide': 'show'}} finished today</button>
             <button (click)="toggleViewBacklog()">{{viewBacklog ? 'hide': 'show'}} backlog</button>
             <button (click)="toggleViewAll()">{{viewAll ? 'hide': 'show'}} all</button>
@@ -34,6 +34,7 @@ import { TasksCore } from '../app/tasks.core';
             <div *ngFor="let item of state.backlogTasks">
                 <div>
                     <strong>{{item.header}}</strong>
+                    ({{formatTime(item.estimatedDuration * 60)}})
                 </div>
                 <div *ngFor="let t of item.tasks" data-id="{{t.tsk_id}}">
                     - <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
@@ -43,6 +44,7 @@ import { TasksCore } from '../app/tasks.core';
                         [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
                         class="task-eta"
                         >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
+                    <span *ngIf="t.tsk_schedule_date_start">(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</span>
                     <span [ngClass]="taskAgeClass(t)">{{taskAge(t)}}</span>
                     <button (click)="setOpen(t)">Move to open</button>
                 </div>
@@ -53,6 +55,7 @@ import { TasksCore } from '../app/tasks.core';
             <div *ngFor="let item of state.openTasks">
                 <div>
                     <strong>{{item.header}}</strong>
+                    ({{formatTime(item.estimatedDuration * 60)}})
                 </div>
                 <div *ngFor="let t of item.tasks" data-id="{{t.tsk_id}}">
                     <input type="checkbox" id="{{t.tsk_id}}"
@@ -66,6 +69,7 @@ import { TasksCore } from '../app/tasks.core';
                         [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
                         class="task-eta"
                         >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
+                    <span *ngIf="t.tsk_schedule_date_start">(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</span>
                     <span [ngClass]="taskAgeClass(t)">{{taskAge(t)}}</span>
                 </div>
             </div>
@@ -73,7 +77,7 @@ import { TasksCore } from '../app/tasks.core';
                 Done Today: {{state.closedTodayTasks.length}} | Time Spent: {{formatTime(state.totalTimeSpentToday)}}
                 <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> => {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} (closed) + {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}} (open)</span>
                 <br/>Total Tasks: {{tasks.length}} | Open: {{state.openTasksCount}} | Backlog: {{state.backlogTasksCount}}
-                <br/>Total Time Estimated: {{formatTime(state.totalTimeEstimated * 60)}}
+                <br/>Total Time Estimated: {{formatTime(state.totalTimeEstimated * 60)}} | Open ETA: {{formatTime(state.totalTimeEstimatedOpen * 60)}} | Closed Today ETA: {{formatTime(state.totalTimeEstimatedClosedToday * 60)}}
             </div>
             <hr/>
         </div>
@@ -125,6 +129,8 @@ import { TasksCore } from '../app/tasks.core';
             <div>Qualifiers: {{state.selected.tsk_qualifiers}}</div>
             <div>Tags: {{state.selected.tsk_tags}}</div>
             <div>Estimated Duration: {{state.selected.tsk_estimated_duration}}</div>
+            <div>Schedule Date Start: {{state.selected.tsk_schedule_date_start}}</div>
+            <div>Schedule Date End: {{state.selected.tsk_schedule_date_end}}</div>
             <div>User Added: {{state.selected.tsk_id_user_added}}</div>
             <div>User Asigned: {{state.selected.tsk_id_user_asigned}}</div>
             <div>Date Add: {{state.selected.tsk_date_add | date: format}}</div>
@@ -149,6 +155,7 @@ import { TasksCore } from '../app/tasks.core';
             <div *ngFor="let item of state.closedTasks">
                 - <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
                 <span>{{item.tsk_name}}</span>
+                <span>(done at {{item.tsk_date_done | date: 'yyyy-MM-dd HH:mm:ss'}})</span>
                 <button (click)="setSelected(item)">details</button>
             </div>
             <hr/>
@@ -175,7 +182,7 @@ export class TasksComponent implements OnInit {
     };
     public showBatchAdd: boolean = false;
 
-    constructor(tasksCore: TasksCore){
+    constructor(tasksCore: TasksCore, private rendered: Renderer){
         this.services.tasksCore = tasksCore;
         this.updateState();
     }
@@ -214,21 +221,28 @@ export class TasksComponent implements OnInit {
 
     updateState(){
         let today = new Date();
-        let yesterday = new Date(today.getFullYear(),today.getMonth(),today.getDate()-1);
+        let today0 = new Date(today.getFullYear(),today.getMonth(),today.getDate());
+        let sortByClosedDate = (a: any, b: any) => {
+            let res = new Date(a.tsk_date_done) > new Date(b.tsk_date_done);
+            return res ? -1 : 1;
+        };
         this.tasks = this.services.tasksCore.tasks();
         this.state.backlogTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.BACKLOG).sort(this.sortByGroup));
         this.state.openTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN).sort(this.sortByGroup));
-        this.state.closedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED).sort((a: any,b: any) => {
-            let res = new Date(a.tsk_date_done) > new Date(b.tsk_date_done);
-            return res ? -1 : 1;
-        });
-        this.state.closedTodayTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED && new Date(t.tsk_date_done) >= yesterday && new Date(t.tsk_date_done) <= today);
+        this.state.closedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED).sort(sortByClosedDate);
+        this.state.closedTodayTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED && new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) <= today).sort(sortByClosedDate);
 
         // Estimated Total
         this.state.totalTimeEstimated = 0;
+        this.state.totalTimeEstimatedOpen = 0;
+        this.state.totalTimeEstimatedClosedToday = 0;
         this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN).forEach((t: any) => {
-            this.state.totalTimeEstimated += parseInt(t.tsk_estimated_duration);
+            this.state.totalTimeEstimatedOpen += parseInt(t.tsk_estimated_duration);
         });
+        this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED && new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) <= today).forEach((t: any) => {
+            this.state.totalTimeEstimatedClosedToday += parseInt(t.tsk_estimated_duration);
+        });
+        this.state.totalTimeEstimated = this.state.totalTimeEstimatedOpen + this.state.totalTimeEstimatedClosedToday;
 
         // Info
         // Total time spent today
@@ -270,10 +284,12 @@ export class TasksComponent implements OnInit {
                 lastHeader = t.tsk_id_record;
                 res.push({
                     'header': lastHeader
+                    , 'estimatedDuration': 0
                     , 'tasks': []
                 });
             }
             res[res.length-1].tasks.push(t);
+            res[res.length-1].estimatedDuration += t.tsk_estimated_duration;
         });
 
         return res;
@@ -357,9 +373,17 @@ export class TasksComponent implements OnInit {
             if (current.previousElementSibling.parentNode.previousElementSibling && current.previousElementSibling.parentNode.previousElementSibling.lastElementChild.querySelector("span[contenteditable=true]")){
                 current.previousElementSibling.parentNode.previousElementSibling.lastElementChild.querySelector("span[contenteditable=true]").focus();
             } else {
-                document.querySelector("input[name=tsk_name]")["focus"]();
+                if (this.showBatchAdd){
+                    this.focusElement("textarea[name=tsk_multiple_name]");
+                } else {
+                    this.focusElement("input[name=tsk_name]");
+                }
             }
         }
+    }
+
+    focusElement(selector: string){
+        document.querySelector(selector)["focus"]();
     }
 
     taskJumpDown(current: any){
@@ -519,14 +543,22 @@ export class TasksComponent implements OnInit {
     }
 
     inputKeyUpHandler(event: KeyboardEvent){
-        if (event.keyCode === 40){
-            document.querySelector("span[contenteditable=true]")['focus']();
+        if (event.keyCode === 40 && !this.showBatchAdd){ // Down arrow
+            this.focusElement("span[contenteditable=true]");
         }
         if (event.keyCode==113){ // detect "F2" = toggle Batch Add
             this.showBatchAdd = !this.showBatchAdd;
-            setTimeout(() => document.querySelector("textarea[name=tsk_multiple_name]")["focus"](), 100);
+            setTimeout(() => {
+                if (this.showBatchAdd){
+                    this.focusElement("textarea[name=tsk_multiple_name]");
+                } else {
+                    this.focusElement("input[name=tsk_name]");
+                }
+            }, 100);
         }
-        // TODO: Ctrl + Enter is same as click button 'Add task'
+        if (event.ctrlKey && event.keyCode==13){ // detect Ctrl + Enter
+            this.addTask()
+        }
     }
 
     toggleViewFinishedToday(){

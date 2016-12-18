@@ -57,6 +57,7 @@ export class TasksCore {
     addTask(task: any){
         let T = this.data.taskList;
 
+        // detect group list for the task (at start of text)
         if (task.tsk_name.startsWith('[')){
             task.tsk_id_record = task.tsk_name.substr(task.tsk_name.indexOf('[')+1,task.tsk_name.indexOf(']')-1);
             task.tsk_name = task.tsk_name.replace(`[${task.tsk_id_record}] `,'');
@@ -75,7 +76,80 @@ export class TasksCore {
             task.tsk_name = this.replaceAll(task.tsk_name,token.tokenStr,token.replaceMethod())
         });
 
-        // detect duration
+        // detect Start Date and End Date
+        if (task.tsk_name.indexOf('%[')){
+            let endPosition = task.tsk_name.indexOf(']',task.tsk_name.indexOf('&[')) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(']',task.tsk_name.indexOf('%['));
+            let expression = task.tsk_name.substring(task.tsk_name.indexOf('%[') + 2,endPosition);
+            let parts = '';
+            let parsed = false;
+            task.tsk_name = task.tsk_name.replace('%[' + expression + '] ','');
+            task.tsk_name = task.tsk_name.replace(' %[' + expression + ']','');
+            task.tsk_name = task.tsk_name.replace('%[' + expression + ']','');
+
+            let patternTime = /\d{2}/i;
+            let patternDateTime = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}/i;
+            let patternDateTimeEnd = /\d{4}-\d{2}-\d{2} \d{2}:\d{2} - \d{2}:\d{2}/i;
+            let patternDateTimeDuration = /\d{4}-\d{2}-\d{2} \d{2}:\d{2} \+ /i;
+            let patternTimeEnd = /\d{2}:\d{2} - \d{2}:\d{2}/i;
+            let patternTimeDuration = /\d{2}:\d{2} \+ /i;
+
+            // start date and time and duration -> yyyy-MM-dd HH:mm + ##h##m
+            if (patternDateTimeDuration.test(expression)){
+                parts = expression.split(' + ');
+                task.tsk_schedule_date_start = new Date(parts[0]);
+                task.tsk_estimated_duration = this.parseTime(parts[1]);
+                task.tsk_schedule_date_end = new Date(task.tsk_schedule_date_start.getTime() + task.tsk_estimated_duration * 60 * 1000);
+                parsed = true;
+            }
+
+            // start time and duration -> HH:mm + ##h##m
+            if (patternTimeDuration.test(expression) && !parsed){
+                parts = expression.split(' + ');
+                let min = parseInt(parts[0].split(':')[0]) * 60 + parseInt(parts[0].split(':')[1]);
+                task.tsk_schedule_date_start = new Date(this.dateOnly(new Date()).getTime() + (min * 60 * 1000));
+                task.tsk_estimated_duration = this.parseTime(parts[1]);
+                task.tsk_schedule_date_end = new Date(task.tsk_schedule_date_start.getTime() + task.tsk_estimated_duration * 60 * 1000);
+                parsed = true;
+            }
+
+            // start date and time and end time -> yyyy-MM-dd HH:mm - HH:mm
+            if (patternDateTimeEnd.test(expression) && !parsed){
+                parts = expression.split(' - ');
+                let dateOnly = parts[0].split(' ')[0];
+                task.tsk_schedule_date_start = new Date(parts[0]);
+                task.tsk_schedule_date_end = new Date(dateOnly + ' ' + parts[1]);
+                task.tsk_estimated_duration = this.elapsedTime(task.tsk_schedule_date_start,task.tsk_schedule_date_end) / 60;
+                parsed = true;
+            }
+
+            // start time and end time -> HH:mm - HH:mm
+            if (patternTimeEnd.test(expression) && !parsed){
+                parts = expression.split(' - ');
+                let min1 = parseInt(parts[0].split(':')[0]) * 60 + parseInt(parts[0].split(':')[1]);
+                let min2 = parseInt(parts[1].split(':')[0]) * 60 + parseInt(parts[1].split(':')[1]);
+                task.tsk_schedule_date_start = new Date(this.dateOnly(new Date()).getTime() + (min1 * 60 * 1000));
+                task.tsk_schedule_date_end = new Date(this.dateOnly(new Date()).getTime() + (min2 * 60 * 1000));
+                task.tsk_estimated_duration = this.elapsedTime(task.tsk_schedule_date_start,task.tsk_schedule_date_end) / 60;
+                parsed = true;
+            }
+
+            // start date and time -> yyyy-MM-dd HH:mm
+            if (patternDateTime.test(expression) && !parsed){
+                let dateParts = expression.substring(0,10).split('-');
+                task.tsk_schedule_date_start = new Date(expression);
+                parsed = true;
+            }
+
+            // time only -> HH:mm
+            if (patternTime.test(expression) && !parsed){
+                let min = parseInt(expression.split(':')[0]) * 60 + parseInt(expression.split(':')[1]);
+                task.tsk_schedule_date_start = new Date(this.dateOnly(new Date()).getTime() + (min * 60 * 1000));
+                parsed = true;
+            }
+
+        }
+
+        // detect estimated duration
         if (task.tsk_name.indexOf('%') !== -1 && task.tsk_name.indexOf('%%') === -1){
             let endPosition = task.tsk_name.indexOf(' ',task.tsk_name.indexOf('%')) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(' ',task.tsk_name.indexOf('%'));
             let duration = task.tsk_name.substring(task.tsk_name.indexOf('%') + 1,endPosition);
@@ -116,8 +190,8 @@ export class TasksCore {
             , 'tsk_qualifiers': ''
             , 'tsk_tags': task.tsk_tags || ''
             , 'tsk_estimated_duration': task.tsk_estimated_duration || 0
-            , 'tsk_schedule_date_start': <Date>undefined
-            , 'tsk_schedule_date_end': <Date>undefined
+            , 'tsk_schedule_date_start': task.tsk_schedule_date_start || <Date>undefined
+            , 'tsk_schedule_date_end': task.tsk_schedule_date_end || <Date>undefined
             , 'tsk_schedule_history': <any>[]
             , 'tsk_date_view_until': <Date>undefined
             , 'tsk_notifications': <any>[]
@@ -221,7 +295,7 @@ export class TasksCore {
         task.tsk_total_time_spent = sum;
     }
 
-    elapsedTime(date1: Date, date2: Date) :number{
+    elapsedTime(date1: Date, date2: Date) :number{ // return diff in seconds
         return Math.abs(date1.getTime() - date2.getTime()) / 1000;
     }
 
@@ -361,10 +435,10 @@ Milestone 1 (POC)
         '%#h#m'  -> ''
     - [ ] If the string '%%' is present, it should be replaced to '%' and the parsing of estimated time should not be done on that block
     - [ ] The estimated duration should be displayed alongside the time tracking in running state as '[##:##] / [##h##m]' (first block: time tracking, second: ETA)
-    - [ ] When a task has estimated duration 0 it should be displayed a message indicating this 'no ETA' alongside the task text
+    - [x] When a task has estimated duration 0 it should be displayed '0m' in red
     - [ ] In running state, if the elapsed time + total time spent is greater than the estimated duration, it must show a browser notification 'Estimated time exceeded ##h##m for task: [TASK]'
-    - [ ] Total time estimated should be displayed in 'Info' section, it will show two values: total ETA remaining (for OPEN tasks), total ETA today (for OPEN and CLOSED today tasks)
-    - [ ] Estimated duration can be edited after task is added, it is not saved unless it has a valid value in same format as when task creation
+    - [x] Total time estimated should be displayed in 'Info' section, it will show two values: total ETA remaining (for OPEN tasks), total ETA today (for OPEN and CLOSED today tasks)
+    - [x] Estimated duration can be edited after task is added, it is not saved unless it has a valid value in same format as when task creation, otherwise zero is set
     Backup & Restore
     - [ ] In the 'Options' section, a button 'Backup' and a button 'Restore' are shown
     - [ ] If user clicks 'Backup' the complete JSON of tasks should be copied to clipboard in stringified format, a message is shown below 'Backup copied to clipboard'
@@ -374,7 +448,18 @@ Milestone 1 (POC)
     - [x] If task has token '[DATETIME]' when adding, it should be replaced with today's date in format 'yyyy-MM-dd HH:mm:ss'
     Batch Add tasks
     - [x] If user press F2 when focused on task text input, it should toggle into a textarea, where the user could add multiple tasks, one per row, when added it should be trated each the same as individual input
-    - [x] After adding batch tasks
+    - [x] After adding batch tasks, textarea should hide and text input should be visible again
+    Parse Start Date and End Date
+    - [x] Start date should be parsed with this format: '[yyyy-MM-dd HH:mm]' if it lacks time data it should not be parsed
+    - [x] Start date and End date should be parsed with this format: '[yyyy-MM-dd HH:mm - HH:mm]' if it lacks time data it should not be parsed
+    - [x] Parsed dates must be persisted
+            Examples
+            datetime duration %[2016-12-18 18:29 + 2h30m]
+            time duration %[18:30 + 1h15m]
+            datetime end %[2016-12-18 18:29 - 19:12]
+            time end %[18:31 - 19:12]
+            datetime %[2016-12-18 18:29]
+            time %[11:21]
 
 Milestone 2 (MVP)
     Working on tasks
