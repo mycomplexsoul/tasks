@@ -23,6 +23,7 @@ import { TasksCore } from '../app/tasks.core';
             <button (click)="toggleViewFinishedToday()">{{viewFinishedToday ? 'hide': 'show'}} finished today</button>
             <button (click)="toggleViewBacklog()">{{viewBacklog ? 'hide': 'show'}} backlog</button>
             <button (click)="toggleViewAll()">{{viewAll ? 'hide': 'show'}} all</button>
+            <button (click)="toggleViewPostponed()" *ngIf="state.postponedTasksCount">{{viewPostponed ? 'hide': 'show'}} postponed</button>
             <button (click)="toggleViewOptions()">{{viewOptions ? 'hide': 'show'}} options</button>
         </form>
         <div *ngIf="viewOptions">
@@ -82,6 +83,16 @@ import { TasksCore } from '../app/tasks.core';
                 <span *ngIf="state.totalTimeEstimatedClosedToday"> | Closed Today ETA: {{formatTime(state.totalTimeEstimatedClosedToday * 60)}} | Open ETA: {{formatTime(state.totalTimeEstimatedOpen * 60)}}</span>
                 <br/>Time Spent Today: {{formatTime(state.totalTimeSpentToday)}}
                 <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> | Closed: {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} | Open {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}}</span>
+            </div>
+            <hr/>
+        </div>
+        <div id="postponedTaskList" *ngIf="viewPostponed">
+            <strong>Postponed Tasks</strong>
+            <div *ngFor="let item of state.postponedTasks">
+                - <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
+                <span>{{item.tsk_name}}</span>
+                <span>(postponed until {{item.tsk_date_view_until | date: 'yyyy-MM-dd HH:mm:ss'}})</span>
+                <button (click)="setSelected(item)">details</button>
             </div>
             <hr/>
         </div>
@@ -179,6 +190,7 @@ export class TasksComponent implements OnInit {
     public viewAll: boolean = false;
     public viewFinishedToday: boolean = false;
     public viewBacklog: boolean = false;
+    public viewPostponed: boolean = false;
     public viewOptions: boolean = false;
     public taskStatus = {
         'BACKLOG': 1,
@@ -231,11 +243,16 @@ export class TasksComponent implements OnInit {
             let res = new Date(a.tsk_date_done) > new Date(b.tsk_date_done);
             return res ? -1 : 1;
         };
+        let sortByDateUntilView = (a: any, b: any) => {
+            let res = new Date(a.tsk_date_until_view) > new Date(b.tsk_date_until_view);
+            return res ? -1 : 1;
+        };
         this.tasks = this.services.tasksCore.tasks();
         this.state.backlogTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.BACKLOG).sort(this.sortByGroup));
         this.state.openTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) < today : true)).sort(this.sortByGroup));
         this.state.closedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED).sort(sortByClosedDate);
         this.state.closedTodayTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED && new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) <= today).sort(sortByClosedDate);
+        this.state.postponedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) > today : false)).sort(this.sortByDateUntilView);
 
         // Estimated Total
         this.state.totalTimeEstimated = 0;
@@ -576,6 +593,10 @@ export class TasksComponent implements OnInit {
 
     toggleViewAll(){
         this.viewAll = !this.viewAll;
+    }
+
+    toggleViewPostponed(){
+        this.viewPostponed = !this.viewPostponed;
     }
 
     toggleViewOptions(){

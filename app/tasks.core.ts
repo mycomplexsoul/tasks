@@ -163,6 +163,15 @@ export class TasksCore {
             task.tsk_estimated_duration = parseInt(duration);
         }
 
+        // detect [OPEN] token, creates task as an OPEN task
+        if (task.tsk_name.indexOf('[OPEN]') !== -1){
+            task.tsk_name = task.tsk_name.replace('[OPEN] ','');
+            task.tsk_name = task.tsk_name.replace(' [OPEN]','');
+            task.tsk_name = task.tsk_name.replace('[OPEN]','');
+
+            task.tsk_ctg_status = 2 // OPEN
+        }
+
         T.push(this.newTaskTemplate(task));
         // console.log(T[T.length-1]);
         this.tasksToStorage();
