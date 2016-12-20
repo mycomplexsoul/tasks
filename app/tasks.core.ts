@@ -365,6 +365,86 @@ export class TasksCore {
         return parseInt(duration);
     }
 
+    parseDatetime(expression: string){
+        let parts = <any>[];
+        let parsed: boolean = false;
+        let s = {
+            date_start: <Date>null
+            , date_end: <Date>null
+            , duration: 0
+            , pattern: ''
+        };
+
+        let patternTime = /\d{2}/i;
+        let patternDateTime = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}/i;
+        let patternDateTimeEnd = /\d{4}-\d{2}-\d{2} \d{2}:\d{2} - \d{2}:\d{2}/i;
+        let patternDateTimeDuration = /\d{4}-\d{2}-\d{2} \d{2}:\d{2} \+ /i;
+        let patternTimeEnd = /\d{2}:\d{2} - \d{2}:\d{2}/i;
+        let patternTimeDuration = /\d{2}:\d{2} \+ /i;
+
+        // start date and time and duration -> yyyy-MM-dd HH:mm + ##h##m
+        if (patternDateTimeDuration.test(expression)){
+            parts = expression.split(' + ');
+            s.date_start = new Date(parts[0]);
+            s.duration = this.parseTime(parts[1]);
+            s.date_end = new Date(s.date_start.getTime() + s.duration * 60 * 1000);
+            parsed = true;
+            s.pattern = 'yyyy-MM-dd HH:mm + ##h##m';
+        }
+
+        // start time and duration -> HH:mm + ##h##m
+        if (patternTimeDuration.test(expression) && !parsed){
+            parts = expression.split(' + ');
+            let min = parseInt(parts[0].split(':')[0]) * 60 + parseInt(parts[0].split(':')[1]);
+            s.date_start = new Date(this.dateOnly(new Date()).getTime() + (min * 60 * 1000));
+            s.duration = this.parseTime(parts[1]);
+            s.date_end = new Date(s.date_start.getTime() + s.duration * 60 * 1000);
+            parsed = true;
+            s.pattern = 'HH:mm + ##h##m';
+        }
+
+        // start date and time and end time -> yyyy-MM-dd HH:mm - HH:mm
+        if (patternDateTimeEnd.test(expression) && !parsed){
+            parts = expression.split(' - ');
+            let dateOnly = parts[0].split(' ')[0];
+            s.date_start = new Date(parts[0]);
+            s.date_end = new Date(dateOnly + ' ' + parts[1]);
+            s.duration = this.elapsedTime(s.date_start,s.date_end) / 60;
+            parsed = true;
+            s.pattern = 'yyyy-MM-dd HH:mm - HH:mm';
+        }
+
+        // start time and end time -> HH:mm - HH:mm
+        if (patternTimeEnd.test(expression) && !parsed){
+            parts = expression.split(' - ');
+            let min1 = parseInt(parts[0].split(':')[0]) * 60 + parseInt(parts[0].split(':')[1]);
+            let min2 = parseInt(parts[1].split(':')[0]) * 60 + parseInt(parts[1].split(':')[1]);
+            s.date_start = new Date(this.dateOnly(new Date()).getTime() + (min1 * 60 * 1000));
+            s.date_end = new Date(this.dateOnly(new Date()).getTime() + (min2 * 60 * 1000));
+            s.duration = this.elapsedTime(s.date_start,s.date_end) / 60;
+            parsed = true;
+            s.pattern = 'HH:mm - HH:mm';
+        }
+
+        // start date and time -> yyyy-MM-dd HH:mm
+        if (patternDateTime.test(expression) && !parsed){
+            let dateParts = expression.substring(0,10).split('-');
+            s.date_start = new Date(expression);
+            parsed = true;
+            s.pattern = 'yyyy-MM-dd HH:mm';
+        }
+
+        // time only -> HH:mm
+        if (patternTime.test(expression) && !parsed){
+            let min = parseInt(expression.split(':')[0]) * 60 + parseInt(expression.split(':')[1]);
+            s.date_start = new Date(this.dateOnly(new Date()).getTime() + (min * 60 * 1000));
+            parsed = true;
+            s.pattern = 'HH:mm';
+        }
+
+        return s;
+    }
+
     /*
 Milestone 1 (POC)
     Basics (visual)
@@ -460,6 +540,15 @@ Milestone 1 (POC)
             time end %[18:31 - 19:12]
             datetime %[2016-12-18 18:29]
             time %[11:21]
+    Postpone Task Until certain date
+    - [x] When user edits task text and adds this text ' --pos X', on blur event this syntax is interpreted and must validate '--pos' part as a date until the task must be kept unseen from user
+    - [x] When interpreted, it should be removed from original text of the task
+    - [x] When the user postpones a task, it is not seen until the date X has passed
+        Examples
+        // --pos 17:30
+        // --pos now +2h30m
+        // --pos tomorrow 09:00
+        // --pos 2016-12-31 23:59
 
 Milestone 2 (MVP)
     Working on tasks

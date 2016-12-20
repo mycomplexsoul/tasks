@@ -52,6 +52,7 @@ import { TasksCore } from '../app/tasks.core';
             <hr/>
         </div>
         <div id="openTaskList">
+            <div *ngIf="!state.openTasks.length"><strong>No tasks open! Congratulations! Consider reviewing the backlog or add new tasks to do.</strong><hr/></div>
             <div *ngFor="let item of state.openTasks">
                 <div>
                     <strong>{{item.header}}</strong>
@@ -64,6 +65,7 @@ import { TasksCore } from '../app/tasks.core';
                     <span>{{(timers[t.tsk_id]) ? '[' + timers[t.tsk_id].timerString + ']' : ''}}</span>
                     <span contenteditable="true" (keyup)="taskEdit(t,$event)"
                         [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2)}"
+                        (blur)="commandOnTask(t,$event)"
                         class="editable">{{t.tsk_name}}</span>
                     <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
                         [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
@@ -74,10 +76,12 @@ import { TasksCore } from '../app/tasks.core';
                 </div>
             </div>
             <div id="Info">
-                Done Today: {{state.closedTodayTasks.length}} | Time Spent: {{formatTime(state.totalTimeSpentToday)}}
-                <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> => {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} (closed) + {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}} (open)</span>
-                <br/>Total Tasks: {{tasks.length}} | Open: {{state.openTasksCount}} | Backlog: {{state.backlogTasksCount}}
-                <br/>Total Time Estimated: {{formatTime(state.totalTimeEstimated * 60)}} | Open ETA: {{formatTime(state.totalTimeEstimatedOpen * 60)}} | Closed Today ETA: {{formatTime(state.totalTimeEstimatedClosedToday * 60)}}
+                Total Tasks: {{tasks.length}} | Backlog: {{state.backlogTasksCount}} | Closed Today: {{state.closedTodayTasks.length}} | Open: {{state.openTasksCount}}
+                <span *ngIf="state.postponedTasksCount"> | Postponed: {{state.postponedTasksCount}}</span>
+                <br/>Time Estimated Today: {{formatTime(state.totalTimeEstimated * 60)}}
+                <span *ngIf="state.totalTimeEstimatedClosedToday"> | Closed Today ETA: {{formatTime(state.totalTimeEstimatedClosedToday * 60)}} | Open ETA: {{formatTime(state.totalTimeEstimatedOpen * 60)}}</span>
+                <br/>Time Spent Today: {{formatTime(state.totalTimeSpentToday)}}
+                <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> | Closed: {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} | Open {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}}</span>
             </div>
             <hr/>
         </div>
@@ -131,6 +135,7 @@ import { TasksCore } from '../app/tasks.core';
             <div>Estimated Duration: {{state.selected.tsk_estimated_duration}}</div>
             <div>Schedule Date Start: {{state.selected.tsk_schedule_date_start}}</div>
             <div>Schedule Date End: {{state.selected.tsk_schedule_date_end}}</div>
+            <div>Date View Until: {{state.selected.tsk_date_view_until}}</div>
             <div>User Added: {{state.selected.tsk_id_user_added}}</div>
             <div>User Asigned: {{state.selected.tsk_id_user_asigned}}</div>
             <div>Date Add: {{state.selected.tsk_date_add | date: format}}</div>
@@ -210,11 +215,11 @@ export class TasksComponent implements OnInit {
                         'tsk_date_add': new Date(),
                         'tsk_name': text
                     });
-                    this.tasks = this.services.tasksCore.tasks();
-                    this.updateState();
-                    form.controls.tsk_multiple_name.reset();
-                    this.showBatchAdd = false;
                 });
+                this.tasks = this.services.tasksCore.tasks();
+                this.updateState();
+                form.controls.tsk_multiple_name.reset();
+                this.showBatchAdd = false;
             }
         }
     }
@@ -228,7 +233,7 @@ export class TasksComponent implements OnInit {
         };
         this.tasks = this.services.tasksCore.tasks();
         this.state.backlogTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.BACKLOG).sort(this.sortByGroup));
-        this.state.openTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN).sort(this.sortByGroup));
+        this.state.openTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) < today : true)).sort(this.sortByGroup));
         this.state.closedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED).sort(sortByClosedDate);
         this.state.closedTodayTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED && new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) <= today).sort(sortByClosedDate);
 
@@ -250,12 +255,15 @@ export class TasksComponent implements OnInit {
         this.state.openTasksCount = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN).length;
         this.state.backlogTasksCount = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.BACKLOG).length;
 
+        // Postponed tasks count
+        this.state.postponedTasksCount = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) > today : false)).length;
+
         setTimeout(() => this.showTimersOnLoad(), 100);
     }
 
     showTimersOnLoad(){
         this.tasks.filter(t => {
-            return t.tsk_ctg_status == this.taskStatus.OPEN && t.tsk_ctg_in_process === 2;
+            return t.tsk_ctg_status == this.taskStatus.OPEN && t.tsk_ctg_in_process === 2  && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) < new Date() : true);
         }).forEach(t => {
             if (!this.timers[t.tsk_id]){
                 this.showTimer(t,this.getTaskDOMElement(t.tsk_id));
@@ -556,9 +564,6 @@ export class TasksComponent implements OnInit {
                 }
             }, 100);
         }
-        if (event.ctrlKey && event.keyCode==13){ // detect Ctrl + Enter
-            this.addTask()
-        }
     }
 
     toggleViewFinishedToday(){
@@ -650,5 +655,27 @@ export class TasksComponent implements OnInit {
         }
     }
 
-    
+    commandOnTask(t: any, event: KeyboardEvent){
+        let command = event.target['textContent'];
+        let originalTask = '';
+        if (command.indexOf('--') !== -1){
+            command = command.substring(command.indexOf('--') + 2);
+            originalTask = t.tsk_name.replace(' --' + command,'');
+            console.log('command:',command);
+            if (command.startsWith('pos')){
+                // --pos 17:30
+                // --pos now +2h30m
+                // --pos tomorrow 09:00
+                // --pos 2016-12-31 23:59
+                let data = command.substring(4);
+                let s = this.services.tasksCore.parseDatetime(data);
+                console.log('date parsed:',s);
+                this.updateTask(t.tsk_id,{
+                    tsk_name: originalTask,
+                    tsk_date_view_until: s.date_start
+                });
+                this.updateState();
+            }
+        }
+    }
 }
