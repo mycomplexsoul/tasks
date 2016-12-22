@@ -558,6 +558,9 @@ Milestone 1 (POC)
         // --pos now +2h30m
         // --pos tomorrow 09:00
         // --pos 2016-12-31 23:59
+    Cancel tasks
+    - [x] User can cancel the task via a hotkey in edit mode via Ctrl + Supr
+    - [x] Upon cancellation, the task changes its status to CANCELLED and is removed from view
 
 Milestone 2 (MVP)
     Working on tasks

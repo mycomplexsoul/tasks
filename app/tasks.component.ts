@@ -52,6 +52,26 @@ import { TasksCore } from '../app/tasks.core';
             </div>
             <hr/>
         </div>
+        <div id="postponedTaskList" *ngIf="viewPostponed">
+            <strong>Postponed Tasks</strong>
+            <div *ngFor="let t of state.postponedTasks">
+                - <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
+                <span contenteditable="true" (keyup)="taskEdit(t,$event)"
+                    [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2)}"
+                    (blur)="commandOnTask(t,$event)"
+                    class="editable">{{t.tsk_name}}</span>
+                <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
+                    [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
+                    class="task-eta"
+                    >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
+                <span *ngIf="t.tsk_schedule_date_start">(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</span>
+                <span [ngClass]="taskAgeClass(t)">{{taskAge(t)}}</span>
+                <span>(postponed until {{t.tsk_date_view_until | date: 'yyyy-MM-dd HH:mm:ss'}})</span>
+                <button (click)="setSelected(t)">details</button>
+                <button (click)="setUnpostpone(t)">see it now</button>
+            </div>
+            <hr/>
+        </div>
         <div id="openTaskList">
             <div *ngIf="!state.openTasks.length"><strong>No tasks open! Congratulations! Consider reviewing the backlog or add new tasks to do.</strong><hr/></div>
             <div *ngFor="let item of state.openTasks">
@@ -86,16 +106,6 @@ import { TasksCore } from '../app/tasks.core';
             </div>
             <hr/>
         </div>
-        <div id="postponedTaskList" *ngIf="viewPostponed">
-            <strong>Postponed Tasks</strong>
-            <div *ngFor="let item of state.postponedTasks">
-                - <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
-                <span>{{item.tsk_name}}</span>
-                <span>(postponed until {{item.tsk_date_view_until | date: 'yyyy-MM-dd HH:mm:ss'}})</span>
-                <button (click)="setSelected(item)">details</button>
-            </div>
-            <hr/>
-        </div>
         <div id="taskDetails" *ngIf="state.selected">
             <button (click)="state.selected=null">hide</button>
             <br/>
@@ -114,7 +124,6 @@ import { TasksCore } from '../app/tasks.core';
                     <legend>Time History</legend>
                     <table>
                         <tr>
-                            <td>Id</td>
                             <td>Sequential</td>
                             <td>Name</td>
                             <td>Date Start</td>
@@ -126,7 +135,6 @@ import { TasksCore } from '../app/tasks.core';
                             <td>Actions</td>
                         </tr>
                         <tr *ngFor="let h of state.selected.tsk_time_history">
-                            <td>{{h.tsh_id}}</td>
                             <td>{{h.tsh_num_secuential}}</td>
                             <td>{{h.tsh_name}}</td>
                             <td><span contenteditable="true" (keyup)="editTimeTracking(h,1,$event)">{{h.tsh_date_start | date: format}}</span></td>
@@ -144,8 +152,8 @@ import { TasksCore } from '../app/tasks.core';
             <div>Qualifiers: {{state.selected.tsk_qualifiers}}</div>
             <div>Tags: {{state.selected.tsk_tags}}</div>
             <div>Estimated Duration: {{state.selected.tsk_estimated_duration}}</div>
-            <div>Schedule Date Start: {{state.selected.tsk_schedule_date_start}}</div>
-            <div>Schedule Date End: {{state.selected.tsk_schedule_date_end}}</div>
+            <div>Schedule Date Start: {{state.selected.tsk_schedule_date_start | date: format}}</div>
+            <div>Schedule Date End: {{state.selected.tsk_schedule_date_end | date: format}}</div>
             <div>Date View Until: {{state.selected.tsk_date_view_until}}</div>
             <div>User Added: {{state.selected.tsk_id_user_added}}</div>
             <div>User Asigned: {{state.selected.tsk_id_user_asigned}}</div>
@@ -195,13 +203,18 @@ export class TasksComponent implements OnInit {
     public taskStatus = {
         'BACKLOG': 1,
         'OPEN': 2,
-        'CLOSED': 3
+        'CLOSED': 3,
+        'CANCELLED': 4
     };
     public showBatchAdd: boolean = false;
+    public load: boolean = true;
 
     constructor(tasksCore: TasksCore, private rendered: Renderer){
         this.services.tasksCore = tasksCore;
         this.updateState();
+        this.notification({
+            body: 'Hello there!! you have ' + this.state.openTasksCount + ' tasks open'
+        });
     }
 
     ngOnInit(){
@@ -244,15 +257,15 @@ export class TasksComponent implements OnInit {
             return res ? -1 : 1;
         };
         let sortByDateUntilView = (a: any, b: any) => {
-            let res = new Date(a.tsk_date_until_view) > new Date(b.tsk_date_until_view);
-            return res ? -1 : 1;
+            let res = new Date(a.tsk_date_view_until) > new Date(b.tsk_date_view_until);
+            return res ? 1 : -1;
         };
         this.tasks = this.services.tasksCore.tasks();
         this.state.backlogTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.BACKLOG).sort(this.sortByGroup));
         this.state.openTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) < today : true)).sort(this.sortByGroup));
         this.state.closedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED).sort(sortByClosedDate);
         this.state.closedTodayTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED && new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) <= today).sort(sortByClosedDate);
-        this.state.postponedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) > today : false)).sort(this.sortByDateUntilView);
+        this.state.postponedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) > today : false)).sort(sortByDateUntilView);
 
         // Estimated Total
         this.state.totalTimeEstimated = 0;
@@ -275,7 +288,11 @@ export class TasksComponent implements OnInit {
         // Postponed tasks count
         this.state.postponedTasksCount = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) > today : false)).length;
 
-        setTimeout(() => this.showTimersOnLoad(), 100);
+        if (this.load){
+            this.load = false;
+            setTimeout(() => this.showTimersOnLoad(), 100);
+            this.scheduleNotificationsForStartingTasks();
+        }
     }
 
     showTimersOnLoad(){
@@ -339,6 +356,9 @@ export class TasksComponent implements OnInit {
         }
         if (event.altKey && event.keyCode==83){ // detect move down
             this.setSelected(t);
+        }
+        if (event.altKey && event.keyCode==46){ // detect supr (delete)
+            this.taskCancel(t);
         }
         if (t.tsk_name !== event.target['textContent']){
             this.updateTask(t.tsk_id,{
@@ -460,11 +480,18 @@ export class TasksComponent implements OnInit {
 
         let watch = setInterval(() => {
             this.timers[task.tsk_id].timerString = this.formatTime(++timer);
+            if (task.tsk_estimated_duration * 60 - 60 < timer && !this.timers[task.tsk_id].burnoutNotified){
+                this.timers[task.tsk_id].burnoutNotified = true;
+                this.notification({
+                    body: `Task "${task.tsk_name}" is about to exceed estimation!`
+                });
+            }
         }, 1000);
 
         this.timers[task.tsk_id] = {};
         this.timers[task.tsk_id].timerString = this.formatTime(timer);
         this.timers[task.tsk_id].watch = watch;
+        this.timers[task.tsk_id].burnoutNotified = false;
     }
 
     hideTimer(task: any, dom: HTMLElement){
@@ -698,5 +725,59 @@ export class TasksComponent implements OnInit {
                 this.updateState();
             }
         }
+    }
+
+    notification(data: any){
+        let not = window["Notification"];
+        if(not && not.permission !== "denied") {
+            not.requestPermission(function(status: string) {  // status is "granted", if accepted by user
+                var n = new not(data.title || 'Tasks', { 
+                    body: data.body,
+                    icon: data.icon || 'favicon.ico' // optional
+                }); 
+            });
+        }
+    }
+
+    setUnpostpone(t: any){
+        this.updateTask(t.tsk_id,{
+            tsk_date_view_until: new Date()
+        });
+        if (this.state.postponedTasks.length === 0){
+            this.viewPostponed = false;
+        }
+        this.updateState();
+    }
+
+    scheduleNotificationsForStartingTasks(){
+        let now = new Date();
+        let tomorrow0 = new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+        if (!this.state.startingTasksSchedule){
+            this.state.startingTasksSchedule = [];
+        }
+        this.tasks.filter((t) => {
+            return t.tsk_ctg_status !== this.taskStatus.CLOSED && (t.tsk_schedule_date_start ? now < new Date(t.tsk_schedule_date_start) && new Date(t.tsk_schedule_date_start) < tomorrow0 : false)
+        }).forEach((t) =>{
+            let diff = this.services.tasksCore.elapsedTime(now, new Date(t.tsk_schedule_date_start));
+            diff = diff - (5 * 60); // date minus 5 minutes
+            let timeout = setTimeout(() => {
+                this.notification({
+                    body: `Task "${t.tsk_name}" is about to start!`
+                });
+            }, diff * 1000);
+            console.log('schedule in ' + this.formatTime(diff),t);
+            this.state.startingTasksSchedule.push({
+                task: t,
+                timeoutHandler: timeout
+            });
+        });
+    }
+
+    taskCancel(t: any){
+        this.updateTask(t.tsk_id,{
+            tsk_ctg_status: this.taskStatus.CANCELLED
+        });
+        this.updateState();
+        console.log('cancelled task',t);
     }
 }
