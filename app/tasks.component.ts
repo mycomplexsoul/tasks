@@ -103,6 +103,7 @@ import { TasksCore } from '../app/tasks.core';
                 <span *ngIf="state.totalTimeEstimatedClosedToday"> | Closed Today ETA: {{formatTime(state.totalTimeEstimatedClosedToday * 60)}} | Open ETA: {{formatTime(state.totalTimeEstimatedOpen * 60)}}</span>
                 <br/>Time Spent Today: {{formatTime(state.totalTimeSpentToday)}}
                 <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> | Closed: {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} | Open {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}}</span>
+                <br/>Productivity Ratio <span [ngClass]="state.productivityRatio.className">{{state.productivityRatio.value}} / {{state.productivityRatio.message}}</span>
             </div>
             <hr/>
         </div>
@@ -242,9 +243,9 @@ export class TasksComponent implements OnInit {
                     });
                 });
                 this.tasks = this.services.tasksCore.tasks();
-                this.updateState();
                 form.controls.tsk_multiple_name.reset();
                 this.showBatchAdd = false;
+                setTimeout(() => this.updateState(), 100);
             }
         }
     }
@@ -287,6 +288,16 @@ export class TasksComponent implements OnInit {
 
         // Postponed tasks count
         this.state.postponedTasksCount = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) > today : false)).length;
+        this.state.productivityRatio = {};
+        this.state.productivityRatio.value = Math.round((this.state.totalTimeEstimatedClosedToday * 60 * 100) / this.state.totalTimeSpentToday) / 100;
+        if (this.state.productivityRatio.value >= 1){
+            this.state.productivityRatio.className = 'productivity-good';
+            this.state.productivityRatio.message = 'Good! keep going!';
+        } else {
+            this.state.productivityRatio.className = 'productivity-bad';
+            this.state.productivityRatio.message = 'Come on! you can do it!';
+        }
+        
 
         if (this.load){
             this.load = false;

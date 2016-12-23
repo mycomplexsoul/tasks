@@ -200,3 +200,11 @@ textarea.task-multiple {
 .task-age-10 {
   color: red;
 }
+
+.productivity-good{
+  color: green;
+}
+
+.productivity-bad{
+  color: brown;
+}

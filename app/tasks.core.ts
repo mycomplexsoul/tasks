@@ -487,13 +487,13 @@ Milestone 1 (POC)
     - [+] Time tracking item that is currently running can be edited (start timestamp only) and the running timer must be adjusted
     - [+] Click on checkbox in a running task -> stops timer (persisting that data), mark task as done and updates the finished date
     Finished Today
-    - [+] Add a 'View Finished' button, that toggles display of the 'Today' section
+    - [x] Add a 'View Finished' button, that toggles display of the 'Today' section
     - [x] Add an 'Info' section, it must contain: Total tasks done today, total time spent (even in tasks not finished yet)
-    - [+] Display a list of done tasks today, each task must be striked and has a checkbox marked indicating task is done, total time spent must be shown
-    - [+] When the checkbox is clicked, the task is marked as not done and moved to open tasks
+    - [x] Display a list of done tasks today, each task must be striked and has a checkbox marked indicating task is done, total time spent must be shown
+    - [x] When the checkbox is clicked, the task is marked as not done and moved to open tasks
     - [ ] User can edit task finished date, data is persisted automatically when a valid date is captured
     Utilitary Information
-    - [ ] Add an 'Information' section, it must contain: Total tasks, pending
+    - [x] Add an 'Information' section, it must contain: Total tasks, pending
     - [ ] If task has more than 3 days of creation, show a section at the end with the legend 'XX days old' and colored depending on days old: =0 -> green (legend changes for 'today'), <3 -> black, <5 -> brown, <10 -> red
     View All
     - [+] Add a 'View All' button, that toggles display of the 'Reports' section
@@ -509,8 +509,8 @@ Milestone 1 (POC)
     - [x] Each task in BACKLOG state will have a button 'Move to Open', clicking this button will change state of the task to OPEN
     - [x] In the 'Info' Section will appear a backlog task counter
     Parsing Estimated Duration of Task from task text
-    - [+] If task contains '%', the text between '%' and ' ' or end of text should be interpreted as the estimated duration of the task in the notation %#h##m
-    - [+] The notation %#h#m could be any of the following cases: (# = any number of any digits)
+    - [x] If task contains '%', the text between '%' and ' ' or end of text should be interpreted as the estimated duration of the task in the notation %#h##m
+    - [x] The notation %#h#m could be any of the following cases: (# = any number of any digits)
         %#   | %5    -> interpreted as minutes
         %#m  | %27m  -> interpreted as minutes
         %#h  | %2h   -> interpreted as hours
@@ -518,16 +518,16 @@ Milestone 1 (POC)
         %#h#m| %2h23m-> interpreted as hours (#h) and add the following as minutes (#m)
         %#h# | %1:15 -> interpreted as hours (#:) and add the following as minutes (#)
         %#h#m| %2:23m-> interpreted as hours (#:) and add the following as minutes (#m)
-    - [+] After the estimated duration has been extracted, it should be replaced in the task text as any of the following cases:
+    - [x] After the estimated duration has been extracted, it should be replaced in the task text as any of the following cases:
         '%#h#m ' -> ''
         ' %#h#m' -> ''
         '%#h#m'  -> ''
     - [ ] If the string '%%' is present, it should be replaced to '%' and the parsing of estimated time should not be done on that block
-    - [ ] The estimated duration should be displayed alongside the time tracking in running state as '[##:##] / [##h##m]' (first block: time tracking, second: ETA)
     - [x] When a task has estimated duration 0 it should be displayed '0m' in red
     - [ ] In running state, if the elapsed time + total time spent is greater than the estimated duration, it must show a browser notification 'Estimated time exceeded ##h##m for task: [TASK]'
     - [x] Total time estimated should be displayed in 'Info' section, it will show two values: total ETA remaining (for OPEN tasks), total ETA today (for OPEN and CLOSED today tasks)
     - [x] Estimated duration can be edited after task is added, it is not saved unless it has a valid value in same format as when task creation, otherwise zero is set
+    - [x] Having total ETA for open tasks (sumETA) and total time spent on tasks today (sumSpent), show a ratio of the two (sumETA/sumSpent) with label "Productivity Ratio", where value < 1 is bad, > 1 is good, show colors
     Backup & Restore
     - [ ] In the 'Options' section, a button 'Backup' and a button 'Restore' are shown
     - [ ] If user clicks 'Backup' the complete JSON of tasks should be copied to clipboard in stringified format, a message is shown below 'Backup copied to clipboard'
