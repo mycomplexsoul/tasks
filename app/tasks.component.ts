@@ -289,13 +289,19 @@ export class TasksComponent implements OnInit {
         // Postponed tasks count
         this.state.postponedTasksCount = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) > today : false)).length;
         this.state.productivityRatio = {};
-        this.state.productivityRatio.value = Math.round((this.state.totalTimeEstimatedClosedToday * 60 * 100) / this.state.totalTimeSpentToday) / 100;
-        if (this.state.productivityRatio.value >= 1){
-            this.state.productivityRatio.className = 'productivity-good';
-            this.state.productivityRatio.message = 'Good! keep going!';
+        if (this.state.totalTimeSpentToday !== 0){
+            this.state.productivityRatio.value = Math.round((this.state.totalTimeEstimatedClosedToday * 60 * 100) / this.state.totalTimeSpentToday) / 100;
+            if (this.state.productivityRatio.value >= 1){
+                this.state.productivityRatio.className = 'productivity-good';
+                this.state.productivityRatio.message = 'Good! keep going!';
+            } else {
+                this.state.productivityRatio.className = 'productivity-bad';
+                this.state.productivityRatio.message = 'Come on! you can do it!';
+            }
         } else {
-            this.state.productivityRatio.className = 'productivity-bad';
-            this.state.productivityRatio.message = 'Come on! you can do it!';
+            this.state.productivityRatio.value = 0;
+            this.state.productivityRatio.className = 'productivity-good';
+            this.state.productivityRatio.message = "Let's begin!";
         }
         
 
