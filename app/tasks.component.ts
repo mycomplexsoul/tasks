@@ -185,6 +185,15 @@ import { TasksCore } from '../app/tasks.core';
             </div>
             <hr/>
         </div>
+        <div>
+            <div *ngFor="let s of reports.week">
+                date: {{s.date | date: 'yyyy-MM-dd'}}
+                tasks done: {{s.tasksDone}}
+                estimated: {{formatTime(s.estimated * 60)}}
+                spent: {{formatTime(s.timeSpent)}}
+                Productivity: {{s.productivity}}
+            </div>
+        </div>
         `,
     providers: [TasksCore]
 })
@@ -209,6 +218,7 @@ export class TasksComponent implements OnInit {
     };
     public showBatchAdd: boolean = false;
     public load: boolean = true;
+    public reports: any = {};
 
     constructor(tasksCore: TasksCore, private rendered: Renderer){
         this.services.tasksCore = tasksCore;
@@ -303,7 +313,7 @@ export class TasksComponent implements OnInit {
             this.state.productivityRatio.className = 'productivity-good';
             this.state.productivityRatio.message = "Let's begin!";
         }
-        
+        // this.weekStats();
 
         if (this.load){
             this.load = false;
@@ -796,5 +806,52 @@ export class TasksComponent implements OnInit {
         });
         this.updateState();
         console.log('cancelled task',t);
+    }
+
+    weekStats(){
+        let mondayDate = this.lastMonday(new Date(2016,11,1));
+        let dayTasks = <any>[];
+        let currentDay = mondayDate;
+        let tomorrow = this.addDays(currentDay,1);
+        let today = this.services.tasksCore.dateOnly(new Date());
+        let dailyCount = <any>[];
+        let estimatedTotalPerDay = 0;
+        let spentTotalPerDay = 0;
+
+        while(currentDay <= today){
+            dayTasks = this.tasks.filter(t => new Date(t.tsk_date_done) > currentDay && new Date(t.tsk_date_done) < tomorrow);
+            estimatedTotalPerDay = 0;
+            spentTotalPerDay = 0;
+
+            dayTasks.forEach((t: any) => {
+                estimatedTotalPerDay += t.tsk_estimated_duration;
+                spentTotalPerDay += t.tsk_total_time_spent;
+            });
+
+            dailyCount.push({
+                date: currentDay
+                , tasksDone: dayTasks.length
+                , estimated: estimatedTotalPerDay
+                , timeSpent: spentTotalPerDay
+                , productivity: spentTotalPerDay === 0 ? 0 : Math.round((estimatedTotalPerDay * 60 * 100) / spentTotalPerDay) / 100
+            });
+
+            currentDay = this.addDays(currentDay,1);
+            tomorrow = this.addDays(currentDay,1);
+        }
+
+        this.reports.week = dailyCount;
+    }
+
+    lastMonday(from: Date){
+        let base: Date = this.services.tasksCore.dateOnly(from);
+        while (base.getDay() !== 1){
+            base = this.addDays(base,-1);
+        }
+        return base;
+    }
+
+    addDays(base: Date, days: number){
+        return new Date(( base.getTime() + (days * 86400000) ));
     }
 }
