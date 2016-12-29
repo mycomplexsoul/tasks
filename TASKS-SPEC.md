@@ -106,6 +106,11 @@ Milestone 1 (POC)
     Cancel tasks
     - [x] User can cancel the task via a hotkey in edit mode via Ctrl + Supr
     - [x] Upon cancellation, the task changes its status to CANCELLED and is removed from view
+    Qualifiers
+    - [x] Qualifiers should be parsed from task text with syntax "$[starred,important,urgent]"
+    - [x] Parsing is optional and if present it should be trimmed from task text
+    - [x] Qualifiers must be persisted along the task
+    - [x] Qualifiers can be edited in the task details' view
 
 Milestone 2 (MVP)
     Working on tasks

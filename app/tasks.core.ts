@@ -172,6 +172,18 @@ export class TasksCore {
             task.tsk_ctg_status = 2 // OPEN
         }
 
+        // detects $[] qualifiers
+        if (task.tsk_name.indexOf('$[') !== -1){
+            let endPosition = task.tsk_name.indexOf(']',task.tsk_name.indexOf('$[')) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(']',task.tsk_name.indexOf('$['));
+            let expression = task.tsk_name.substring(task.tsk_name.indexOf('$[') + 2,endPosition);
+
+            task.tsk_name = task.tsk_name.replace('$[' + expression + '] ','');
+            task.tsk_name = task.tsk_name.replace(' $[' + expression + ']','');
+            task.tsk_name = task.tsk_name.replace('$[' + expression + ']','');
+
+            task.tsk_qualifiers = expression;
+        }
+
         T.push(this.newTaskTemplate(task));
         // console.log(T[T.length-1]);
         this.tasksToStorage();
@@ -196,7 +208,7 @@ export class TasksCore {
             , 'tsk_total_time_spent': 0
             , 'tsk_time_history': task.tsk_time_history || <any>[]
             , 'tsk_ctg_in_process': 1
-            , 'tsk_qualifiers': ''
+            , 'tsk_qualifiers': task.tsk_qualifiers || ''
             , 'tsk_tags': task.tsk_tags || ''
             , 'tsk_estimated_duration': task.tsk_estimated_duration || 0
             , 'tsk_schedule_date_start': task.tsk_schedule_date_start || <Date>undefined

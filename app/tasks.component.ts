@@ -41,6 +41,7 @@ import { TasksCore } from '../app/tasks.core';
                 <div *ngFor="let t of item.tasks" data-id="{{t.tsk_id}}">
                     - <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
                     <span contenteditable="true" (keyup)="taskEdit(t,$event)"
+                        [ngClass]="{'task-important': (t.tsk_qualifiers.indexOf('important') !== -1)}"
                         class="editable">{{t.tsk_name}}</span>
                     <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
                         [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
@@ -58,7 +59,7 @@ import { TasksCore } from '../app/tasks.core';
             <div *ngFor="let t of state.postponedTasks">
                 - <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
                 <span contenteditable="true" (keyup)="taskEdit(t,$event)"
-                    [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2)}"
+                    [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1)}"
                     (blur)="commandOnTask(t,$event)"
                     class="editable">{{t.tsk_name}}</span>
                 <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
@@ -86,7 +87,7 @@ import { TasksCore } from '../app/tasks.core';
                     <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
                     <span>{{(timers[t.tsk_id]) ? '[' + timers[t.tsk_id].timerString + ']' : ''}}</span>
                     <span contenteditable="true" (keyup)="taskEdit(t,$event)"
-                        [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2)}"
+                        [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1)}"
                         (blur)="commandOnTask(t,$event)"
                         class="editable">{{t.tsk_name}}</span>
                     <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
@@ -151,7 +152,7 @@ import { TasksCore } from '../app/tasks.core';
                 </fieldset>
             </div>
             <div>In Progress: {{state.selected.tsk_ctg_in_process}}</div>
-            <div>Qualifiers: {{state.selected.tsk_qualifiers}}</div>
+            <div>Qualifiers: <span contenteditable="true" (blur)="taskQualifiersEdit(state.selected,$event)">{{state.selected.tsk_qualifiers}}</span></div>
             <div>Tags: {{state.selected.tsk_tags}}</div>
             <div>Estimated Duration: {{state.selected.tsk_estimated_duration}}</div>
             <div>Schedule Date Start: {{state.selected.tsk_schedule_date_start | date: format}}</div>
@@ -861,5 +862,16 @@ export class TasksComponent implements OnInit {
 
     addDays(base: Date, days: number){
         return new Date(( base.getTime() + (days * 86400000) ));
+    }
+
+    taskQualifiersEdit(task: any, event: KeyboardEvent){
+        let newQualifiers = event.target['textContent'];
+
+        if (task.tsk_qualifiers !== newQualifiers){
+            this.updateTask(task.tsk_id,{
+                tsk_qualifiers: newQualifiers
+            });
+            // this.updateState();
+        }
     }
 }

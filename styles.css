@@ -208,3 +208,6 @@ textarea.task-multiple {
 .productivity-bad{
   color: brown;
 }
+.task-important{
+  font-weight: bold;
+}
