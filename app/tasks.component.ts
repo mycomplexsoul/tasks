@@ -24,6 +24,7 @@ import { TasksCore } from '../app/tasks.core';
             <button (click)="toggleViewBacklog()">{{viewBacklog ? 'hide': 'show'}} backlog</button>
             <button (click)="toggleViewAll()">{{viewAll ? 'hide': 'show'}} all</button>
             <button (click)="toggleViewPostponed()" *ngIf="state.postponedTasksCount">{{viewPostponed ? 'hide': 'show'}} postponed</button>
+            <button (click)="toggleViewReportsWeek()">{{viewReportsWeek ? 'hide': 'show'}} reports week</button>
             <button (click)="toggleViewOptions()">{{viewOptions ? 'hide': 'show'}} options</button>
         </form>
         <div *ngIf="viewOptions">
@@ -185,7 +186,7 @@ import { TasksCore } from '../app/tasks.core';
             </div>
             <hr/>
         </div>
-        <div>
+        <div *ngIf="viewReportsWeek">
             <div *ngFor="let s of reports.week">
                 date: {{s.date | date: 'yyyy-MM-dd'}}
                 tasks done: {{s.tasksDone}}
@@ -209,6 +210,7 @@ export class TasksComponent implements OnInit {
     public viewFinishedToday: boolean = false;
     public viewBacklog: boolean = false;
     public viewPostponed: boolean = false;
+    public viewReportsWeek: boolean = false;
     public viewOptions: boolean = false;
     public taskStatus = {
         'BACKLOG': 1,
@@ -313,7 +315,7 @@ export class TasksComponent implements OnInit {
             this.state.productivityRatio.className = 'productivity-good';
             this.state.productivityRatio.message = "Let's begin!";
         }
-        // this.weekStats();
+        this.weekStats();
 
         if (this.load){
             this.load = false;
@@ -649,6 +651,10 @@ export class TasksComponent implements OnInit {
         this.viewAll = !this.viewAll;
     }
 
+    toggleViewReportsWeek(){
+        this.viewReportsWeek = !this.viewReportsWeek;
+    }
+
     toggleViewPostponed(){
         this.viewPostponed = !this.viewPostponed;
     }
@@ -809,7 +815,7 @@ export class TasksComponent implements OnInit {
     }
 
     weekStats(){
-        let mondayDate = this.lastMonday(new Date(2016,11,1));
+        let mondayDate = this.lastMonday(new Date(2016,11,15));
         let dayTasks = <any>[];
         let currentDay = mondayDate;
         let tomorrow = this.addDays(currentDay,1);
@@ -828,13 +834,15 @@ export class TasksComponent implements OnInit {
                 spentTotalPerDay += t.tsk_total_time_spent;
             });
 
-            dailyCount.push({
-                date: currentDay
-                , tasksDone: dayTasks.length
-                , estimated: estimatedTotalPerDay
-                , timeSpent: spentTotalPerDay
-                , productivity: spentTotalPerDay === 0 ? 0 : Math.round((estimatedTotalPerDay * 60 * 100) / spentTotalPerDay) / 100
-            });
+            if (spentTotalPerDay !== 0){
+                dailyCount.push({
+                    date: currentDay
+                    , tasksDone: dayTasks.length
+                    , estimated: estimatedTotalPerDay
+                    , timeSpent: spentTotalPerDay
+                    , productivity: spentTotalPerDay === 0 ? 0 : Math.round((estimatedTotalPerDay * 60 * 100) / spentTotalPerDay) / 100
+                });
+            }
 
             currentDay = this.addDays(currentDay,1);
             tomorrow = this.addDays(currentDay,1);
