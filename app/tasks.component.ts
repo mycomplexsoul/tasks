@@ -105,6 +105,7 @@ import { TasksCore } from '../app/tasks.core';
                 <span *ngIf="state.totalTimeEstimatedClosedToday"> | Closed Today ETA: {{formatTime(state.totalTimeEstimatedClosedToday * 60)}} | Open ETA: {{formatTime(state.totalTimeEstimatedOpen * 60)}}</span>
                 <br/>Time Spent Today: {{formatTime(state.totalTimeSpentToday)}}
                 <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> | Closed: {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} | Open {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}}</span>
+                <br/>Real Time Elapsed: {{formatTime(state.realTimeElapsed)}} (day started at {{state.dayStartedAtDate | date: format}})
                 <br/>Productivity Ratio <span [ngClass]="state.productivityRatio.className">{{state.productivityRatio.value}} / {{state.productivityRatio.message}}</span>
             </div>
             <hr/>
@@ -194,6 +195,7 @@ import { TasksCore } from '../app/tasks.core';
                 estimated: {{formatTime(s.estimated * 60)}}
                 spent: {{formatTime(s.timeSpent)}}
                 Productivity: {{s.productivity}}
+                Real Time Elapsed: {{formatTime(s.realTimeElapsed)}}
             </div>
         </div>
         `,
@@ -316,6 +318,9 @@ export class TasksComponent implements OnInit {
             this.state.productivityRatio.className = 'productivity-good';
             this.state.productivityRatio.message = "Let's begin!";
         }
+
+        this.state.realTimeElapsed = this.elapsedTime(this.firstTTEntryFromDay(today0),this.lastTTEntryFromDay(today0));
+        this.state.dayStartedAtDate = this.firstTTEntryFromDay(today0);
         this.weekStats();
 
         if (this.load){
@@ -842,6 +847,7 @@ export class TasksComponent implements OnInit {
                     , estimated: estimatedTotalPerDay
                     , timeSpent: spentTotalPerDay
                     , productivity: spentTotalPerDay === 0 ? 0 : Math.round((estimatedTotalPerDay * 60 * 100) / spentTotalPerDay) / 100
+                    , realTimeElapsed: this.elapsedTime(this.firstTTEntryFromDay(currentDay),this.lastTTEntryFromDay(currentDay))
                 });
             }
 
@@ -873,5 +879,49 @@ export class TasksComponent implements OnInit {
             });
             // this.updateState();
         }
+    }
+
+    firstTTEntryFromDay(date: Date){
+        let day0 = this.services.tasksCore.dateOnly(date);
+        let nextDay0 = this.addDays(day0,1);
+        let firstDate: Date = nextDay0;
+        let tasksOfTheDay = this.tasks.filter((t: any) => {
+            return new Date(t.tsk_date_done) >= day0 && new Date(t.tsk_date_done) < nextDay0;
+        });
+        tasksOfTheDay.forEach((t: any) => {
+            if (t.tsk_time_history.length){
+                t.tsk_time_history.forEach((h: any) => {
+                    if (new Date(h.tsh_date_start) < firstDate && day0 < new Date(h.tsh_date_start)){
+                        firstDate = new Date(h.tsh_date_start);
+                    }
+                });
+            }
+        });
+        if (firstDate === nextDay0){
+            return null;
+        }
+        return firstDate;
+    }
+
+    lastTTEntryFromDay(date: Date){
+        let day0 = this.services.tasksCore.dateOnly(date);
+        let nextDay0 = this.addDays(day0,1);
+        let lastDate: Date = day0;
+        let tasksOfTheDay = this.tasks.filter((t: any) => {
+            return new Date(t.tsk_date_done) >= day0 && new Date(t.tsk_date_done) < nextDay0;
+        });
+        tasksOfTheDay.forEach((t: any) => {
+            if (t.tsk_time_history.length){
+                t.tsk_time_history.forEach((h: any) => {
+                    if (new Date(h.tsh_date_end) > lastDate && new Date(h.tsh_date_end) < nextDay0){
+                        lastDate = new Date(h.tsh_date_end);
+                    }
+                });
+            }
+        });
+        if (lastDate === day0){
+            return null;
+        }
+        return lastDate;
     }
 }
