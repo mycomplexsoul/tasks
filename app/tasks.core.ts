@@ -207,18 +207,18 @@ export class TasksCore {
             , 'tsk_date_done': <Date>undefined
             , 'tsk_total_time_spent': 0
             , 'tsk_time_history': task.tsk_time_history || <any>[]
-            , 'tsk_ctg_in_process': 1
+            , 'tsk_ctg_in_process': task.tsk_ctg_in_process || 1
             , 'tsk_qualifiers': task.tsk_qualifiers || ''
             , 'tsk_tags': task.tsk_tags || ''
             , 'tsk_estimated_duration': task.tsk_estimated_duration || 0
             , 'tsk_schedule_date_start': task.tsk_schedule_date_start || <Date>undefined
             , 'tsk_schedule_date_end': task.tsk_schedule_date_end || <Date>undefined
             , 'tsk_schedule_history': <any>[]
-            , 'tsk_date_view_until': <Date>undefined
+            , 'tsk_date_view_until': task.tsk_date_view_until || <Date>undefined
             , 'tsk_notifications': <any>[]
             , 'tsk_id_user_added': task.tsk_id_user_added || this.data.user
             , 'tsk_id_user_asigned': task.tsk_id_user_asigned || this.data.user
-            , 'tsk_date_add': new Date()
+            , 'tsk_date_add': task.tsk_date_add || new Date()
             , 'tsk_date_mod': new Date()
             , 'tsk_ctg_status': task.tsk_ctg_status || 1
         }
