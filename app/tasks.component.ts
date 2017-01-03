@@ -105,8 +105,9 @@ import { TasksCore } from '../app/tasks.core';
                 <span *ngIf="state.totalTimeEstimatedClosedToday"> | Closed Today ETA: {{formatTime(state.totalTimeEstimatedClosedToday * 60)}} | Open ETA: {{formatTime(state.totalTimeEstimatedOpen * 60)}}</span>
                 <br/>Time Spent Today: {{formatTime(state.totalTimeSpentToday)}}
                 <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> | Closed: {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} | Open {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}}</span>
-                <br/>Real Time Elapsed: {{formatTime(state.realTimeElapsed)}} (day started at {{state.dayStartedAtDate | date: format}})
-                <br/>Productivity Ratio <span [ngClass]="state.productivityRatio.className">{{state.productivityRatio.value}} / {{state.productivityRatio.message}}</span>
+                <span *ngIf="state.dayStartedAtDate"><br/>Real Time Elapsed: {{formatTime(state.realTimeElapsed)}} (day started at {{state.dayStartedAtDate | date: format}})</span>
+                <br/>Productivity Ratio: <span [ngClass]="state.productivityRatio.className">{{state.productivityRatio.value}} / {{state.productivityRatio.message}}</span>
+                <br/>Karma Score: <span>{{state.karmaScore}} ({{state.karmaCount}} / {{state.closedTodayTasks.length}})</span>
             </div>
             <hr/>
         </div>
@@ -319,8 +320,22 @@ export class TasksComponent implements OnInit {
             this.state.productivityRatio.message = "Let's begin!";
         }
 
-        this.state.realTimeElapsed = this.elapsedTime(this.firstTTEntryFromDay(today0),this.lastTTEntryFromDay(today0));
+        // Indicators
         this.state.dayStartedAtDate = this.firstTTEntryFromDay(today0);
+        if(this.state.dayStartedAtDate){
+            this.state.realTimeElapsed = this.elapsedTime(this.firstTTEntryFromDay(today0),this.lastTTEntryFromDay(today0));
+        }
+        this.state.karmaCount = 0;
+        this.state.karmaScore = 0;
+        this.state.closedTodayTasks.forEach((t: any) => {
+            let onTime = t.tsk_total_time_spent < (t.tsk_estimated_duration * 60);
+            this.state.karmaCount += onTime ? 1 : 0;
+        });
+        if (this.state.closedTodayTasks.length){
+            this.state.karmaScore = Math.round(this.state.karmaCount * 100 / this.state.closedTodayTasks.length) / 100;
+        }
+
+        // reporting
         this.weekStats();
 
         if (this.load){
