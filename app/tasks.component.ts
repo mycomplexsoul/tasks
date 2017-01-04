@@ -410,6 +410,9 @@ export class TasksComponent implements OnInit {
         if (event.altKey && event.keyCode==46){ // detect supr (delete)
             this.taskCancel(t);
         }
+        if (event.altKey && event.keyCode==66){ // detect 'b'
+            this.taskToBacklog(t);
+        }
         if (t.tsk_name !== event.target['textContent']){
             this.updateTask(t.tsk_id,{
                 tsk_name: event.target['textContent']
@@ -938,5 +941,12 @@ export class TasksComponent implements OnInit {
             return null;
         }
         return lastDate;
+    }
+
+    taskToBacklog(t: any){
+        this.updateTask(t.tsk_id,{
+            tsk_ctg_status: this.taskStatus.BACKLOG
+        });
+        this.updateState();
     }
 }
