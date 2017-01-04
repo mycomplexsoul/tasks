@@ -73,10 +73,10 @@ Milestone 1 (POC)
     - [x] Total time estimated should be displayed in 'Info' section, it will show two values: total ETA remaining (for OPEN tasks), total ETA today (for OPEN and CLOSED today tasks)
     - [x] Estimated duration can be edited after task is added, it is not saved unless it has a valid value in same format as when task creation, otherwise zero is set
     - [x] Having total ETA for open tasks (sumETA) and total time spent on tasks today (sumSpent), show a ratio of the two (sumETA/sumSpent) with label "Productivity Ratio", where value < 1 is bad, > 1 is good, show colors
-    Backup & Restore
-    - [ ] In the 'Options' section, a button 'Backup' and a button 'Restore' are shown
-    - [ ] If user clicks 'Backup' the complete JSON of tasks should be copied to clipboard in stringified format, a message is shown below 'Backup copied to clipboard'
-    - [ ] If user clicks 'Restore' it will try to get clipboard data, parse it as JSON, get tasks and add them to existent ones, and save to storage, a message is shown below 'Added tasks from restore process'
+    Backup & Import
+    - [ ] In the 'Options' section, a button 'Backup' and a button 'Import' are shown
+    - [ ] If user clicks 'Backup' the complete JSON of tasks should be copied to clipboard in stringified format, a message is shown below the button 'Backup copied to clipboard'
+    - [ ] If user clicks 'Import' it will try to get clipboard data, parse it as JSON, get tasks and add them to existent ones, and save to storage, a message is shown below the button 'Added tasks from import process successfully'
     Parse special tokens
     - [x] If task has token '[DATE]' when adding, it should be replaced with today's date in format 'yyyy-MM-dd'
     - [x] If task has token '[DATETIME]' when adding, it should be replaced with today's date in format 'yyyy-MM-dd HH:mm:ss'
@@ -111,7 +111,7 @@ Milestone 1 (POC)
     - [x] Parsing is optional and if present it should be trimmed from task text
     - [x] Qualifiers must be persisted along the task
     - [x] Qualifiers can be edited in the task details' view
-
+        
 Milestone 2 (MVP)
     Working on tasks
     - [ ] Task UI capture should parse these schemes on capture (and must persist values):

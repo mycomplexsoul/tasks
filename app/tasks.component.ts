@@ -106,6 +106,7 @@ import { TasksCore } from '../app/tasks.core';
                 <br/>Time Spent Today: {{formatTime(state.totalTimeSpentToday)}}
                 <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> | Closed: {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} | Open {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}}</span>
                 <span *ngIf="state.dayStartedAtDate"><br/>Real Time Elapsed: {{formatTime(state.realTimeElapsed)}} (day started at {{state.dayStartedAtDate | date: format}})</span>
+                <br/>Time Management Ratio: <span>{{state.timeManagementRatio}}</span>
                 <br/>Productivity Ratio: <span [ngClass]="state.productivityRatio.className">{{state.productivityRatio.value}} / {{state.productivityRatio.message}}</span>
                 <br/>Karma Score: <span>{{state.karmaScore}} ({{state.karmaCount}} / {{state.closedTodayTasks.length}})</span>
             </div>
@@ -333,6 +334,10 @@ export class TasksComponent implements OnInit {
         });
         if (this.state.closedTodayTasks.length){
             this.state.karmaScore = Math.round(this.state.karmaCount * 100 / this.state.closedTodayTasks.length) / 100;
+        }
+        this.state.timeManagementRatio = 0;
+        if (this.state.realTimeElapsed){
+            this.state.timeManagementRatio = Math.round(this.state.totalTimeSpentToday * 100 / this.state.realTimeElapsed) / 100;
         }
 
         // reporting
