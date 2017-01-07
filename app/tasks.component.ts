@@ -25,6 +25,7 @@ import { TasksCore } from '../app/tasks.core';
             <button (click)="toggleViewAll()">{{viewAll ? 'hide': 'show'}} all</button>
             <button (click)="toggleViewPostponed()" *ngIf="state.postponedTasksCount">{{viewPostponed ? 'hide': 'show'}} postponed</button>
             <button (click)="toggleViewReportsWeek()">{{viewReportsWeek ? 'hide': 'show'}} reports week</button>
+            <button (click)="toggleViewReportsDayDistribution()">{{viewReportsDayDistribution ? 'hide': 'show'}} reports day distribution</button>
             <button (click)="toggleViewOptions()">{{viewOptions ? 'hide': 'show'}} options</button>
         </form>
         <div *ngIf="viewOptions">
@@ -200,6 +201,24 @@ import { TasksCore } from '../app/tasks.core';
                 Real Time Elapsed: {{formatTime(s.realTimeElapsed)}}
             </div>
         </div>
+        <div *ngIf="viewReportsDayDistribution">
+            <table>
+                <tr>
+                    <td>Record</td>
+                    <td>Total ETA</td>
+                    <td>Total Real</td>
+                    <td>Percentage ETA</td>
+                    <td>Percentage Real</td>
+                </tr>
+                <tr *ngFor="let r of reports.dayDistribution">
+                    <td>{{r.record}}</td>
+                    <td>{{formatTime(r.eta * 60)}}</td>
+                    <td>{{formatTime(r.real)}}</td>
+                    <td>{{r.percentageEta}}</td>
+                    <td>{{r.percentageReal}}</td>
+                </tr>
+            </table>
+        </div>
         `,
     providers: [TasksCore]
 })
@@ -216,6 +235,7 @@ export class TasksComponent implements OnInit {
     public viewBacklog: boolean = false;
     public viewPostponed: boolean = false;
     public viewReportsWeek: boolean = false;
+    public viewReportsDayDistribution: boolean = false;
     public viewOptions: boolean = false;
     public taskStatus = {
         'BACKLOG': 1,
@@ -342,6 +362,7 @@ export class TasksComponent implements OnInit {
 
         // reporting
         this.weekStats();
+        this.dayDistribution();
 
         if (this.load){
             this.load = false;
@@ -684,6 +705,10 @@ export class TasksComponent implements OnInit {
         this.viewReportsWeek = !this.viewReportsWeek;
     }
 
+    toggleViewReportsDayDistribution(){
+        this.viewReportsDayDistribution = !this.viewReportsDayDistribution;
+    }
+
     toggleViewPostponed(){
         this.viewPostponed = !this.viewPostponed;
     }
@@ -953,5 +978,44 @@ export class TasksComponent implements OnInit {
             tsk_ctg_status: this.taskStatus.BACKLOG
         });
         this.updateState();
+    }
+
+    dayDistribution(){
+        let table = <any>[];
+        let records = <any>[];
+        let closedTodayTasks = this.state.closedTodayTasks;
+        closedTodayTasks.forEach((t: any) => {
+            if (table.indexOf(t.tsk_id_record) === -1){
+                table.push(t.tsk_id_record);
+                records.push({
+                    "record": t.tsk_id_record,
+                    "eta": 0,
+                    "real": 0,
+                    "percentageEta": 0,
+                    "percentageReal": 0
+                });
+            }
+        });
+
+        let rec: any = null;
+        let totalEta: number = 0;
+        let totalReal: number = 0;
+        closedTodayTasks.forEach((t: any) => {
+            rec = records.find((r: any) => r.record === t.tsk_id_record);
+            if (rec){
+                rec.eta += t.tsk_estimated_duration;
+                rec.real += t.tsk_total_time_spent;
+                totalEta += t.tsk_estimated_duration;
+                totalReal += t.tsk_total_time_spent;
+            }
+        });
+
+        // percentage
+        records.forEach((r: any) => {
+            r.percentageEta = Math.round(r.eta * 100 / totalEta) / 100;
+            r.percentageReal = Math.round(r.real * 100 / totalReal) / 100;
+        });
+
+        this.reports.dayDistribution = records;
     }
 }
