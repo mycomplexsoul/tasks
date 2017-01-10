@@ -793,7 +793,7 @@ export class TasksComponent implements OnInit {
     commandOnTask(t: any, event: KeyboardEvent){
         let command = event.target['textContent'];
         let originalTask = '';
-        if (command.indexOf('--') !== -1){
+        if (command.indexOf('--') !== -1){ // postpone
             command = command.substring(command.indexOf('--') + 2);
             originalTask = t.tsk_name.replace(' --' + command,'');
             console.log('command:',command);
@@ -808,6 +808,19 @@ export class TasksComponent implements OnInit {
                 this.updateTask(t.tsk_id,{
                     tsk_name: originalTask,
                     tsk_date_view_until: s.date_start
+                });
+                this.updateState();
+            }
+        }
+        if (command.startsWith('->[')){ // move to other record
+            command = command.substring(command.indexOf('->[') + 3,command.indexOf(']',command.indexOf('->[') + 3));
+            originalTask = t.tsk_name.replace('->[' + command + '] ','');
+            originalTask = t.tsk_name.replace('->[' + command + ']','');
+            console.log('command new list:',command);
+            if (command) {
+                this.updateTask(t.tsk_id,{
+                    tsk_name: originalTask,
+                    tsk_id_record: command
                 });
                 this.updateState();
             }
