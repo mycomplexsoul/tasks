@@ -126,12 +126,21 @@ Milestone 2 (MVP)
     Fields for scheduling repetitions
     - On Schedule/On Completion
       Daily/Weekly
-      Some Days of the Week [DLMXJVS], On Every Given Period [Number + [days,weeks,months,years]], On A Days of Each Month [1st, 2nd, ..., 5th, Last + [DLMXJVS]]
+      Some Days of the Week [DLMXJVS], On Every Given Period [Number + [days,weeks,months,years]], On A Day of Each Month [1st, 2nd, ..., 5th, Last + [DLMXJVS]]
       End Repeat [never, on date, after # repetitions]
     Fields for alarms array
     - Relative alarm: days, before/after, hours, minutes
     - On Date: datetime
-
+    tsk_ctg_repeat (true/false)
+    tsk_ctg_repeat_type (on schedule/on completion)
+    tsk_ctg_repeat_code (daily/weekly/some-days/period)
+    tsk_repeat_value (number | some-days: [DLMXJVS]/period: num/each-month: num)
+    tsk_repeat_unit (period: [days,weeks,...]/each-month: [DLMXJVS])
+    tsk_ctg_repeat_end_code (never/on-date/num-repetitions)
+    tsk_repeat_end_value (on-date: date/num-repetitions: number)
+    tsk_repeat_template (replaceable-tokens: [NEXT#]/[NEXTDAY]/[NEXTWEEK])
+    tsk_repeat_template_data ({"code": "[NEXT#]", value: "20"})
+    tsk_repeat_num_repetition (number)
      */
 
     //     "actividad":[

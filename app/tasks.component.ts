@@ -124,7 +124,7 @@ import { TasksCore } from '../app/tasks.core';
             <div>Notes: {{state.selected.tsk_notes}}</div>
             <div>Parent: {{state.selected.tsk_parent}}</div>
             <div>Order: {{state.selected.tsk_order}}</div>
-            <div>Date Done: {{state.selected.tsk_date_done}}</div>
+            <div>Date Done: {{state.selected.tsk_date_done | date: format}}</div>
             <div>Total Time Spent: {{formatTime(state.selected.tsk_total_time_spent)}}</div>
             <div>
                 <fieldset *ngIf="state.selected.tsk_time_history.length">

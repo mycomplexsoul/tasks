@@ -262,37 +262,18 @@ export class TasksCore {
             if (tasks){
                 // parse dates
                 tasks.forEach((t: any) => {
-                    if (t.tsk_date_done){
-                        t.tsk_date_done = new Date(t.tsk_date_done);
-                    }
-                    if (t.tsk_schedule_date_start){
-                        t.tsk_schedule_date_start = new Date(t.tsk_schedule_date_start);
-                    }
-                    if (t.tsk_schedule_date_end){
-                        t.tsk_schedule_date_end = new Date(t.tsk_schedule_date_end);
-                    }
-                    if (t.tsk_date_view_until){
-                        t.tsk_date_view_until = new Date(t.tsk_date_view_until);
-                    }
-                    if (t.tsk_date_add){
-                        t.tsk_date_add = new Date(t.tsk_date_add);
-                    }
-                    if (t.tsk_date_mod){
-                        t.tsk_date_mod = new Date(t.tsk_date_mod);
-                    }
+                    t.tsk_date_done = this.stringDateToDate(t.tsk_date_done);
+                    t.tsk_schedule_date_start = this.stringDateToDate(t.tsk_schedule_date_start);
+                    t.tsk_schedule_date_end = this.stringDateToDate(t.tsk_schedule_date_end);
+                    t.tsk_date_view_until = this.stringDateToDate(t.tsk_date_view_until);
+                    t.tsk_date_add = this.stringDateToDate(t.tsk_date_add);
+                    t.tsk_date_mod = this.stringDateToDate(t.tsk_date_mod);
+                    
                     t.tsk_time_history.forEach((h: any) => {
-                        if (h.tsh_date_start){
-                            h.tsh_date_start = new Date(h.tsh_date_start);
-                        }
-                        if (h.tsh_date_end){
-                            h.tsh_date_end = new Date(h.tsh_date_end);
-                        }
-                        if (h.tsh_date_add){
-                            h.tsh_date_add = new Date(h.tsh_date_add);
-                        }
-                        if (h.tsh_date_mod){
-                            h.tsh_date_mod = new Date(h.tsh_date_mod);
-                        }
+                        h.tsh_date_start = this.stringDateToDate(h.tsh_date_start);
+                        h.tsh_date_end = this.stringDateToDate(h.tsh_date_end);
+                        h.tsh_date_add = this.stringDateToDate(h.tsh_date_add);
+                        h.tsh_date_mod = this.stringDateToDate(h.tsh_date_mod);
                     });
                 });
                 return tasks;
@@ -307,6 +288,14 @@ export class TasksCore {
         }
     }
     /** END Storage */
+
+    stringDateToDate(date: string){
+        if(/\d{4}-\d{2}-\d{2}/.test(date)){ // looks like a date
+            return new Date(date);
+        }
+        return <Date>undefined;
+    }
+
 
     updateTask(task: any, newData: any){
         Object.keys(newData).forEach(k => {
