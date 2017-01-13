@@ -293,7 +293,7 @@ export class TasksCore {
         if(/\d{4}-\d{2}-\d{2}/.test(date)){ // looks like a date
             return new Date(date);
         }
-        return <Date>undefined;
+        return undefined;
     }
 
 
