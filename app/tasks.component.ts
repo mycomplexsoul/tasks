@@ -124,7 +124,7 @@ import { TasksCore } from '../app/tasks.core';
             <div>Notes: {{state.selected.tsk_notes}}</div>
             <div>Parent: {{state.selected.tsk_parent}}</div>
             <div>Order: {{state.selected.tsk_order}}</div>
-            <div>Date Done: {{state.selected.tsk_date_done | date: format}}</div>
+            <div>Date Done: <span contenteditable="true" (keyup)="editDateDone(state.selected,$event)">{{state.selected.tsk_date_done | date: format}}</span></div>
             <div>Total Time Spent: {{formatTime(state.selected.tsk_total_time_spent)}}</div>
             <div>
                 <fieldset *ngIf="state.selected.tsk_time_history.length">
@@ -272,12 +272,14 @@ export class TasksComponent implements OnInit {
             }
         } else {
             // Batch add
+            let t: any;
             if (form.value.tsk_multiple_name){
                 form.value.tsk_multiple_name.split('\n').forEach((text: string) => {
-                    this.services.tasksCore.addTask({
+                    t = this.services.tasksCore.addTask({
                         'tsk_date_add': new Date(),
                         'tsk_name': text
                     });
+                    console.log("added task:",t);
                 });
                 this.tasks = this.services.tasksCore.tasks();
                 form.controls.tsk_multiple_name.reset();
@@ -1030,5 +1032,18 @@ export class TasksComponent implements OnInit {
         });
 
         this.reports.dayDistribution = records;
+    }
+
+    editDateDone(t: any, event: KeyboardEvent){
+        let newValue: string = event.target['textContent'];
+        let oldValue: string = t.tsk_date_done;
+
+        if (newValue.length !== 19 || (new Date(newValue)).getTime() === (new Date(oldValue)).getTime()){
+            return false;
+        }
+
+        this.updateTask(t.tsk_id,{
+            tsk_date_done: new Date(newValue)
+        });
     }
 }

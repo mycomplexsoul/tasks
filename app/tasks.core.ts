@@ -211,8 +211,8 @@ export class TasksCore {
             , 'tsk_qualifiers': task.tsk_qualifiers || ''
             , 'tsk_tags': task.tsk_tags || ''
             , 'tsk_estimated_duration': task.tsk_estimated_duration || 0
-            , 'tsk_schedule_date_start': task.tsk_schedule_date_start || <Date>undefined
-            , 'tsk_schedule_date_end': task.tsk_schedule_date_end || <Date>undefined
+            , 'tsk_schedule_date_start': task.tsk_schedule_date_start || undefined
+            , 'tsk_schedule_date_end': task.tsk_schedule_date_end || undefined
             , 'tsk_schedule_history': <any>[]
             , 'tsk_date_view_until': task.tsk_date_view_until || <Date>undefined
             , 'tsk_notifications': <any>[]
