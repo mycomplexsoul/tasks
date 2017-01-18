@@ -30,6 +30,12 @@ import { TasksCore } from '../app/tasks.core';
         </form>
         <div *ngIf="viewOptions">
             <button (click)="deleteTasks()">delete all tasks</button>
+            <input type="text"
+                name="optionsInput"
+                [(ngModel)]="optionsInput" />
+            <button (click)="backup()">backup</button>
+            <button (click)="import()">import</button>
+            <div #optionsMessages></div>
             <hr/>
         </div>
         <div id="backlogTaskList" *ngIf="viewBacklog">
@@ -246,6 +252,7 @@ export class TasksComponent implements OnInit {
     public showBatchAdd: boolean = false;
     public load: boolean = true;
     public reports: any = {};
+    public optionsInput: string = "default";
 
     constructor(tasksCore: TasksCore, private rendered: Renderer){
         this.services.tasksCore = tasksCore;
@@ -1045,5 +1052,21 @@ export class TasksComponent implements OnInit {
         this.updateTask(t.tsk_id,{
             tsk_date_done: new Date(newValue)
         });
+    }
+
+    backup(){
+        let tasks = JSON.stringify(this.tasks);
+        this.optionsInput = tasks;
+    }
+
+    import(){
+        let data = this.optionsInput;
+        let tasks = JSON.parse(data);
+
+        if (Array.isArray(tasks) && tasks.length > 0){
+            this.services.tasksCore.import(tasks);
+            this.tasks = this.services.tasksCore.tasks();
+            setTimeout(() => this.updateState(), 100);
+        }
     }
 }

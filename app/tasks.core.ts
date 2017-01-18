@@ -490,4 +490,11 @@ export class TasksCore {
         return s;
     }
 
+    import(tasks: any[]){
+        tasks.forEach((t: any) => {
+            this.data.taskList.push(t);
+        });
+        this.tasksToStorage();
+    }
+
 }
