@@ -568,7 +568,7 @@ export class TasksComponent implements OnInit {
 
         let watch = setInterval(() => {
             this.timers[task.tsk_id].timerString = this.formatTime(++timer);
-            if (task.tsk_estimated_duration * 60 - 60 < timer && !this.timers[task.tsk_id].burnoutNotified){
+            if (task.tsk_estimated_duration * 60 - 60 < task.tsk_total_time_spent + timer && !this.timers[task.tsk_id].burnoutNotified){
                 this.timers[task.tsk_id].burnoutNotified = true;
                 this.notification({
                     body: `Task "${task.tsk_name}" is about to exceed estimation!`
@@ -793,8 +793,14 @@ export class TasksComponent implements OnInit {
     taskEstimatedDurationEdit(t: any, event: KeyboardEvent){
         let newDuration = this.services.tasksCore.parseTime(event.target['textContent']);
         if (newDuration !== t.tsk_estimated_duration){
+            // if schedule date end is set, update it as well
+            let newEnd = t.tsk_schedule_date_end;
+            if (t.tsk_schedule_date_end){
+                newEnd = new Date(t.tsk_schedule_date_start.getTime() + parseInt(newDuration) * 60 * 1000);
+            }
             this.updateTask(t.tsk_id,{
                 tsk_estimated_duration: newDuration
+                , tsk_schedule_date_end: newEnd
             });
         }
     }
