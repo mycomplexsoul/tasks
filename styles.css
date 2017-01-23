@@ -211,3 +211,6 @@ textarea.task-multiple {
 .task-important{
   font-weight: bold;
 }
+.task-open-with-tt {
+  color: green;
+}

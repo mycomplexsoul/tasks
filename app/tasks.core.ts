@@ -13,41 +13,6 @@ export class TasksCore {
         this.data.taskList = tasks;
     }
 
-    mockData(){
-        let T = this.data.taskList;
-        let data = [{
-            'tsk_date_add': new Date(2016,9,31,13,30,0)
-            , 'tsk_name': '[Tasks] ActividadApp to Tasks - Start migration to Angular2!!'
-            , 'tsk_ctg_status': 2
-        },{
-            'tsk_date_add': new Date(2016,10,1,22,36,12)
-            , 'tsk_name': '[Tasks] ActividadApp to Tasks - Service configuration test'
-            , 'tsk_ctg_status': 2
-        },{
-            'tsk_date_add': new Date(2016,10,4,16,32,27)
-            , 'tsk_name': '[Tasks] ActividadApp to Tasks - Id generation for task'
-            , 'tsk_ctg_status': 2
-            , 'tsk_time_history': [
-                {
-                    'tsh_id': ''
-                    , 'tsh_num_secuential': 1
-                    , 'tsh_date_start': new Date(2016,10,4,20,0,2)
-                    , 'tsh_date_end': new Date(2016,10,4,21,20,0)
-                    , 'tsh_time_spent': 0
-                    , 'tsh_id_user': 2
-                    , 'tsh_date_add': new Date(2016,10,4,19,25,0)
-                    , 'tsh_date_mod': new Date(2016,10,4,19,25,0)
-                }
-            ]
-        }];
-        
-        data.forEach((t) => {
-            // T.push(this.newTaskTemplate(t));
-            this.addTask(t);
-            // console.log(T[T.length-1]);
-        });
-    }
-
     /** BEGIN API methods */
     /**
      * Creation and addition of a new task to the collection.
@@ -77,7 +42,7 @@ export class TasksCore {
         });
 
         // detect Start Date and End Date
-        if (task.tsk_name.indexOf('%[')){
+        if (task.tsk_name.indexOf('%[') !== -1){
             let endPosition = task.tsk_name.indexOf(']',task.tsk_name.indexOf('&[')) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(']',task.tsk_name.indexOf('%['));
             let expression = task.tsk_name.substring(task.tsk_name.indexOf('%[') + 2,endPosition);
             let parts = '';

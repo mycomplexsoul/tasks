@@ -91,7 +91,9 @@ import { TasksCore } from '../app/tasks.core';
                 <div *ngFor="let t of item.tasks" data-id="{{t.tsk_id}}">
                     <input type="checkbox" id="{{t.tsk_id}}"
                         (click)="taskCheckboxHandler(t,$event)" />
-                    <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
+                    <span *ngIf="t.tsk_total_time_spent !== 0"
+                        [ngClass]="{'task-open-with-tt': (t.tsk_ctg_status === this.taskStatus.OPEN && t.tsk_time_history.length > 0)}"
+                        >[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
                     <span>{{(timers[t.tsk_id]) ? '[' + timers[t.tsk_id].timerString + ']' : ''}}</span>
                     <span contenteditable="true" (keyup)="taskEdit(t,$event)"
                         [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1)}"
