@@ -1,16 +1,21 @@
-// import { Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
+import { Http } from '@angular/http';
 
-// @Injectable()
+@Injectable()
 export class TasksCore {
     pendingRequests: Array<any> = [];
     data: any = {
         taskList: <any>[]
         , user: 'anon'
     };
+    serverData: any = {
 
-    constructor() {
+    };
+
+    constructor(private http: Http) {
         let tasks = <any> this.tasksFromStorage();
         this.data.taskList = tasks;
+        this.getTasks();
     }
 
     /** BEGIN API methods */
@@ -151,6 +156,7 @@ export class TasksCore {
 
         T.push(this.newTaskTemplate(task));
         // console.log(T[T.length-1]);
+        this.postTask(T[T.length-1]);
         this.tasksToStorage();
         return T[T.length-1];
     }
@@ -266,7 +272,7 @@ export class TasksCore {
         Object.keys(newData).forEach(k => {
             task[k] = newData[k];
         });
-        task.tsk_date_mod = new Date(); 
+        task.tsk_date_mod = new Date();
         this.tasksToStorage();
     }
 
@@ -460,6 +466,36 @@ export class TasksCore {
             this.data.taskList.push(t);
         });
         this.tasksToStorage();
+    }
+
+    getTasks(){
+        this.http.get('http://localhost:8081/?action=get&entity=task').subscribe(
+            (data) => {
+                this.serverData.tasks = JSON.parse(data["_body"]);
+                console.log('from BE',this.serverData.tasks);
+            },
+            (err) => {
+                console.log(err);
+            }
+        )
+    }
+
+    postTask(t: any){
+        this.http.post('http://localhost:8081/?action=create&entity=task',this.parseToPost(t)).subscribe(
+            response => {
+                console.log('post response',response);
+            }
+        );
+    }
+
+    parseToPost(obj: any){
+        let resp = '';
+        Object.keys(obj).forEach(k => {
+            if (obj[k] === 0 || (obj[k] !== '' && obj[k])) {
+                resp = (resp !== '' ? resp + '&' : '') + `${k}=${obj[k]}`;
+            }
+        });
+        return resp;
     }
 
 }
