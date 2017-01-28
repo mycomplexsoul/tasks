@@ -34,8 +34,10 @@ import { TasksCore } from '../app/tasks.core';
                 name="optionsInput"
                 [(ngModel)]="optionsInput" />
             <button (click)="backup()">backup</button>
+            <button (click)="backupDoneOnly()">backup done only</button>
             <button (click)="import()">import</button>
-            <div #optionsMessages></div>
+            <button (click)="purgeDoneTasks()">purge done tasks</button>
+            <div id="optionsMessages"></div>
             <hr/>
         </div>
         <div id="backlogTaskList" *ngIf="viewBacklog">
@@ -1066,6 +1068,19 @@ export class TasksComponent implements OnInit {
         let tasks = JSON.stringify(this.tasks);
         this.optionsInput = tasks;
     }
+    
+    backupDoneOnly(){
+        let tasks = this.tasks.filter((t: any) => {
+            return t.tsk_ctg_status === this.taskStatus.CLOSED;
+        });
+        let tasksStr = JSON.stringify(tasks);
+        this.optionsInput = tasksStr;
+        this.optionsMessage(`Backup correctly ${tasks.length} tasks.`);
+    }
+
+    optionsMessage(message: string){
+        document.querySelector('#optionsMessages').innerHTML = message;
+    }
 
     import(){
         let data = this.optionsInput;
@@ -1074,7 +1089,16 @@ export class TasksComponent implements OnInit {
         if (Array.isArray(tasks) && tasks.length > 0){
             this.services.tasksCore.import(tasks);
             this.tasks = this.services.tasksCore.tasks();
+            this.optionsMessage(`Imported correctly ${tasks.length} tasks.`);
             setTimeout(() => this.updateState(), 100);
         }
+    }
+
+    purgeDoneTasks(){
+        let tasks = this.tasks.filter((t: any) => {
+            return t.tsk_ctg_status === this.taskStatus.CLOSED;
+        });
+        this.services.tasksCore.purgeDoneTasks();
+        this.optionsMessage(`Deleted correctly ${tasks.length} tasks.`);
     }
 }

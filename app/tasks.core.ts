@@ -499,4 +499,13 @@ export class TasksCore {
         return resp;
     }
 
+    purgeDoneTasks(){
+        let filtered = this.data.taskList.filter((t: any) => {
+            return t.tsk_ctg_status !== 3; // CLOSED
+        });
+
+        this.data.taskList = filtered;
+        this.tasksToStorage();
+    }
+
 }
