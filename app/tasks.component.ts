@@ -105,7 +105,7 @@ import { TasksCore } from '../app/tasks.core';
                         [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
                         class="task-eta"
                         >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
-                    <span *ngIf="t.tsk_schedule_date_start">(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</span>
+                    <span *ngIf="t.tsk_schedule_date_start"><strong>(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</strong></span>
                     <span [ngClass]="taskAgeClass(t)">{{taskAge(t)}}</span>
                 </div>
             </div>
@@ -423,6 +423,11 @@ export class TasksComponent implements OnInit {
             res[res.length-1].estimatedDuration += t.tsk_estimated_duration;
         });
 
+        // order groups by total ETA
+        res = res.sort((a: any, b: any) :number => {
+            return a.estimatedDuration > b.estimatedDuration ? -1 : 1;
+        });
+
         return res;
     }
 
@@ -574,9 +579,11 @@ export class TasksComponent implements OnInit {
             this.timers[task.tsk_id].timerString = this.formatTime(++timer);
             if (task.tsk_estimated_duration * 60 - 60 < task.tsk_total_time_spent + timer && !this.timers[task.tsk_id].burnoutNotified){
                 this.timers[task.tsk_id].burnoutNotified = true;
-                this.notification({
-                    body: `Task "${task.tsk_name}" is about to exceed estimation!`
-                });
+                if (this.tasks.find(t => t.tsk_id === task.tsk_id).tsk_ctg_status !== this.taskStatus.OPEN){
+                    this.notification({
+                        body: `Task "${task.tsk_name}" is about to exceed estimation!`
+                    });
+                }
             }
         }, 1000);
 
