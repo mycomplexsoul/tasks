@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Http } from '@angular/http';
+import { Task } from './task.type';
 
 @Injectable()
 export class TasksCore {
@@ -31,7 +32,7 @@ export class TasksCore {
         // detect group list for the task (at start of text)
         if (task.tsk_name.startsWith('[')){
             task.tsk_id_record = task.tsk_name.substr(task.tsk_name.indexOf('[')+1,task.tsk_name.indexOf(']')-1);
-            task.tsk_name = task.tsk_name.replace(`[${task.tsk_id_record}] `,'');
+            task.tsk_name = task.tsk_name.replace(`[${task.tsk_id_record}] `,'').replace(`[${task.tsk_id_record}]`,'');
         }
 
         // Parse special tokens

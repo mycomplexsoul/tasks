@@ -1,0 +1,226 @@
+<form #tasksForm="ngForm">
+    <input type="text" name="tsk_name"
+        placeholder="Write a task..."
+        class="task"
+        autocomplete="off"
+        autofocus="true"
+        *ngIf="!showBatchAdd"
+        (keyup)="inputKeyUpHandler($event)"
+        [(ngModel)]="tsk_name" />
+    <textarea name="tsk_multiple_name"
+        placeholder="Write a task per line..."
+        class="task-multiple"
+        (keyup)="inputKeyUpHandler($event)"
+        [(ngModel)]="tsk_multiple_name"
+        *ngIf="showBatchAdd"></textarea>
+    <button type="submit" (click)="addTask(tasksForm)" id="btnAddTask">Add task</button>
+    <button (click)="toggleViewFinishedToday()">{{viewFinishedToday ? 'hide': 'show'}} finished today</button>
+    <button (click)="toggleViewBacklog()">{{viewBacklog ? 'hide': 'show'}} backlog</button>
+    <button (click)="toggleViewAll()">{{viewAll ? 'hide': 'show'}} all</button>
+    <button (click)="toggleViewPostponed()" *ngIf="state.postponedTasksCount">{{viewPostponed ? 'hide': 'show'}} postponed</button>
+    <button (click)="toggleViewReportsWeek()">{{viewReportsWeek ? 'hide': 'show'}} reports week</button>
+    <button (click)="toggleViewReportsDayDistribution()">{{viewReportsDayDistribution ? 'hide': 'show'}} reports day distribution</button>
+    <button (click)="toggleViewOptions()">{{viewOptions ? 'hide': 'show'}} options</button>
+</form>
+<div *ngIf="viewOptions">
+    <button (click)="deleteTasks()">delete all tasks</button>
+    <input type="text"
+        name="optionsInput"
+        [(ngModel)]="optionsInput" />
+    <button (click)="backup()">backup</button>
+    <button (click)="backupDoneOnly()">backup done only</button>
+    <button (click)="import()">import</button>
+    <button (click)="purgeDoneTasks()">purge done tasks</button>
+    <div id="optionsMessages"></div>
+    <hr/>
+</div>
+<div id="backlogTaskList" *ngIf="viewBacklog">
+    <strong>Backlog</strong>
+    <div *ngFor="let item of state.backlogTasks">
+        <div>
+            <strong>{{item.header}}</strong>
+            ({{formatTime(item.estimatedDuration * 60)}})
+        </div>
+        <div *ngFor="let t of item.tasks" data-id="{{t.tsk_id}}">
+            - <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
+            <span contenteditable="true" (keyup)="taskEdit(t,$event)"
+                [ngClass]="{'task-important': (t.tsk_qualifiers.indexOf('important') !== -1)}"
+                class="editable">{{t.tsk_name}}</span>
+            <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
+                [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
+                class="task-eta"
+                >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
+            <span *ngIf="t.tsk_schedule_date_start">(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</span>
+            <span [ngClass]="taskAgeClass(t)">{{taskAge(t)}}</span>
+            <button (click)="setOpen(t)">Move to open</button>
+        </div>
+    </div>
+    <hr/>
+</div>
+<div id="postponedTaskList" *ngIf="viewPostponed">
+    <strong>Postponed Tasks</strong>
+    <div *ngFor="let t of state.postponedTasks">
+        - <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
+        <span contenteditable="true" (keyup)="taskEdit(t,$event)"
+            [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1)}"
+            (blur)="commandOnTask(t,$event)"
+            class="editable">{{t.tsk_name}}</span>
+        <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
+            [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
+            class="task-eta"
+            >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
+        <span *ngIf="t.tsk_schedule_date_start">(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</span>
+        <span [ngClass]="taskAgeClass(t)">{{taskAge(t)}}</span>
+        <span>(postponed until {{t.tsk_date_view_until | date: 'yyyy-MM-dd HH:mm:ss'}})</span>
+        <button (click)="setSelected(t)">details</button>
+        <button (click)="setUnpostpone(t)">see it now</button>
+    </div>
+    <hr/>
+</div>
+<div id="openTaskList">
+    <div *ngIf="!state.openTasks.length"><strong>No tasks open! Congratulations! Consider reviewing the backlog or add new tasks to do.</strong><hr/></div>
+    <div *ngFor="let item of state.openTasks">
+        <div>
+            <strong>{{item.header}}</strong>
+            ({{formatTime(item.estimatedDuration * 60)}})
+        </div>
+        <div *ngFor="let t of item.tasks" data-id="{{t.tsk_id}}">
+            <input type="checkbox" id="{{t.tsk_id}}"
+                (click)="taskCheckboxHandler(t,$event)" />
+            <span *ngIf="t.tsk_total_time_spent !== 0"
+                [ngClass]="{'task-open-with-tt': (t.tsk_ctg_status === this.taskStatus.OPEN && t.tsk_time_history.length > 0)}"
+                >[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
+            <span>{{(timers[t.tsk_id]) ? '[' + timers[t.tsk_id].timerString + ']' : ''}}</span>
+            <span contenteditable="true" (keyup)="taskEdit(t,$event)"
+                [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1)}"
+                (blur)="commandOnTask(t,$event)"
+                class="editable">{{t.tsk_name}}</span>
+            <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
+                [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
+                class="task-eta"
+                >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
+            <span *ngIf="t.tsk_schedule_date_start"><strong>(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</strong></span>
+            <span [ngClass]="taskAgeClass(t)">{{taskAge(t)}}</span>
+        </div>
+    </div>
+    <div id="Info">
+        Total Tasks: {{tasks.length}} | Backlog: {{state.backlogTasksCount}} | Closed Today: {{state.closedTodayTasks.length}} | Open: {{state.openTasksCount}}
+        <span *ngIf="state.postponedTasksCount"> | Postponed: {{state.postponedTasksCount}}</span>
+        <br/>Time Estimated Today: {{formatTime(state.totalTimeEstimated * 60)}}
+        <span> | Added Today Only: {{formatTime(state.totalTimeEstimatedAddedToday * 60)}} </span>
+        <span *ngIf="state.totalTimeEstimatedClosedToday"> | Closed Today ETA: {{formatTime(state.totalTimeEstimatedClosedToday * 60)}} | Open ETA: {{formatTime(state.totalTimeEstimatedOpen * 60)}}</span>
+        <br/>Time Spent Today: {{formatTime(state.totalTimeSpentToday)}}
+        <span *ngIf="state.totalTimeSpentTodayOnOpenTasks"> | Closed: {{formatTime(state.totalTimeSpentTodayOnClosedTasks)}} | Open {{formatTime(state.totalTimeSpentTodayOnOpenTasks)}}</span>
+        <span *ngIf="state.dayStartedAtDate"><br/>Real Time Elapsed: {{formatTime(state.realTimeElapsed)}} (day started at {{state.dayStartedAtDate | date: format}})</span>
+        <br/>Time Management Ratio: <span>{{state.timeManagementRatio}}</span>
+        <br/>Productivity Ratio: <span [ngClass]="state.productivityRatio.className">{{state.productivityRatio.value}} / {{state.productivityRatio.message}}</span>
+        <br/>Karma Score: <span>{{state.karmaScore}} ({{state.karmaCount}} / {{state.closedTodayTasks.length}})</span>
+    </div>
+    <hr/>
+</div>
+<div id="taskDetails" *ngIf="state.selected">
+    <button (click)="state.selected=null">hide</button>
+    <br/>
+    <strong>Task Details</strong>
+    <div>Id: {{state.selected.tsk_id}}</div>
+    <div>Container: {{state.selected.tsk_id_container}}</div>
+    <div>Record: {{state.selected.tsk_id_record}}</div>
+    <div>Name: {{state.selected.tsk_name}}</div>
+    <div>Notes: {{state.selected.tsk_notes}}</div>
+    <div>Parent: {{state.selected.tsk_parent}}</div>
+    <div>Order: {{state.selected.tsk_order}}</div>
+    <div>Date Done: <span contenteditable="true" (keyup)="editDateDone(state.selected,$event)">{{state.selected.tsk_date_done | date: format}}</span></div>
+    <div>Total Time Spent: {{formatTime(state.selected.tsk_total_time_spent)}}</div>
+    <div>
+        <fieldset *ngIf="state.selected.tsk_time_history.length">
+            <legend>Time History</legend>
+            <table>
+                <tr>
+                    <td>Sequential</td>
+                    <td>Name</td>
+                    <td>Date Start</td>
+                    <td>Date End</td>
+                    <td>Time Spent</td>
+                    <td>User</td>
+                    <td>Date Add</td>
+                    <td>Date Mod</td>
+                    <td>Actions</td>
+                </tr>
+                <tr *ngFor="let h of state.selected.tsk_time_history">
+                    <td>{{h.tsh_num_secuential}}</td>
+                    <td>{{h.tsh_name}}</td>
+                    <td><span contenteditable="true" (keyup)="editTimeTracking(h,1,$event)">{{h.tsh_date_start | date: format}}</span></td>
+                    <td><span contenteditable="true" (keyup)="editTimeTracking(h,2,$event)">{{h.tsh_date_end | date: format}}</span></td>
+                    <td>{{formatTime(h.tsh_time_spent)}}</td>
+                    <td>{{h.tsh_id_user}}</td>
+                    <td>{{h.tsh_date_add | date: format}}</td>
+                    <td>{{h.tsh_date_mod | date: format}}</td>
+                    <td><button *ngIf="h.tsh_date_end" (click)="deleteTimeTracking(state.selected,h)">delete</button></td>
+                </tr>
+            </table>
+        </fieldset>
+    </div>
+    <div>In Progress: {{state.selected.tsk_ctg_in_process}}</div>
+    <div>Qualifiers: <span contenteditable="true" (blur)="taskQualifiersEdit(state.selected,$event)">{{state.selected.tsk_qualifiers}}</span></div>
+    <div>Tags: {{state.selected.tsk_tags}}</div>
+    <div>Estimated Duration: {{state.selected.tsk_estimated_duration}}</div>
+    <div>Schedule Date Start: {{state.selected.tsk_schedule_date_start | date: format}}</div>
+    <div>Schedule Date End: {{state.selected.tsk_schedule_date_end | date: format}}</div>
+    <div>Date View Until: {{state.selected.tsk_date_view_until}}</div>
+    <div>User Added: {{state.selected.tsk_id_user_added}}</div>
+    <div>User Asigned: {{state.selected.tsk_id_user_asigned}}</div>
+    <div>Date Add: {{state.selected.tsk_date_add | date: format}}</div>
+    <div>Date Last Mod: {{state.selected.tsk_date_mod | date: format}}</div>
+    <div>Status: {{state.selected.tsk_ctg_status}}</div>
+    <hr/>
+</div>
+<div *ngIf="viewFinishedToday">
+    <strong>Finished Today</strong>
+    <div *ngFor="let item of state.closedTodayTasks">
+        <input type="checkbox" id="{{item.tsk_id}}" checked
+            (click)="taskCheckboxHandler(item,$event)" />
+        <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
+        <span [ngClass]="{'task-done': (item.tsk_ctg_status === this.taskStatus.CLOSED)}"
+            >{{item.tsk_name}}</span>
+        <button (click)="setSelected(item)">details</button>
+    </div>
+    <hr/>
+</div>
+<div id="closedTaskList" *ngIf="viewAll">
+    <strong>Closed Tasks</strong>
+    <div *ngFor="let item of state.closedTasks">
+        - <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
+        <span>{{item.tsk_name}}</span>
+        <span>(done at {{item.tsk_date_done | date: 'yyyy-MM-dd HH:mm:ss'}})</span>
+        <button (click)="setSelected(item)">details</button>
+    </div>
+    <hr/>
+</div>
+<div *ngIf="viewReportsWeek">
+    <div *ngFor="let s of reports.week">
+        date: {{s.date | date: 'yyyy-MM-dd'}}
+        tasks done: {{s.tasksDone}}
+        estimated: {{formatTime(s.estimated * 60)}}
+        spent: {{formatTime(s.timeSpent)}}
+        Productivity: {{s.productivity}}
+        Real Time Elapsed: {{formatTime(s.realTimeElapsed)}}
+    </div>
+</div>
+<div *ngIf="viewReportsDayDistribution">
+    <table>
+        <tr>
+            <td>Record</td>
+            <td>Total ETA</td>
+            <td>Total Real</td>
+            <td>Percentage ETA</td>
+            <td>Percentage Real</td>
+        </tr>
+        <tr *ngFor="let r of reports.dayDistribution">
+            <td>{{r.record}}</td>
+            <td>{{formatTime(r.eta * 60)}}</td>
+            <td>{{formatTime(r.real)}}</td>
+            <td>{{r.percentageEta}}</td>
+            <td>{{r.percentageReal}}</td>
+        </tr>
+    </table>
+</div>
