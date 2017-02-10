@@ -99,6 +99,7 @@
                 [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
                 class="task-eta"
                 >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
+            <span *ngIf="t.tsk_tags" class="task-tags">{{formatTags(t.tsk_tags)}}</span>
             <span *ngIf="t.tsk_schedule_date_start"><strong>(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</strong></span>
             <span [ngClass]="taskAgeClass(t)">{{taskAge(t)}}</span>
         </div>

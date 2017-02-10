@@ -156,6 +156,30 @@ export class TasksCore {
             task.tsk_qualifiers = expression;
         }
 
+        // detects #[] hashtags (multiple)
+        if (task.tsk_name.indexOf('#[') !== -1){
+            let endPosition = task.tsk_name.indexOf(']',task.tsk_name.indexOf('#[')) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(']',task.tsk_name.indexOf('#['));
+            let expression = task.tsk_name.substring(task.tsk_name.indexOf('#[') + 2,endPosition);
+
+            task.tsk_name = task.tsk_name.replace('#[' + expression + '] ','');
+            task.tsk_name = task.tsk_name.replace(' #[' + expression + ']','');
+            task.tsk_name = task.tsk_name.replace('#[' + expression + ']','');
+
+            task.tsk_tags = expression;
+        }
+
+        // detects # hashtags (individual)
+        while (task.tsk_name.indexOf('#') !== -1){
+            let endPosition = task.tsk_name.indexOf(' ',task.tsk_name.indexOf('#')) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(' ',task.tsk_name.indexOf('#'));
+            let expression = task.tsk_name.substring(task.tsk_name.indexOf('#') + 1,endPosition);
+
+            task.tsk_name = task.tsk_name.replace('#' + expression + ' ','');
+            task.tsk_name = task.tsk_name.replace(' #' + expression + '','');
+            task.tsk_name = task.tsk_name.replace('#' + expression + '','');
+
+            task.tsk_tags = task.tsk_tags ? task.tsk_tags + ' ' + expression : expression;
+        }
+
         T.push(this.newTaskTemplate(task));
         // console.log(T[T.length-1]);
         this.postTask(T[T.length-1]);
@@ -328,7 +352,10 @@ export class TasksCore {
     }
 
     elapsedTime(date1: Date, date2: Date) :number{ // return diff in seconds
-        return Math.abs(date1.getTime() - date2.getTime()) / 1000;
+        if (date1.getTime && date2.getTime){
+            return Math.abs(date1.getTime() - date2.getTime()) / 1000;
+        }
+        return 0;
     }
 
     elapsedDays(date1: Date, date2: Date) :number{

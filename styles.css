@@ -214,3 +214,6 @@ textarea.task-multiple {
 .task-open-with-tt {
   color: green;
 }
+.task-tags {
+  color: gray;
+}

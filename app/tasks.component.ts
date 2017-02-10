@@ -398,7 +398,8 @@ export class TasksComponent implements OnInit {
 
     // TODO: replace with service's method
     elapsedTime(date1: Date, date2: Date) :number{
-        return Math.abs(date1.getTime() - date2.getTime()) / 1000;
+        return this.services.tasksCore.elapsedTime(date1,date2);
+        //return Math.abs(date1.getTime() - date2.getTime()) / 1000;
     }
 
     formatTime(elapsed: number, format: String = undefined) :String{
@@ -934,5 +935,12 @@ export class TasksComponent implements OnInit {
             tsk_qualifiers: qualifiers
         });
         // this.updateState();
+    }
+
+    formatTags(tags: string){
+        if (tags){
+            return tags.replace(/\s/g," #");
+        }
+        return "";
     }
 }
