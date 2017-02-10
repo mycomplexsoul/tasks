@@ -60,11 +60,13 @@ export class TasksComponent implements OnInit {
             let t: any;
             if (form.value.tsk_multiple_name){
                 form.value.tsk_multiple_name.split('\n').forEach((text: string) => {
-                    t = this.services.tasksCore.addTask({
-                        'tsk_date_add': new Date(),
-                        'tsk_name': text
-                    });
-                    console.log("added task:",t);
+                    if (!text.startsWith('//') && text !== ''){
+                        t = this.services.tasksCore.addTask({
+                            'tsk_date_add': new Date(),
+                            'tsk_name': text
+                        });
+                        console.log("added task:",t);
+                    }
                 });
                 this.tasks = this.services.tasksCore.tasks();
                 form.controls.tsk_multiple_name.reset();
@@ -94,7 +96,10 @@ export class TasksComponent implements OnInit {
 
         // Estimated Total
         this.state.totalTimeEstimated = 0;
+        this.state.totalTimeEstimatedOld = 0;
         this.state.totalTimeEstimatedAddedToday = 0;
+        this.state.totalTimeEstimatedAddedTodayClosed = 0;
+        this.state.totalTimeEstimatedAddedTodayOpen = 0;
         this.state.totalTimeEstimatedOpen = 0;
         this.state.totalTimeEstimatedClosedToday = 0;
         this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN).forEach((t: any) => {
@@ -103,10 +108,19 @@ export class TasksComponent implements OnInit {
         this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED && new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) <= today).forEach((t: any) => {
             this.state.totalTimeEstimatedClosedToday += parseInt(t.tsk_estimated_duration);
         });
-        this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && new Date(t.tsk_date_add) >= today0 && new Date(t.tsk_date_add) <= today).forEach((t: any) => {
+        this.tasks.filter((t) => new Date(t.tsk_date_add) >= today0 && new Date(t.tsk_date_add) <= today).forEach((t: any) => {
             this.state.totalTimeEstimatedAddedToday += parseInt(t.tsk_estimated_duration);
+            if (t.tsk_ctg_status == this.taskStatus.OPEN){
+                this.state.totalTimeEstimatedAddedTodayOpen += parseInt(t.tsk_estimated_duration);
+            }
+            if (t.tsk_ctg_status == this.taskStatus.CLOSED){
+                this.state.totalTimeEstimatedAddedTodayClosed += parseInt(t.tsk_estimated_duration);
+            }
         });
         this.state.totalTimeEstimated = this.state.totalTimeEstimatedOpen + this.state.totalTimeEstimatedClosedToday;
+        this.tasks.filter((t) => (new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) < today && new Date(t.tsk_date_add) < today0) || (new Date(t.tsk_date_add) < today0 && t.tsk_ctg_status == this.taskStatus.OPEN)).forEach((t: any) => {
+            this.state.totalTimeEstimatedOld += parseInt(t.tsk_estimated_duration);
+        });
 
         // Info
         // Total time spent today
@@ -631,6 +645,21 @@ export class TasksComponent implements OnInit {
                 });
                 this.updateState();
             }
+        }
+        if (command.indexOf('%[') !== -1){ // set schedule
+            let endPosition = command.indexOf(']',command.indexOf('%[')) === -1 ? command.length : command.indexOf(']',command.indexOf('%['));
+            command = command.substring(command.indexOf('%[') + 2,endPosition);
+            let s = this.services.tasksCore.parseDatetime(command);
+            originalTask = t.tsk_name.replace('%[' + command + '] ','');
+            originalTask = t.tsk_name.replace(' %[' + command + ']','');
+            originalTask = t.tsk_name.replace('%[' + command + ']','');
+            this.updateTask(t.tsk_id,{
+                tsk_name: originalTask,
+                tsk_schedule_date_start: s.date_start,
+                tsk_schedule_date_end: s.date_end,
+                tsk_estimated_duration: s.duration
+            });
+            this.updateState();
         }
     }
 

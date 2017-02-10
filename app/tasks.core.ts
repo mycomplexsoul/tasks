@@ -50,7 +50,7 @@ export class TasksCore {
 
         // detect Start Date and End Date
         if (task.tsk_name.indexOf('%[') !== -1){
-            let endPosition = task.tsk_name.indexOf(']',task.tsk_name.indexOf('&[')) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(']',task.tsk_name.indexOf('%['));
+            let endPosition = task.tsk_name.indexOf(']',task.tsk_name.indexOf('%[')) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(']',task.tsk_name.indexOf('%['));
             let expression = task.tsk_name.substring(task.tsk_name.indexOf('%[') + 2,endPosition);
             let parts = '';
             let parsed = false;
@@ -176,7 +176,7 @@ export class TasksCore {
             , 'tsk_name': task.tsk_name
             , 'tsk_notes': task.tsk_notes || ''
             , 'tsk_parent': task.tsk_parent || 0
-            , 'tsk_order': this.data.taskList.length + 1
+            , 'tsk_order': this.nextOrder()
             , 'tsk_date_done': <Date>undefined
             , 'tsk_total_time_spent': 0
             , 'tsk_time_history': task.tsk_time_history || <any>[]
@@ -195,6 +195,20 @@ export class TasksCore {
             , 'tsk_date_mod': new Date()
             , 'tsk_ctg_status': task.tsk_ctg_status || 1
         }
+    }
+
+    nextOrder(){
+        if (this.data.taskList.length){
+            // find max existent order
+            let order = 0;
+            this.data.taskList.forEach((t: any) => {
+                if (order < parseInt(t.tsk_order)){
+                    order = parseInt(t.tsk_order);
+                }
+            });
+            return order + 1;
+        }
+        return 1;
     }
 
     tasks(){
