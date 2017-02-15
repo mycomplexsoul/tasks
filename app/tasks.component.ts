@@ -31,6 +31,7 @@ export class TasksComponent implements OnInit {
     public load: boolean = true;
     public reports: any = {};
     public optionsInput: string = "default";
+    public showButtonSection: boolean = false;
 
     constructor(tasksCore: TasksCore, private rendered: Renderer){
         this.services.tasksCore = tasksCore;
@@ -251,6 +252,9 @@ export class TasksComponent implements OnInit {
         }
         if (event.altKey && event.keyCode==73){ // detect 'i'
             this.markTaskAsImportant(t);
+        }
+        if (event.altKey && event.keyCode==85){ // detect 'u'
+            this.markTaskAsUrgent(t);
         }
         if (t.tsk_name !== event.target['textContent']){
             this.updateTask(t.tsk_id,{
@@ -662,6 +666,19 @@ export class TasksComponent implements OnInit {
             });
             this.updateState();
         }
+        if (command.indexOf('#[') !== -1){ // set schedule
+            let endPosition = command.indexOf(']',command.indexOf('#[')) === -1 ? command.length : command.indexOf(']',command.indexOf('#['));
+            command = command.substring(command.indexOf('#[') + 2,endPosition);
+            
+            originalTask = t.tsk_name.replace('#[' + command + '] ','');
+            originalTask = t.tsk_name.replace(' #[' + command + ']','');
+            originalTask = t.tsk_name.replace('#[' + command + ']','');
+            this.updateTask(t.tsk_id,{
+                tsk_name: originalTask,
+                tsk_tags: command,
+            });
+            this.updateState();
+        }
     }
 
     notification(data: any){
@@ -939,8 +956,25 @@ export class TasksComponent implements OnInit {
 
     formatTags(tags: string){
         if (tags){
-            return tags.replace(/\s/g," #");
+            return "#" + tags.replace(/\s/g," #");
         }
         return "";
+    }
+
+    markTaskAsUrgent(t: any){
+        let task = this.tasks.find((e: any) => {
+            return e.tsk_id === t.tsk_id;
+        });
+        let qualifiers = task.tsk_qualifiers;
+        const urgent = 'urgent';
+        if (qualifiers.indexOf(urgent) === -1){ // not present, add it
+            qualifiers = qualifiers ? qualifiers + ',' + urgent : urgent;
+        } else { // present, remove it
+            qualifiers = qualifiers.replace(',' + urgent,'').replace(urgent + ',','').replace(urgent,'');
+        }
+        this.updateTask(t.tsk_id,{
+            tsk_qualifiers: qualifiers
+        });
+        // this.updateState();
     }
 }

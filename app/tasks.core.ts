@@ -161,9 +161,7 @@ export class TasksCore {
             let endPosition = task.tsk_name.indexOf(']',task.tsk_name.indexOf('#[')) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(']',task.tsk_name.indexOf('#['));
             let expression = task.tsk_name.substring(task.tsk_name.indexOf('#[') + 2,endPosition);
 
-            task.tsk_name = task.tsk_name.replace('#[' + expression + '] ','');
-            task.tsk_name = task.tsk_name.replace(' #[' + expression + ']','');
-            task.tsk_name = task.tsk_name.replace('#[' + expression + ']','');
+            task.tsk_name = this.replaceTokenInText(task.tsk_name,'#[' + expression + ']');
 
             task.tsk_tags = expression;
         }
@@ -173,9 +171,7 @@ export class TasksCore {
             let endPosition = task.tsk_name.indexOf(' ',task.tsk_name.indexOf('#')) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(' ',task.tsk_name.indexOf('#'));
             let expression = task.tsk_name.substring(task.tsk_name.indexOf('#') + 1,endPosition);
 
-            task.tsk_name = task.tsk_name.replace('#' + expression + ' ','');
-            task.tsk_name = task.tsk_name.replace(' #' + expression + '','');
-            task.tsk_name = task.tsk_name.replace('#' + expression + '','');
+            task.tsk_name = this.replaceTokenInText(task.tsk_name,'#' + expression);
 
             task.tsk_tags = task.tsk_tags ? task.tsk_tags + ' ' + expression : expression;
         }
@@ -352,7 +348,7 @@ export class TasksCore {
     }
 
     elapsedTime(date1: Date, date2: Date) :number{ // return diff in seconds
-        if (date1.getTime && date2.getTime){
+        if (date1 && date2){
             return Math.abs(date1.getTime() - date2.getTime()) / 1000;
         }
         return 0;
@@ -548,6 +544,25 @@ export class TasksCore {
 
         this.data.taskList = filtered;
         this.tasksToStorage();
+    }
+
+    replaceTokenInText(tsk_name: string, expression: string){
+        let r = tsk_name;
+        r = r.replace(expression + ' ','');
+        r = r.replace(' ' + expression,'');
+        r = r.replace(expression,'');
+        return r;
+    }
+
+    doThisWithAToken(task: any, method: Function, token: string, tokenEnd: string = ' '){
+        while (task.tsk_name.indexOf(token) !== -1){
+            let endPosition = task.tsk_name.indexOf(' ',task.tsk_name.indexOf(token)) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(tokenEnd,task.tsk_name.indexOf(token));
+            let expression = task.tsk_name.substring(task.tsk_name.indexOf(token) + token.length,endPosition);
+
+            task.tsk_name = this.replaceTokenInText(task.tsk_name,token + expression + (tokenEnd === ' ' ? '' : tokenEnd));
+
+            method(task,expression);
+        }
     }
 
 }

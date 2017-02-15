@@ -14,13 +14,16 @@
         [(ngModel)]="tsk_multiple_name"
         *ngIf="showBatchAdd"></textarea>
     <button type="submit" (click)="addTask(tasksForm)" id="btnAddTask">Add task</button>
-    <button (click)="toggleViewFinishedToday()">{{viewFinishedToday ? 'hide': 'show'}} finished today</button>
-    <button (click)="toggleViewBacklog()">{{viewBacklog ? 'hide': 'show'}} backlog</button>
-    <button (click)="toggleViewAll()">{{viewAll ? 'hide': 'show'}} all</button>
-    <button (click)="toggleViewPostponed()" *ngIf="state.postponedTasksCount">{{viewPostponed ? 'hide': 'show'}} postponed</button>
-    <button (click)="toggleViewReportsWeek()">{{viewReportsWeek ? 'hide': 'show'}} reports week</button>
-    <button (click)="toggleViewReportsDayDistribution()">{{viewReportsDayDistribution ? 'hide': 'show'}} reports day distribution</button>
-    <button (click)="toggleViewOptions()">{{viewOptions ? 'hide': 'show'}} options</button>
+    <button (click)="showButtonSection = !showButtonSection">{{showButtonSection ? 'hide': 'show'}} actions</button>
+    <span id="buttonSection" *ngIf="showButtonSection">
+        <button (click)="toggleViewFinishedToday()">{{viewFinishedToday ? 'hide': 'show'}} finished today</button>
+        <button (click)="toggleViewBacklog()">{{viewBacklog ? 'hide': 'show'}} backlog</button>
+        <button (click)="toggleViewAll()">{{viewAll ? 'hide': 'show'}} all</button>
+        <button (click)="toggleViewPostponed()" *ngIf="state.postponedTasksCount">{{viewPostponed ? 'hide': 'show'}} postponed</button>
+        <button (click)="toggleViewReportsWeek()">{{viewReportsWeek ? 'hide': 'show'}} reports week</button>
+        <button (click)="toggleViewReportsDayDistribution()">{{viewReportsDayDistribution ? 'hide': 'show'}} reports day distribution</button>
+        <button (click)="toggleViewOptions()">{{viewOptions ? 'hide': 'show'}} options</button>
+    </span>
 </form>
 <div *ngIf="viewOptions">
     <button (click)="deleteTasks()">delete all tasks</button>
@@ -44,7 +47,7 @@
         <div *ngFor="let t of item.tasks" data-id="{{t.tsk_id}}">
             - <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
             <span contenteditable="true" (keyup)="taskEdit(t,$event)"
-                [ngClass]="{'task-important': (t.tsk_qualifiers.indexOf('important') !== -1)}"
+                [ngClass]="{'task-important': (t.tsk_qualifiers.indexOf('important') !== -1), 'task-urgent': (t.tsk_qualifiers.indexOf('urgent') !== -1)}"
                 class="editable">{{t.tsk_name}}</span>
             <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
                 [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
@@ -62,7 +65,7 @@
     <div *ngFor="let t of state.postponedTasks">
         - <span *ngIf="t.tsk_total_time_spent !== 0">[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
         <span contenteditable="true" (keyup)="taskEdit(t,$event)"
-            [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1)}"
+            [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1), 'task-urgent': (t.tsk_qualifiers.indexOf('urgent') !== -1)}"
             (blur)="commandOnTask(t,$event)"
             class="editable">{{t.tsk_name}}</span>
         <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
@@ -92,7 +95,7 @@
                 >[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
             <span>{{(timers[t.tsk_id]) ? '[' + timers[t.tsk_id].timerString + ']' : ''}}</span>
             <span contenteditable="true" (keyup)="taskEdit(t,$event)"
-                [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1)}"
+                [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1), 'task-urgent': (t.tsk_qualifiers.indexOf('urgent') !== -1)}"
                 (blur)="commandOnTask(t,$event)"
                 class="editable">{{t.tsk_name}}</span>
             <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
