@@ -877,6 +877,11 @@ export class TasksComponent implements OnInit {
             }
         });
 
+        // order by total real
+        records = records.sort((a: any, b: any) => {
+            return (a.real < b.real) ? 1 : -1;
+        });
+
         // percentage
         records.forEach((r: any) => {
             r.percentageEta = Math.round(r.eta * 100 / totalEta) / 100;

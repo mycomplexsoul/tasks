@@ -12,7 +12,7 @@ export class TasksCore {
     serverData: any = {
 
     };
-    apiRoot: string = 'http://localhost:8081/';
+    apiRoot: string = 'http://localhost:8081';
 
     constructor(private http: Http) {
         let tasks = <any> this.tasksFromStorage();
@@ -508,7 +508,7 @@ export class TasksCore {
     }
 
     getTasks(){
-        this.http.get(`${this.apiRoot}?action=get&entity=task`).subscribe(
+        this.http.get(`${this.apiRoot}/?action=get&entity=task`).subscribe(
             (data) => {
                 this.serverData.tasks = JSON.parse(data["_body"]);
                 console.log('from BE',this.serverData.tasks);
@@ -520,7 +520,7 @@ export class TasksCore {
     }
 
     postTask(t: any){
-        this.http.post(`${this.apiRoot}?action=create&entity=task`,this.parseToPost(t)).subscribe(
+        this.http.post(`${this.apiRoot}/task/create`,this.parseToPost(t)).subscribe(
             response => {
                 console.log('post response',response);
             }
