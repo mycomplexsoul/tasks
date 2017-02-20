@@ -102,7 +102,13 @@
                 [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
                 class="task-eta"
                 >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
-            <span *ngIf="t.tsk_tags" class="task-tags">{{formatTags(t.tsk_tags)}}</span>
+            <span *ngIf="t.tsk_tags" class="task-tags">
+                <span *ngFor="let tag of t.tsk_tags.split(' ')"
+                    (click)="showTagStats(tag)"
+                    class="tag">
+                    #{{tag}}
+                </span>
+            </span>
             <span *ngIf="t.tsk_schedule_date_start"><strong>(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</strong></span>
             <span [ngClass]="taskAgeClass(t)">{{taskAge(t)}}</span>
         </div>
@@ -122,6 +128,30 @@
         <br/>Time Management Ratio: <span>{{state.timeManagementRatio}}</span>
         <br/>Productivity Ratio: <span [ngClass]="state.productivityRatio.className">{{state.productivityRatio.value}} / {{state.productivityRatio.message}}</span>
         <br/>Karma Score: <span>{{state.karmaScore}} ({{state.karmaCount}} / {{state.closedTodayTasks.length}})</span>
+    </div>
+    <hr/>
+</div>
+<div id="tagInfo" *ngIf="tagInfo.display === true">
+    <button (click)="tagInfo.display=false">hide</button>
+    <br/>Closed Tasks | Estimated: {{formatTime(tagInfo.tasksClosedTotalEstimated * 60)}} | Spent: {{formatTime(tagInfo.tasksClosedTotalSpent)}}
+    <br/>Open Tasks | Estimated: {{formatTime(tagInfo.tasksOpenTotalEstimated * 60)}} | Spent: {{formatTime(tagInfo.tasksOpenTotalSpent)}}
+    <div *ngIf="tagInfo.tasks.length > 0">
+        <table>
+            <tr>
+                <td>Name</td>
+                <td>Estimated</td>
+                <td>Spent</td>
+                <td>Status</td>
+                <td>Actions</td>
+            </tr>
+            <tr *ngFor="let e of tagInfo.tasks">
+                <td>{{e.tsk_name}}</td>
+                <td>{{formatTime(e.tsk_estimated_duration * 60)}}</td>
+                <td>{{formatTime(e.tsk_total_time_spent)}}</td>
+                <td>{{statusText(e.tsk_ctg_status)}}</td>
+                <td><button (click)="setSelected(e)">details</button></td>
+            </tr>
+        </table>
     </div>
     <hr/>
 </div>

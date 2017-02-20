@@ -508,7 +508,7 @@ export class TasksCore {
     }
 
     getTasks(){
-        this.http.get(`${this.apiRoot}/?action=get&entity=task`).subscribe(
+        this.http.get(`${this.apiRoot}/task/list`).subscribe(
             (data) => {
                 this.serverData.tasks = JSON.parse(data["_body"]);
                 console.log('from BE',this.serverData.tasks);

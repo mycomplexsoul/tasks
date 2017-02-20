@@ -32,6 +32,7 @@ export class TasksComponent implements OnInit {
     public reports: any = {};
     public optionsInput: string = "default";
     public showButtonSection: boolean = false;
+    public tagInfo: any = {};
 
     constructor(tasksCore: TasksCore, private rendered: Renderer){
         this.services.tasksCore = tasksCore;
@@ -959,12 +960,12 @@ export class TasksComponent implements OnInit {
         // this.updateState();
     }
 
-    formatTags(tags: string){
-        if (tags){
-            return "#" + tags.replace(/\s/g," #");
-        }
-        return "";
-    }
+    // formatTags(tags: string){
+    //     if (tags){
+    //         return "#" + tags.replace(/\s/g," #");
+    //     }
+    //     return "";
+    // }
 
     markTaskAsUrgent(t: any){
         let task = this.tasks.find((e: any) => {
@@ -981,5 +982,47 @@ export class TasksComponent implements OnInit {
             tsk_qualifiers: qualifiers
         });
         // this.updateState();
+    }
+
+    showTagStats(tag: string){
+        let tasks = this.tasks.filter(t => t.tsk_tags.indexOf(tag) !== -1);
+        this.tagInfo.display = true;
+        this.tagInfo.tasks = tasks;
+        // this.tagInfo.tasksOpen = tasks.filter(t => t.tsk_ctg_status === this.taskStatus.OPEN || t.tsk_ctg_status === this.taskStatus.BACKLOG);
+        // this.tagInfo.tasksClosed = tasks.filter(t => t.tsk_ctg_status === this.taskStatus.CLOSED || t.tsk_ctg_status === this.taskStatus.CANCELLED);
+
+        this.tagInfo.tasksOpenTotalEstimated = 0;
+        this.tagInfo.tasksOpenTotalSpent = 0;
+        this.tagInfo.tasksClosedTotalEstimated = 0;
+        this.tagInfo.tasksClosedTotalSpent = 0;
+        tasks.forEach(t => {
+            if (t.tsk_ctg_status === this.taskStatus.OPEN || t.tsk_ctg_status === this.taskStatus.BACKLOG){
+                this.tagInfo.tasksOpenTotalEstimated += t.tsk_estimated_duration;
+                this.tagInfo.tasksOpenTotalSpent += t.tsk_total_time_spent;
+            }
+            if (t.tsk_ctg_status === this.taskStatus.CLOSED || t.tsk_ctg_status === this.taskStatus.CANCELLED){
+                this.tagInfo.tasksClosedTotalEstimated += t.tsk_estimated_duration;
+                this.tagInfo.tasksClosedTotalSpent += t.tsk_total_time_spent;
+            }
+        });
+    }
+
+    statusText(status: number){
+        let r = '';
+        switch(status){
+            case this.taskStatus.BACKLOG:
+                r = 'BACKLOG';
+                break;
+            case this.taskStatus.OPEN:
+                r = 'OPEN';
+                break;
+            case this.taskStatus.CANCELLED:
+                r = 'CANCELLED';
+                break;
+            case this.taskStatus.CLOSED:
+                r = 'CLOSED';
+                break;
+        }
+        return r;
     }
 }

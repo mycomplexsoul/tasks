@@ -220,3 +220,6 @@ textarea.task-multiple {
 .task-urgent{
   background-color: yellow;
 }
+.tag:hover {
+  cursor: pointer;
+}
