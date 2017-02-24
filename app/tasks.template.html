@@ -95,7 +95,7 @@
                 >[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]</span>
             <span>{{(timers[t.tsk_id]) ? '[' + timers[t.tsk_id].timerString + ']' : ''}}</span>
             <span contenteditable="true" (keyup)="taskEdit(t,$event)"
-                [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1), 'task-urgent': (t.tsk_qualifiers.indexOf('urgent') !== -1)}"
+                [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1), 'task-urgent': (t.tsk_qualifiers.indexOf('urgent') !== -1), 'task-highlighted': (t.tsk_qualifiers.indexOf('highlighted') !== -1)}"
                 (blur)="commandOnTask(t,$event)"
                 class="editable">{{t.tsk_name}}</span>
             <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
@@ -133,6 +133,7 @@
 </div>
 <div id="tagInfo" *ngIf="tagInfo.display === true">
     <button (click)="tagInfo.display=false">hide</button>
+    <strong>Tag Information</strong>
     <br/>Closed Tasks | Estimated: {{formatTime(tagInfo.tasksClosedTotalEstimated * 60)}} | Spent: {{formatTime(tagInfo.tasksClosedTotalSpent)}}
     <br/>Open Tasks | Estimated: {{formatTime(tagInfo.tasksOpenTotalEstimated * 60)}} | Spent: {{formatTime(tagInfo.tasksOpenTotalSpent)}}
     <div *ngIf="tagInfo.tasks.length > 0">
@@ -219,6 +220,13 @@
         <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
         <span [ngClass]="{'task-done': (item.tsk_ctg_status === this.taskStatus.CLOSED)}"
             >{{item.tsk_name}}</span>
+        <span *ngIf="item.tsk_tags" class="task-tags">
+            <span *ngFor="let tag of item.tsk_tags.split(' ')"
+                (click)="showTagStats(tag)"
+                class="tag">
+                #{{tag}}
+            </span>
+        </span>
         <button (click)="setSelected(item)">details</button>
     </div>
     <hr/>
@@ -227,8 +235,16 @@
     <strong>Closed Tasks</strong>
     <div *ngFor="let item of state.closedTasks">
         - <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
+        <span>[{{item.tsk_id_record}}]</span>
         <span>{{item.tsk_name}}</span>
         <span>(done at {{item.tsk_date_done | date: 'yyyy-MM-dd HH:mm:ss'}})</span>
+        <span *ngIf="item.tsk_tags" class="task-tags">
+            <span *ngFor="let tag of item.tsk_tags.split(' ')"
+                (click)="showTagStats(tag)"
+                class="tag">
+                #{{tag}}
+            </span>
+        </span>
         <button (click)="setSelected(item)">details</button>
     </div>
     <hr/>

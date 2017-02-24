@@ -217,6 +217,9 @@ textarea.task-multiple {
 .task-tags {
   color: gray;
 }
+.task-highlighted {
+  background-color: #ddd;
+}
 .task-urgent{
   background-color: yellow;
 }

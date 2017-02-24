@@ -252,10 +252,13 @@ export class TasksComponent implements OnInit {
             this.taskToBacklog(t);
         }
         if (event.altKey && event.keyCode==73){ // detect 'i'
-            this.markTaskAsImportant(t);
+            this.markTaskAs(t,'important');
         }
         if (event.altKey && event.keyCode==85){ // detect 'u'
-            this.markTaskAsUrgent(t);
+            this.markTaskAs(t,'urgent');
+        }
+        if (event.altKey && event.keyCode==72){ // detect 'h'
+            this.markTaskAs(t,'highlighted');
         }
         if (t.tsk_name !== event.target['textContent']){
             this.updateTask(t.tsk_id,{
@@ -943,46 +946,12 @@ export class TasksComponent implements OnInit {
         this.optionsMessage(`Deleted correctly ${tasks.length} tasks.`);
     }
 
-    markTaskAsImportant(t: any){
-        let task = this.tasks.find((e: any) => {
-            return e.tsk_id === t.tsk_id;
-        });
-        let qualifiers = task.tsk_qualifiers;
-        const important = 'important';
-        if (qualifiers.indexOf(important) === -1){ // not present, add it
-            qualifiers = qualifiers ? qualifiers + ',' + important : important;
-        } else { // present, remove it
-            qualifiers = qualifiers.replace(',' + important,'').replace(important + ',','').replace(important,'');
-        }
-        this.updateTask(t.tsk_id,{
-            tsk_qualifiers: qualifiers
-        });
-        // this.updateState();
-    }
-
     // formatTags(tags: string){
     //     if (tags){
     //         return "#" + tags.replace(/\s/g," #");
     //     }
     //     return "";
     // }
-
-    markTaskAsUrgent(t: any){
-        let task = this.tasks.find((e: any) => {
-            return e.tsk_id === t.tsk_id;
-        });
-        let qualifiers = task.tsk_qualifiers;
-        const urgent = 'urgent';
-        if (qualifiers.indexOf(urgent) === -1){ // not present, add it
-            qualifiers = qualifiers ? qualifiers + ',' + urgent : urgent;
-        } else { // present, remove it
-            qualifiers = qualifiers.replace(',' + urgent,'').replace(urgent + ',','').replace(urgent,'');
-        }
-        this.updateTask(t.tsk_id,{
-            tsk_qualifiers: qualifiers
-        });
-        // this.updateState();
-    }
 
     showTagStats(tag: string){
         let tasks = this.tasks.filter(t => t.tsk_tags.indexOf(tag) !== -1);
@@ -1024,5 +993,20 @@ export class TasksComponent implements OnInit {
                 break;
         }
         return r;
+    }
+
+    markTaskAs(t: any, qualifier: string){
+        let task = this.tasks.find((e: any) => {
+            return e.tsk_id === t.tsk_id;
+        });
+        let qualifiers = task.tsk_qualifiers;
+        if (qualifiers.indexOf(qualifier) === -1){ // not present, add it
+            qualifiers = qualifiers ? qualifiers + ',' + qualifier : qualifier;
+        } else { // present, remove it
+            qualifiers = qualifiers.replace(',' + qualifier,'').replace(qualifier + ',','').replace(qualifier,'');
+        }
+        this.updateTask(t.tsk_id,{
+            tsk_qualifiers: qualifiers
+        });
     }
 }
