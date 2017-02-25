@@ -1009,4 +1009,19 @@ export class TasksComponent implements OnInit {
             tsk_qualifiers: qualifiers
         });
     }
+
+    isOnline(){
+        return navigator.onLine;
+    }
+
+    taskTagsEdit(task: any, event: KeyboardEvent){
+        let newData = event.target['textContent'];
+
+        if (task.tsk_tags !== newData){
+            this.updateTask(task.tsk_id,{
+                tsk_tags: newData
+            });
+            this.updateState();
+        }
+    }
 }

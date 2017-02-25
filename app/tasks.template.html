@@ -128,6 +128,7 @@
         <br/>Time Management Ratio: <span>{{state.timeManagementRatio}}</span>
         <br/>Productivity Ratio: <span [ngClass]="state.productivityRatio.className">{{state.productivityRatio.value}} / {{state.productivityRatio.message}}</span>
         <br/>Karma Score: <span>{{state.karmaScore}} ({{state.karmaCount}} / {{state.closedTodayTasks.length}})</span>
+        <br/><strong>{{isOnline() ? '' : 'You are OFFLINE'}}</strong>
     </div>
     <hr/>
 </div>
@@ -200,7 +201,7 @@
     </div>
     <div>In Progress: {{state.selected.tsk_ctg_in_process}}</div>
     <div>Qualifiers: <span contenteditable="true" (blur)="taskQualifiersEdit(state.selected,$event)">{{state.selected.tsk_qualifiers}}</span></div>
-    <div>Tags: {{state.selected.tsk_tags}}</div>
+    <div>Tags: <span contenteditable="true" (blur)="taskTagsEdit(state.selected,$event)">{{state.selected.tsk_tags}}</span></div>
     <div>Estimated Duration: {{state.selected.tsk_estimated_duration}}</div>
     <div>Schedule Date Start: {{state.selected.tsk_schedule_date_start | date: format}}</div>
     <div>Schedule Date End: {{state.selected.tsk_schedule_date_end | date: format}}</div>

@@ -6,7 +6,7 @@ import { Task } from './task.type';
 export class TasksCore {
     pendingRequests: Array<any> = [];
     data: any = {
-        taskList: <any>[]
+        taskList: <Array<Task>>[]
         , user: 'anon'
     };
     serverData: any = {
@@ -15,7 +15,7 @@ export class TasksCore {
     apiRoot: string = 'http://localhost:8081';
 
     constructor(private http: Http) {
-        let tasks = <any> this.tasksFromStorage();
+        let tasks: Array<Task> = this.tasksFromStorage();
         this.data.taskList = tasks;
         this.getTasks();
     }
@@ -265,24 +265,24 @@ export class TasksCore {
     /** BEGIN Storage */
     tasksFromStorage(){
         if(typeof(window.localStorage) !== "undefined") {
-            let tasks = JSON.parse(localStorage.getItem("Tasks"));
+            let tasks: Array<Task> = JSON.parse(localStorage.getItem("Tasks"));
             if (tasks){
                 // parse dates
-                tasks.forEach((t: any) => {
-                    t.tsk_date_done = this.stringDateToDate(t.tsk_date_done);
-                    t.tsk_schedule_date_start = this.stringDateToDate(t.tsk_schedule_date_start);
-                    t.tsk_schedule_date_end = this.stringDateToDate(t.tsk_schedule_date_end);
-                    t.tsk_date_view_until = this.stringDateToDate(t.tsk_date_view_until);
-                    t.tsk_date_add = this.stringDateToDate(t.tsk_date_add);
-                    t.tsk_date_mod = this.stringDateToDate(t.tsk_date_mod);
+                // tasks.forEach((t: any) => {
+                //     t.tsk_date_done = this.stringDateToDate(t.tsk_date_done);
+                //     t.tsk_schedule_date_start = this.stringDateToDate(t.tsk_schedule_date_start);
+                //     t.tsk_schedule_date_end = this.stringDateToDate(t.tsk_schedule_date_end);
+                //     t.tsk_date_view_until = this.stringDateToDate(t.tsk_date_view_until);
+                //     t.tsk_date_add = this.stringDateToDate(t.tsk_date_add);
+                //     t.tsk_date_mod = this.stringDateToDate(t.tsk_date_mod);
                     
-                    t.tsk_time_history.forEach((h: any) => {
-                        h.tsh_date_start = this.stringDateToDate(h.tsh_date_start);
-                        h.tsh_date_end = this.stringDateToDate(h.tsh_date_end);
-                        h.tsh_date_add = this.stringDateToDate(h.tsh_date_add);
-                        h.tsh_date_mod = this.stringDateToDate(h.tsh_date_mod);
-                    });
-                });
+                //     t.tsk_time_history.forEach((h: any) => {
+                //         h.tsh_date_start = this.stringDateToDate(h.tsh_date_start);
+                //         h.tsh_date_end = this.stringDateToDate(h.tsh_date_end);
+                //         h.tsh_date_add = this.stringDateToDate(h.tsh_date_add);
+                //         h.tsh_date_mod = this.stringDateToDate(h.tsh_date_mod);
+                //     });
+                // });
                 return tasks;
             }
         }
