@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
-import { Http } from '@angular/http';
+import { Http, Headers } from '@angular/http';
 import { Task } from './task.type';
+import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class TasksCore {
@@ -13,6 +14,7 @@ export class TasksCore {
 
     };
     apiRoot: string = 'http://localhost:8081';
+    private headers = new Headers({'Content-Type': 'application/json'});
 
     constructor(private http: Http) {
         let tasks: Array<Task> = this.tasksFromStorage();
@@ -309,6 +311,7 @@ export class TasksCore {
             task[k] = newData[k];
         });
         task.tsk_date_mod = new Date();
+        this.updateTaskBE(task);
         this.tasksToStorage();
     }
 
@@ -507,24 +510,52 @@ export class TasksCore {
         this.tasksToStorage();
     }
 
+    // getTasks(){
+    //     this.http.get(`${this.apiRoot}/task/list`).subscribe(
+    //         (data) => {
+    //             this.serverData.tasks = JSON.parse(data["_body"]);
+    //             console.log('from BE',this.serverData.tasks);
+    //         },
+    //         (err) => {
+    //             console.log(err);
+    //         }
+    //     )
+    // }
+
     getTasks(){
-        this.http.get(`${this.apiRoot}/task/list`).subscribe(
-            (data) => {
-                this.serverData.tasks = JSON.parse(data["_body"]);
-                console.log('from BE',this.serverData.tasks);
-            },
-            (err) => {
-                console.log(err);
-            }
-        )
+        this.http.get(`${this.apiRoot}/task/list`).toPromise()
+        .then((data) => {
+            this.serverData.tasks = data.json();
+            console.log('from BE',this.serverData.tasks);
+        }).catch((err) => {
+            console.log(err);
+        });
     }
 
+    // postTask(t: any){
+    //     this.http.post(`${this.apiRoot}/task/create`,this.parseToPost(t)).subscribe(
+    //         response => {
+    //             console.log('post response',response);
+    //         }
+    //     );
+    // }
+
     postTask(t: any){
-        this.http.post(`${this.apiRoot}/task/create`,this.parseToPost(t)).subscribe(
-            response => {
-                console.log('post response',response);
-            }
-        );
+        this.http.post(`${this.apiRoot}/task/create`,t,{headers: this.headers})
+        .toPromise().then(response => {
+            console.log('post response',response.json());
+        }).catch((err) => {
+            console.log('err',err);
+        });
+    }
+
+    updateTaskBE(t: any){
+        this.http.post(`${this.apiRoot}/task/update`,t,{headers: this.headers})
+        .toPromise().then(response => {
+            console.log('post response',response.json());
+        }).catch((err) => {
+            console.log('err',err);
+        });
     }
 
     parseToPost(obj: any){

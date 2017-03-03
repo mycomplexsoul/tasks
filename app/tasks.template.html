@@ -118,7 +118,7 @@
         <span *ngIf="state.postponedTasksCount"> | Postponed: {{state.postponedTasksCount}}</span>
         <br/>Time Estimated Today: {{formatTime(state.totalTimeEstimated * 60)}}
         <span *ngIf="state.totalTimeEstimatedClosedToday"> | Closed Today ETA: {{formatTime(state.totalTimeEstimatedClosedToday * 60)}} | Open ETA: {{formatTime(state.totalTimeEstimatedOpen * 60)}}</span>
-        <br/>Open ETA until yesterday: {{formatTime(state.totalTimeEstimatedOld * 60)}}
+        <br/>Open ETA until yesterday: {{formatTime(state.totalTimeEstimatedOld * 60)}} | Task count until yesterday: {{state.totalTaskCountOld}}
         <br/>Today New Tasks, Total ETA: {{formatTime(state.totalTimeEstimatedAddedToday * 60)}}
          | Closed ETA: {{formatTime(state.totalTimeEstimatedAddedTodayClosed * 60)}}
          | Open ETA: {{formatTime(state.totalTimeEstimatedAddedTodayOpen * 60)}}

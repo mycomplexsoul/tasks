@@ -99,6 +99,7 @@ export class TasksComponent implements OnInit {
         // Estimated Total
         this.state.totalTimeEstimated = 0;
         this.state.totalTimeEstimatedOld = 0;
+        this.state.totalTaskCountOld = 0;
         this.state.totalTimeEstimatedAddedToday = 0;
         this.state.totalTimeEstimatedAddedTodayClosed = 0;
         this.state.totalTimeEstimatedAddedTodayOpen = 0;
@@ -123,6 +124,7 @@ export class TasksComponent implements OnInit {
         this.tasks.filter((t) => (new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) < today && new Date(t.tsk_date_add) < today0) || (new Date(t.tsk_date_add) < today0 && t.tsk_ctg_status == this.taskStatus.OPEN)).forEach((t: any) => {
             this.state.totalTimeEstimatedOld += parseInt(t.tsk_estimated_duration);
         });
+        this.state.totalTaskCountOld = this.tasks.filter((t) => (new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) < today && new Date(t.tsk_date_add) < today0) || (new Date(t.tsk_date_add) < today0 && t.tsk_ctg_status == this.taskStatus.OPEN)).length;
 
         // Info
         // Total time spent today
