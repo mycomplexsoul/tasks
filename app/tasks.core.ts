@@ -523,10 +523,24 @@ export class TasksCore {
     // }
 
     getTasks(){
-        this.http.get(`${this.apiRoot}/task/list`).toPromise()
+        return this.http.get(`${this.apiRoot}/task/list`).toPromise()
         .then((data) => {
             this.serverData.tasks = data.json();
             console.log('from BE',this.serverData.tasks);
+            return data.json();
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
+
+    getTasksFromServer(){
+        this.http.get(`${this.apiRoot}/task/list`).toPromise()
+        .then((data) => {
+            this.data.taskList = data.json();
+            this.data.taskList.forEach((t: any) => {
+                t.tsk_time_history = t.tsk_time_history || [];
+            });
+            this.tasksToStorage();
         }).catch((err) => {
             console.log(err);
         });
@@ -594,6 +608,16 @@ export class TasksCore {
 
             method(task,expression);
         }
+    }
+
+    batchAdd(){
+        let t = this.data.taskList;
+        this.http.post(`${this.apiRoot}/task/batch`,t,{headers: this.headers})
+        .toPromise().then(response => {
+            console.log('post response',response.json());
+        }).catch((err) => {
+            console.log('err',err);
+        });
     }
 
 }
