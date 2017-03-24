@@ -1,5 +1,5 @@
 // Set a name for the current cache
-var cacheName = 'v1'; 
+var cacheName = 'v1.1'; 
 
 // Default files to always cache
 var cacheFiles = [
@@ -18,7 +18,7 @@ var cacheFiles = [
 ]
 
 self.addEventListener('install', function(e) {
-    console.log('[ServiceWorker] Installed');
+    console.log('[ServiceWorker] Installed ' + cacheName);
 
     // e.waitUntil Delays the event until the Promise is resolved
     e.waitUntil(
@@ -58,7 +58,7 @@ self.addEventListener('activate', function(e) {
 
 
 self.addEventListener('fetch', function(e) {
-	console.log('[ServiceWorker] Fetch', e.request.url);
+	console.log('[ServiceWorker] Fetch ' + cacheName, e.request.url);
 
     var isNotExcluded = function(url){
         var exclusions = ['browser-sync'];

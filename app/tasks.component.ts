@@ -1,10 +1,11 @@
 import { Component, OnInit, Renderer } from '@angular/core';
 import { TasksCore } from '../app/tasks.core';
+import { SyncAPI } from '../app/sync.api';
 
 @Component({
     selector: 'tasks',
     templateUrl: './app/tasks.template.html',
-    providers: [TasksCore]
+    providers: [TasksCore, SyncAPI]
 })
 export class TasksComponent implements OnInit {
     public item: any;

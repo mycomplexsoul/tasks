@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Http, Headers } from '@angular/http';
 import { Task } from './task.type';
 import 'rxjs/add/operator/toPromise';
+import { SyncAPI } from './sync.api';
 
 @Injectable()
 export class TasksCore {
@@ -16,10 +17,12 @@ export class TasksCore {
     apiRoot: string = 'http://localhost:8081';
     private headers = new Headers({'Content-Type': 'application/json'});
 
-    constructor(private http: Http) {
+    constructor(private http: Http, private sync: SyncAPI) {
         let tasks: Array<Task> = this.tasksFromStorage();
         this.data.taskList = tasks;
         this.getTasks();
+        this.http = http;
+        this.sync = sync;
     }
 
     /** BEGIN API methods */
@@ -352,7 +355,7 @@ export class TasksCore {
 
     elapsedTime(date1: Date, date2: Date) :number{ // return diff in seconds
         if (date1 && date2){
-            return Math.abs(date1.getTime() - date2.getTime()) / 1000;
+            return Math.floor(Math.abs(date1.getTime() - date2.getTime()) / 1000);
         }
         return 0;
     }
@@ -555,21 +558,27 @@ export class TasksCore {
     // }
 
     postTask(t: any){
-        this.http.post(`${this.apiRoot}/task/create`,t,{headers: this.headers})
-        .toPromise().then(response => {
-            console.log('post response',response.json());
-        }).catch((err) => {
-            console.log('err',err);
-        });
+        // this.http.post(`${this.apiRoot}/task/create`,t,{headers: this.headers})
+        // .toPromise().then(response => {
+        //     console.log('post response',response.json());
+        // }).catch((err) => {
+        //     console.log('err',err);
+        // });
+        this.sync.request('POST',`${this.apiRoot}/task/create`,t,(data: any) => {
+            
+        })
     }
 
     updateTaskBE(t: any){
-        this.http.post(`${this.apiRoot}/task/update`,t,{headers: this.headers})
-        .toPromise().then(response => {
-            console.log('post response',response.json());
-        }).catch((err) => {
-            console.log('err',err);
-        });
+        // this.http.post(`${this.apiRoot}/task/update`,t,{headers: this.headers})
+        // .toPromise().then(response => {
+        //     console.log('post response',response.json());
+        // }).catch((err) => {
+        //     console.log('err',err);
+        // });
+        this.sync.request('POST',`${this.apiRoot}/task/update`,t,(data: any) => {
+            
+        })
     }
 
     parseToPost(obj: any){
