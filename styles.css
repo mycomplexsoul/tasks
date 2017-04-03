@@ -226,3 +226,6 @@ textarea.task-multiple {
 .tag:hover {
   cursor: pointer;
 }
+.task-progressed{
+  background-color: #A2FFA9;
+}

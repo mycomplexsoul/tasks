@@ -1,6 +1,7 @@
 import { Component, OnInit, Renderer } from '@angular/core';
 import { TasksCore } from '../app/tasks.core';
 import { SyncAPI } from '../app/sync.api';
+import { Task } from './task.type';
 
 @Component({
     selector: 'tasks',
@@ -22,6 +23,8 @@ export class TasksComponent implements OnInit {
     public viewReportsWeek: boolean = false;
     public viewReportsDayDistribution: boolean = false;
     public viewOptions: boolean = false;
+    public viewQualifierTotals: boolean = false;
+    public viewETABeforeAdd: boolean = false;
     public taskStatus = {
         'BACKLOG': 1,
         'OPEN': 2,
@@ -173,6 +176,7 @@ export class TasksComponent implements OnInit {
         // reporting
         this.weekStats();
         this.dayDistribution();
+        this.qualifierTotals();
 
         if (this.load){
             this.load = false;
@@ -262,6 +266,9 @@ export class TasksComponent implements OnInit {
         }
         if (event.altKey && event.keyCode==72){ // detect 'h'
             this.markTaskAs(t,'highlighted');
+        }
+        if (event.altKey && event.keyCode==80){ // detect 'p'
+            this.markTaskAs(t,'progressed');
         }
         if (t.tsk_name !== event.target['textContent']){
             this.updateTask(t.tsk_id,{
@@ -506,6 +513,7 @@ export class TasksComponent implements OnInit {
         }
         if (event.keyCode==113){ // detect "F2" = toggle Batch Add
             this.showBatchAdd = !this.showBatchAdd;
+            this.viewETABeforeAdd = false;
             setTimeout(() => {
                 if (this.showBatchAdd){
                     this.focusElement("textarea[name=tsk_multiple_name]");
@@ -513,6 +521,39 @@ export class TasksComponent implements OnInit {
                     this.focusElement("input[name=tsk_name]");
                 }
             }, 100);
+        }
+        // interpret ETAs and sum them up by record
+        let t: any;
+        let totalETA = 0;
+        let totalPerRecord = <any>[];
+        let value: string = event.target['value'];
+        // console.log('event',event);
+        // console.log(value.split('\n'));
+        if (value){
+            value.split('\n').forEach((text: string) => {
+                if (!text.startsWith('//') && text !== ''){
+                    t = this.services.tasksCore.parseTask({
+                        'tsk_date_add': new Date(),
+                        'tsk_name': text
+                    });
+                    if (totalPerRecord.find((r: any) => r.record === t.tsk_id_record)){
+                        totalPerRecord.find((r: any) => r.record === t.tsk_id_record).totalETA += t.tsk_estimated_duration || 0;
+                    } else {
+                        totalPerRecord.push({
+                            record: t.tsk_id_record
+                            , totalETA: t.tsk_estimated_duration || 0
+                        });
+                    }
+                    totalETA += t.tsk_estimated_duration || 0;
+                    // console.log("totals",totalPerRecord);
+                }
+            });
+            this.viewETABeforeAdd = true;
+            this.state.beforeAddETA = totalPerRecord;
+            this.state.beforeAddTotalETA = totalETA;
+            // console.log('ETA',totalETA);
+        } else {
+            this.viewETABeforeAdd = false;
         }
     }
 
@@ -1049,5 +1090,71 @@ export class TasksComponent implements OnInit {
     getTasksFromServer(){
         this.services.tasksCore.getTasksFromServer();
         this.updateState();
+    }
+
+    qualifierTotals(){
+        let qualifierCollection = ['important','urgent','highlighted','progressed'];
+        let tasks = this.tasks.filter((t: Task) => t.tsk_ctg_status === this.taskStatus.OPEN);
+        let filtered: Array<Task> = [];
+        let records = <any>[];
+        let rec = {
+            qualifier: <string> null
+            , taskCount: 0
+            , totalETA: 0
+        };
+
+        qualifierCollection.forEach((q) => {
+            filtered = tasks.filter((t: Task) => t.tsk_qualifiers && t.tsk_qualifiers.indexOf(q) !== -1);
+            rec = {
+                qualifier: q
+                , taskCount: filtered.length
+                , totalETA: 0
+            }
+            filtered.forEach((t) => {
+                rec.totalETA += t.tsk_estimated_duration;
+            });
+
+            records.push(rec);
+        });
+        
+        // order by total ETA
+        records = records.sort((a: any, b: any) => {
+            return (a.totalETA < b.totalETA) ? 1 : -1;
+        });
+
+        // total overall
+        records.push({
+            qualifier: 'TOTAL'
+            , taskCount: records.reduce((p: any, n: any) => {
+                return (p.taskCount || p) + n.taskCount;
+            })
+            , totalETA: records.reduce((p: any, n: any) => {
+                return (p.totalETA || p) + n.totalETA;
+            })
+        });
+
+        this.reports.qualifierTotals = records;
+    }
+
+    toggleView(view: string){
+        this[view] = !this[view];
+    }
+
+    timeTrackingQuickEdit(task: any, event: KeyboardEvent, target: string){
+        let newValue: string = event.target['textContent'].trim();
+        if (newValue.length === 8 && /[0-2][0-9]:[0-5][0-9]:[0-5][0-9]/.test(newValue)){
+            let parts = newValue.split(':');
+            let data = {};
+            data[`tsh_date_${target}`] = new Date(this.services.tasksCore.dateOnly(new Date()).getTime() + (parseInt(parts[0]) * 60 * 60 * 1000) + (parseInt(parts[1]) * 60 * 1000) + (parseInt(parts[2]) * 1000));
+            task.tsk_time_history[task.tsk_time_history.length-1][`tsh_date_${target}`] = data[`tsh_date_${target}`];
+            this.updateTaskTimeTracking(task.tsk_id,task.tsk_time_history.length,data);
+
+            if (this.timers[task.tsk_id]){
+                let dom: HTMLElement = this.getTaskDOMElement(task.tsk_id); 
+                this.hideTimer(task,dom);
+                this.showTimer(task,dom);
+            }
+            this.calculateTotalTimeSpentToday();
+        }
     }
 }

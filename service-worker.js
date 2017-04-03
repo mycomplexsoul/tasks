@@ -5,7 +5,6 @@ var cacheName = 'v1.1';
 var cacheFiles = [
 	'./',
 	'./index.html',
-	'./app/tasks.template.html',
     'node_modules/core-js/client/shim.min.js',
     'node_modules/zone.js/dist/zone.js',
     'node_modules/reflect-metadata/Reflect.js',
@@ -13,6 +12,13 @@ var cacheFiles = [
     'systemjs.config.js',
     'node_modules/rxjs/util/isFunction.js',
 	'./app/main.js',
+	'./app/app.module.js',
+	'./app/app.component.js',
+	'./app/sync.api.js',
+	'./app/tasks.component.js',
+	'./app/tasks.core.js',
+	'./app/tasks.types.js',
+	'./app/tasks.template.html',
 	'./styles.css'
 	// 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic'
 ]

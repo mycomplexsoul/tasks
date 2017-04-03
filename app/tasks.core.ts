@@ -34,6 +34,16 @@ export class TasksCore {
     addTask(task: any){
         let T = this.data.taskList;
 
+        let parsedTask = this.parseTask(task);
+
+        T.push(this.newTaskTemplate(parsedTask));
+        // console.log(T[T.length-1]);
+        this.postTask(T[T.length-1]);
+        this.tasksToStorage();
+        return T[T.length-1];
+    }
+
+    parseTask(task: any){
         // detect group list for the task (at start of text)
         if (task.tsk_name.startsWith('[')){
             task.tsk_id_record = task.tsk_name.substr(task.tsk_name.indexOf('[')+1,task.tsk_name.indexOf(']')-1);
@@ -181,11 +191,7 @@ export class TasksCore {
             task.tsk_tags = task.tsk_tags ? task.tsk_tags + ' ' + expression : expression;
         }
 
-        T.push(this.newTaskTemplate(task));
-        // console.log(T[T.length-1]);
-        this.postTask(T[T.length-1]);
-        this.tasksToStorage();
-        return T[T.length-1];
+        return task;
     }
 
     /**
