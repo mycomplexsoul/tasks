@@ -37,6 +37,9 @@ export class TasksComponent implements OnInit {
     public optionsInput: string = "default";
     public showButtonSection: boolean = false;
     public tagInfo: any = {};
+    public options: any = {
+        optViewElapsedDays: false
+    };
 
     constructor(tasksCore: TasksCore, private rendered: Renderer){
         this.services.tasksCore = tasksCore;
@@ -44,6 +47,14 @@ export class TasksComponent implements OnInit {
         this.notification({
             body: 'Hello there!! you have ' + this.state.openTasksCount + ' tasks open'
         });
+        if (typeof(window.localStorage) !== "undefined") {
+            this.options = JSON.parse(localStorage.getItem('Options'));
+            if(!this.options){
+                this.options = {
+                    optViewElapsedDays: false
+                };
+            }
+        }
     }
 
     ngOnInit(){
@@ -80,6 +91,7 @@ export class TasksComponent implements OnInit {
                 setTimeout(() => this.updateState(), 100);
             }
         }
+        this.viewETABeforeAdd = false;
     }
 
     updateState(){
@@ -322,11 +334,12 @@ export class TasksComponent implements OnInit {
     }
 
     taskJumpUp(current: any){
-        if (current.previousElementSibling.querySelector("span[contenteditable=true]")){
-            current.previousElementSibling.querySelector("span[contenteditable=true]").focus();
+        let selector = "span.task-text[contenteditable=true]";
+        if (current.previousElementSibling.querySelector(selector)){
+            current.previousElementSibling.querySelector(selector).focus();
         } else {
-            if (current.previousElementSibling.parentNode.previousElementSibling && current.previousElementSibling.parentNode.previousElementSibling.lastElementChild.querySelector("span[contenteditable=true]")){
-                current.previousElementSibling.parentNode.previousElementSibling.lastElementChild.querySelector("span[contenteditable=true]").focus();
+            if (current.previousElementSibling.parentNode.previousElementSibling && current.previousElementSibling.parentNode.previousElementSibling.lastElementChild.querySelector(selector)){
+                current.previousElementSibling.parentNode.previousElementSibling.lastElementChild.querySelector(selector).focus();
             } else {
                 if (this.showBatchAdd){
                     this.focusElement("textarea[name=tsk_multiple_name]");
@@ -342,11 +355,12 @@ export class TasksComponent implements OnInit {
     }
 
     taskJumpDown(current: any){
-        if (current.nextElementSibling && current.nextElementSibling.querySelector("span[contenteditable=true]")){
-            current.nextElementSibling.querySelector("span[contenteditable=true]").focus();
+        let selector = "span.task-text[contenteditable=true]";
+        if (current.nextElementSibling && current.nextElementSibling.querySelector(selector)){
+            current.nextElementSibling.querySelector(selector).focus();
         } else {
-            if (current.parentNode.nextElementSibling && current.parentNode.nextElementSibling.firstElementChild.nextElementSibling.querySelector("span[contenteditable=true]")){
-                current.parentNode.nextElementSibling.firstElementChild.nextElementSibling.querySelector("span[contenteditable=true]").focus();
+            if (current.parentNode.nextElementSibling && current.parentNode.nextElementSibling.firstElementChild.nextElementSibling.querySelector(selector)){
+                current.parentNode.nextElementSibling.firstElementChild.nextElementSibling.querySelector(selector).focus();
             }
         }
     }
@@ -1155,6 +1169,13 @@ export class TasksComponent implements OnInit {
                 this.showTimer(task,dom);
             }
             this.calculateTotalTimeSpentToday();
+        }
+    }
+
+    toggleOptViewElapsedDays(){
+        this.options.optViewElapsedDays = !this.options.optViewElapsedDays;
+        if(typeof(window.localStorage) !== "undefined") {
+            localStorage.setItem("Options", JSON.stringify(this.options));
         }
     }
 }
