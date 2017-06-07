@@ -16,7 +16,6 @@
     <button type="submit" (click)="addTask(tasksForm)" id="btnAddTask">Add task</button>
     <button (click)="showButtonSection = !showButtonSection">{{showButtonSection ? 'hide': 'show'}} actions</button>
     <span id="buttonSection" *ngIf="showButtonSection">
-        <button (click)="toggleViewFinishedToday()">{{viewFinishedToday ? 'hide': 'show'}} finished today</button>
         <button (click)="toggleViewBacklog()">{{viewBacklog ? 'hide': 'show'}} backlog</button>
         <button (click)="toggleViewAll()">{{viewAll ? 'hide': 'show'}} all</button>
         <button (click)="toggleViewPostponed()" *ngIf="state.postponedTasksCount">{{viewPostponed ? 'hide': 'show'}} postponed</button>
@@ -48,8 +47,15 @@
         <input type="checkbox" name="optCheckViewElapsedDays" id="optCheckViewElapsedDays"
             ng-checked="options.optViewElapsedDays"
             [(ngModel)]="options.optViewElapsedDays"
-            (click)="toggleOptViewElapsedDays()" />
+            (click)="toggleOption('optViewElapsedDays')" />
         <label for="optCheckViewElapsedDays">Display days elapsed since task was added</label>
+    </span>
+    <span>
+        <input type="checkbox" name="optCheckShowFinishedToday" id="optCheckShowFinishedToday"
+            ng-checked="options.optShowFinishedToday"
+            [(ngModel)]="options.optShowFinishedToday"
+            (click)="toggleOption('optShowFinishedToday')" />
+        <label for="optCheckShowFinishedToday">Show Finished Today</label>
     </span>
     <div id="optionsMessages"></div>
     <hr/>
@@ -99,42 +105,52 @@
 </div>
 <div id="openTaskList">
     <div *ngIf="!state.openTasks.length"><strong>No tasks open! Congratulations! Consider reviewing the backlog or add new tasks to do.</strong><hr/></div>
-    <div *ngFor="let item of state.openTasks">
-        <div>
-            <strong>{{item.header}}</strong>
-            / {{item.tasks.length}} tasks ({{formatTime(item.estimatedDuration * 60)}})
-        </div>
-        <div *ngFor="let t of item.tasks" data-id="{{t.tsk_id}}">
-            <input type="checkbox" id="{{t.tsk_id}}"
-                (click)="taskCheckboxHandler(t,$event)" />
-            <span *ngIf="t.tsk_total_time_spent !== 0"
-                [ngClass]="{'task-open-with-tt': (t.tsk_ctg_status === this.taskStatus.OPEN && t.tsk_time_history.length > 0)}"
-                >[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]
-                <span *ngIf="t.tsk_ctg_in_process !== 2">
-                    [<span contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'start')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_start | date: 'HH:mm:ss'}}</span> - <span contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'end')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_end | date: 'HH:mm:ss'}}</span>]
+    <div class="task-open-task-list-container">
+        <div *ngFor="let item of state.openTasks" class="task-record">
+            <div>
+                <strong>{{item.header}}</strong>
+                / {{item.tasks.length}} tasks ({{formatTime(item.estimatedDuration * 60)}})
+            </div>
+            <div *ngFor="let t of item.tasks" data-id="{{t.tsk_id}}">
+                <input type="checkbox" id="{{t.tsk_id}}"
+                    (click)="taskCheckboxHandler(t,$event)" />
+                <span class="mobile-only">
+                    <span class="play-button clickable" *ngIf="t.tsk_ctg_in_process === 1"
+                        (click)="toggleTimeTracking(t,$event)">&#9654;</span>
+                    <span class="stop-button clickable" *ngIf="t.tsk_ctg_in_process === 2"
+                        (click)="toggleTimeTracking(t,$event)">&#9724;</span>
                 </span>
-            </span>
-            <span *ngIf="t.tsk_ctg_in_process === 2">
-                [<span contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'start')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_start | date: 'HH:mm:ss'}}</span>]
-            </span>
-            <span>{{(timers[t.tsk_id]) ? '[' + timers[t.tsk_id].timerString + ']' : ''}}</span>
-            <span contenteditable="true" (keyup)="taskEdit(t,$event)"
-                [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1), 'task-urgent': (t.tsk_qualifiers.indexOf('urgent') !== -1), 'task-highlighted': (t.tsk_qualifiers.indexOf('highlighted') !== -1), 'task-progressed': (t.tsk_qualifiers.indexOf('progressed') !== -1)}"
-                (blur)="commandOnTask(t,$event)"
-                class="editable task-text">{{t.tsk_name}}</span>
-            <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
-                [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
-                class="task-eta"
-                >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
-            <span *ngIf="t.tsk_tags" class="task-tags">
-                <span *ngFor="let tag of t.tsk_tags.split(' ')"
-                    (click)="showTagStats(tag)"
-                    class="tag">
-                    #{{tag}}
+                <span *ngIf="t.tsk_total_time_spent !== 0"
+                    [ngClass]="{'task-open-with-tt': (t.tsk_ctg_status === this.taskStatus.OPEN && t.tsk_time_history.length > 0)}"
+                    >[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]
+                    <span *ngIf="t.tsk_ctg_in_process !== 2">
+                        [<span contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'start')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_start | date: 'HH:mm:ss'}}</span> - <span contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'end')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_end | date: 'HH:mm:ss'}}</span>]
+                    </span>
                 </span>
-            </span>
-            <span *ngIf="t.tsk_schedule_date_start"><strong>(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</strong></span>
-            <span [ngClass]="taskAgeClass(t)" *ngIf="options.optViewElapsedDays">{{taskAge(t)}}</span>
+                <span *ngIf="t.tsk_ctg_in_process === 2">
+                    [<span contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'start')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_start | date: 'HH:mm:ss'}}</span>]
+                </span>
+                <span (click)="toggleTimeMode()" class="clickable" title="click to toggle timer mode">
+                    {{(timers[t.tsk_id]) ? '[' + timers[t.tsk_id].timerString + ']' : ''}}
+                </span>
+                <span contenteditable="true" (keyup)="taskEdit(t,$event)"
+                    [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1), 'task-urgent': (t.tsk_qualifiers.indexOf('urgent') !== -1), 'task-highlighted': (t.tsk_qualifiers.indexOf('highlighted') !== -1), 'task-progressed': (t.tsk_qualifiers.indexOf('progressed') !== -1), 'task-call': (t.tsk_qualifiers.indexOf('call') !== -1)}"
+                    (blur)="commandOnTask(t,$event)"
+                    class="editable task-text">{{t.tsk_name}}</span>
+                <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
+                    [ngClass]="{'task-no-eta': (t.tsk_estimated_duration === 0)}"
+                    class="task-eta"
+                    >{{formatTime(t.tsk_estimated_duration * 60,"#h#m")}}</span>
+                <span *ngIf="t.tsk_tags" class="task-tags">
+                    <span *ngFor="let tag of t.tsk_tags.split(' ')"
+                        (click)="showTagStats(tag)"
+                        class="tag">
+                        #{{tag}}
+                    </span>
+                </span>
+                <span *ngIf="t.tsk_schedule_date_start"><strong>(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</strong></span>
+                <span [ngClass]="taskAgeClass(t)" *ngIf="options.optViewElapsedDays">{{taskAge(t)}}</span>
+            </div>
         </div>
     </div>
     <div id="Info">
@@ -152,6 +168,7 @@
         <br/>Time Management Ratio: <span>{{state.timeManagementRatio}}</span>
         <br/>Productivity Ratio: <span [ngClass]="state.productivityRatio.className">{{state.productivityRatio.value}} / {{state.productivityRatio.message}}</span>
         <br/>Karma Score: <span>{{state.karmaScore}} ({{state.karmaCount}} / {{state.closedTodayTasks.length}})</span>
+        <br/>Tasks not in sync: {{services.sync.queue.length}}
         <br/><strong>{{isOnline() ? '' : 'You are OFFLINE'}}</strong>
     </div>
     <hr/>
@@ -237,12 +254,19 @@
     <div>Status: {{state.selected.tsk_ctg_status}}</div>
     <hr/>
 </div>
-<div *ngIf="viewFinishedToday">
-    <strong>Finished Today</strong>
+<div *ngIf="options.optShowFinishedToday">
+    <strong>Finished Today / {{state.closedTodayTasks.length}} tasks</strong>
     <div *ngFor="let item of state.closedTodayTasks">
         <input type="checkbox" id="{{item.tsk_id}}" checked
             (click)="taskCheckboxHandler(item,$event)" />
-        <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
+        <span *ngIf="item.tsk_total_time_spent !== 0"
+            [ngClass]="{'task-open-with-tt': (item.tsk_ctg_status === this.taskStatus.OPEN && item.tsk_time_history.length > 0)}"
+            >[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]
+            <span *ngIf="item.tsk_ctg_in_process !== 2">
+                [<span contenteditable="true" (keyup)="timeTrackingQuickEdit(item,$event,'start')">{{item.tsk_time_history[item.tsk_time_history.length-1].tsh_date_start | date: 'HH:mm:ss'}}</span> - <span contenteditable="true" (keyup)="timeTrackingQuickEdit(item,$event,'end')">{{item.tsk_time_history[item.tsk_time_history.length-1].tsh_date_end | date: 'HH:mm:ss'}}</span>]
+            </span>
+        </span>
+        <span>(Done at: <span contenteditable="true" (keyup)="editDateDone(item,$event)">{{item.tsk_date_done | date: format}}</span>)</span>
         <span [ngClass]="{'task-done': (item.tsk_ctg_status === this.taskStatus.CLOSED)}"
             >{{item.tsk_name}}</span>
         <span *ngIf="item.tsk_tags" class="task-tags">
