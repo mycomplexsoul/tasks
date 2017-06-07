@@ -14,7 +14,7 @@ export class TasksCore {
     serverData: any = {
 
     };
-    apiRoot: string = 'http://localhost:8081';
+    apiRoot: string = 'http://127.0.0.1:8081';
     private headers = new Headers({'Content-Type': 'application/json'});
 
     constructor(private http: Http, private sync: SyncAPI) {
@@ -564,27 +564,23 @@ export class TasksCore {
     // }
 
     postTask(t: any){
-        // this.http.post(`${this.apiRoot}/task/create`,t,{headers: this.headers})
-        // .toPromise().then(response => {
-        //     console.log('post response',response.json());
-        // }).catch((err) => {
-        //     console.log('err',err);
-        // });
-        this.sync.request('POST',`${this.apiRoot}/task/create`,t,(data: any) => {
+        this.sync.request('POST', `${this.apiRoot}/task/create`, t
+            , (val: any) => val.tsk_id === t.tsk_id
+            , (e: Task) => e.tsk_id + ' / ' + e.tsk_name
+            , (data: any) => {
             
-        })
+            }
+        );
     }
 
     updateTaskBE(t: any){
-        // this.http.post(`${this.apiRoot}/task/update`,t,{headers: this.headers})
-        // .toPromise().then(response => {
-        //     console.log('post response',response.json());
-        // }).catch((err) => {
-        //     console.log('err',err);
-        // });
-        this.sync.request('POST',`${this.apiRoot}/task/update`,t,(data: any) => {
+        this.sync.request('POST', `${this.apiRoot}/task/update`, t
+            , (val: any) => val.tsk_id === t.tsk_id
+            , (e: Task) => e.tsk_id + ' / ' + e.tsk_name
+            , (data: any) => {
             
-        })
+            }
+        );
     }
 
     parseToPost(obj: any){

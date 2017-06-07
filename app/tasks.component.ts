@@ -17,7 +17,7 @@ export class TasksComponent implements OnInit {
     public groupHeader: string;
     public timers: any = {};
     public viewAll: boolean = false;
-    public viewFinishedToday: boolean = false;
+    // public viewFinishedToday: boolean = false;
     public viewBacklog: boolean = false;
     public viewPostponed: boolean = false;
     public viewReportsWeek: boolean = false;
@@ -39,10 +39,13 @@ export class TasksComponent implements OnInit {
     public tagInfo: any = {};
     public options: any = {
         optViewElapsedDays: false
+        , optShowFinishedToday: false
     };
+    public timerModeRemaining: boolean = false;
 
-    constructor(tasksCore: TasksCore, private rendered: Renderer){
+    constructor(tasksCore: TasksCore, private sync: SyncAPI, private rendered: Renderer){
         this.services.tasksCore = tasksCore;
+        this.services.sync = sync;
         this.updateState();
         this.notification({
             body: 'Hello there!! you have ' + this.state.openTasksCount + ' tasks open'
@@ -244,6 +247,11 @@ export class TasksComponent implements OnInit {
         return res;
     }
 
+    toggleTimeTracking(t: any, event: KeyboardEvent){
+        let parent = event.target["parentNode"];
+        this.taskToggleTimeTracking(t,parent);
+    }
+
     taskEdit(t: any, event: KeyboardEvent){
         let parent = event.target["parentNode"];
         if (event.altKey && event.keyCode==38){ // detect move up
@@ -270,23 +278,24 @@ export class TasksComponent implements OnInit {
         if (event.altKey && event.keyCode==66){ // detect 'b'
             this.taskToBacklog(t);
         }
-        if (event.altKey && event.keyCode==73){ // detect 'i'
+        if (event.altKey && (event.keyCode==73 || event.keyCode==50)){ // detect 'i' || '2'
             this.markTaskAs(t,'important');
         }
-        if (event.altKey && event.keyCode==85){ // detect 'u'
+        if (event.altKey && (event.keyCode==85 || event.keyCode==52)){ // detect 'u' || '4'
             this.markTaskAs(t,'urgent');
         }
-        if (event.altKey && event.keyCode==72){ // detect 'h'
+        if (event.altKey && (event.keyCode==72 || event.keyCode==53)){ // detect 'h' || '5'
             this.markTaskAs(t,'highlighted');
         }
-        if (event.altKey && event.keyCode==80){ // detect 'p'
+        if (event.altKey && (event.keyCode==80 || event.keyCode==51)){ // detect 'p' || '3'
             this.markTaskAs(t,'progressed');
         }
-        if (t.tsk_name !== event.target['textContent']){
-            this.updateTask(t.tsk_id,{
-                tsk_name: event.target['textContent']
-            });
+        if (event.altKey && (event.keyCode==67 || event.keyCode==54)){ // detect 'c' || '6'
+            this.markTaskAs(t,'call');
         }
+        // event.preventDefault();
+        // event.returnValue = false;
+        // return false;
     }
 
     taskCheckboxHandler(t: any, event: Event){
@@ -401,9 +410,16 @@ export class TasksComponent implements OnInit {
         }
 
         // dom.querySelector("span[contenteditable=true]").classList.add("task-in-process");
+        let formatTimerString = (timer: number) => {
+            if (this.timerModeRemaining){
+                return "R-" + this.formatTime((parseInt(task.tsk_estimated_duration) * 60) - parseInt(task.tsk_total_time_spent) - timer);
+            } else {
+                return this.formatTime(timer);
+            }
+        };
 
         let watch = setInterval(() => {
-            this.timers[task.tsk_id].timerString = this.formatTime(++timer);
+            this.timers[task.tsk_id].timerString = formatTimerString(++timer);
             if (task.tsk_estimated_duration * 60 - 60 < task.tsk_total_time_spent + timer && !this.timers[task.tsk_id].burnoutNotified){
                 this.timers[task.tsk_id].burnoutNotified = true;
                 if (this.tasks.find(t => t.tsk_id === task.tsk_id).tsk_ctg_status === this.taskStatus.OPEN){
@@ -415,7 +431,7 @@ export class TasksComponent implements OnInit {
         }, 1000);
 
         this.timers[task.tsk_id] = {};
-        this.timers[task.tsk_id].timerString = this.formatTime(timer);
+        this.timers[task.tsk_id].timerString = formatTimerString(timer);
         this.timers[task.tsk_id].watch = watch;
         this.timers[task.tsk_id].burnoutNotified = false;
     }
@@ -570,10 +586,6 @@ export class TasksComponent implements OnInit {
             this.viewETABeforeAdd = false;
         }
     }
-
-    toggleViewFinishedToday(){
-        this.viewFinishedToday = !this.viewFinishedToday;
-    }
     
     toggleViewBacklog(){
         this.viewBacklog = !this.viewBacklog;
@@ -679,6 +691,12 @@ export class TasksComponent implements OnInit {
     }
 
     commandOnTask(t: any, event: KeyboardEvent){
+        if (t.tsk_name !== event.target['textContent']){
+            this.updateTask(t.tsk_id,{
+                tsk_name: event.target['textContent']
+            });
+        }
+
         let command = event.target['textContent'];
         let originalTask = '';
         if (command.indexOf('--') !== -1){ // postpone
@@ -1172,10 +1190,14 @@ export class TasksComponent implements OnInit {
         }
     }
 
-    toggleOptViewElapsedDays(){
-        this.options.optViewElapsedDays = !this.options.optViewElapsedDays;
+    toggleOption(optionName: string){
+        this.options[optionName] = !this.options[optionName];
         if(typeof(window.localStorage) !== "undefined") {
             localStorage.setItem("Options", JSON.stringify(this.options));
         }
+    }
+
+    toggleTimeMode(){
+        this.timerModeRemaining = !this.timerModeRemaining;
     }
 }

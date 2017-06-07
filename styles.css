@@ -229,3 +229,29 @@ textarea.task-multiple {
 .task-progressed{
   background-color: #A2FFA9;
 }
+.task-call {
+  background-color: #81d4fa;
+}
+.clickable{
+  cursor: pointer;
+}
+@media (max-width: 504px){
+  .mobile-only {
+    display: initial;
+  }
+}
+@media (min-width: 505px){
+  .mobile-only {
+    display: none;
+  }
+}
+
+.task-open-task-list-container {
+  display: flex;
+  flex-flow: row wrap;
+}
+.task-record {
+  max-width: 500px;
+  min-width: 300px;
+  flex: 0 0 33%;
+}

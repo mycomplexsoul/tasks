@@ -1,25 +1,55 @@
 import { Injectable } from "@angular/core";
-import { Http, Headers } from '@angular/http';
+import { Http, Headers, RequestOptions } from '@angular/http';
 
 @Injectable()
 export class SyncAPI {
     public queue: Array<SyncQueue> = [];
-    private apiRoot: string = 'http://localhost:8081';
-    private headers = new Headers({'Content-Type': 'application/json'});
+    private apiRoot: string = 'http://127.0.0.1:8081';
+    private headers = new Headers({'Content-Type': 'application/json', 'Access-Control-Allow-Headers': 'Content-Type'});
+    private options = new RequestOptions({ headers: this.headers });
+    private version = 'v1.2';
+    private logPrefix = `Sync API ${this.version} -`;
     
     constructor(private http: Http){
         this.http = http;
+        this.log('Starting, recovering pending queue from storage');
+        this.queue = this.fromStorage() || [];
+        this.queueStatus();
+        
+        if (this.queue.length > 0){
+            this.log(`Found in storage ${this.queue.length} requests, trying to process queue if possible`);
+            this.log('Current queue',this.queue);
+            this.isOnline().then((online) => {
+                if (online){
+                    this.processQueue();
+                }
+            });
+        }
     }
 
-    request(method: string, url: string, data: any, callback: Function){
-        this.queue.push({
-            method, url, data, callback
-            , status: 'queue'
-        });
+    request(method: string, url: string, data: any, matchMethod: (val: any) => boolean, objNameMethod: (e: any) => string, callback: Function){
+        this.log(`Handling new request`);
+        if (matchMethod){
+            let foundIndex = this.queue.findIndex((val: any) => matchMethod(val.data) && (val.status === 'queue' || val.status === 'error'));
 
-        console.log(`Sync API - Recieved a request to ${url} and added it to the queue`);
-        console.log(`Sync API - Currently there are ${this.queue.length} elements in the queue`);
-        console.log(`Sync API - Of which ${this.queue.filter(q => q.status === 'queue').length} elements are not yet processed`);
+            if (foundIndex !== -1) { // if record has a match, replace data only
+                this.log(`Recieved a request, found record with id ${objNameMethod(data)} and updated it`);
+                this.queue[foundIndex].data = data;
+            } else { // if not found, add it
+                this.queue.push({
+                    method, url, data, callback
+                    , status: 'queue'
+                });
+            }
+        } else {
+            // by request
+            this.queue.push({
+                method, url, data, callback
+                , status: 'queue'
+            });
+        }
+
+        this.log(`Recieved a request to ${url} and added it to the queue`);
 
         this.isOnline().then((online) => {
             if (online){
@@ -30,7 +60,9 @@ export class SyncAPI {
 
     isOnline(){
         let nav = navigator.onLine;
+        this.log(`Your navigator reports online status as: ${nav}`)
         return this.isServerReachable().then((data) => { // some request to BE
+            this.log(`Tried to contact the server, answer was`,data);
             return nav && data;
         });
     }
@@ -38,10 +70,8 @@ export class SyncAPI {
     isServerReachable(){
         return this.http.get(`${this.apiRoot}/online`).toPromise()
         .then((data) => {
-            console.log(data.json());
             return true;
         }).catch((err) => {
-            console.log(err);
             return false;
         });
     }
@@ -50,17 +80,20 @@ export class SyncAPI {
         this.queue.filter((q: any) => { // retry the ones with error
             return q.status === 'error';
         }).forEach((q: any) => {
-            console.log('Sync API - Processing request that before had an error', q);
+            this.log('Processing request that before had an error', q);
             if (q.method === 'POST'){
-                this.http.post(q.url,q.data,{headers: this.headers}).toPromise()
+                this.http.post(q.url,q.data,this.options).toPromise()
                 .then((data) => {
-                    console.log('Sync API - Processed request and response', q, data.json());
+                    this.log('Processed request and response',data.json());
                     q.callback(data.json());
                     q.status = 'processed';
-                    console.log(`Sync API - ${this.queue.length} elements in the queue, ${this.queue.filter(q => q.status === 'processed').length} processed, ${this.queue.filter(q => q.status === 'queue').length} not yet processed, ${this.queue.filter(q => q.status === 'error').length} with error`);
+                    this.queueStatus();
+                    this.toStorage();
                 }).catch((err) => {
-                    console.log('Sync API - Error for request (again)', q, err);
+                    this.log('Error for request (again)', [q, err]);
                     q.status = 'error';
+                    this.queueStatus();
+                    this.toStorage();
                 });
             }
         });
@@ -68,26 +101,52 @@ export class SyncAPI {
         this.queue.filter((q: any) => { // process queue
             return q.status === 'queue';
         }).forEach((q: any) => {
-            console.log('Sync API - Processing request', q);
+            this.log('Processing request', q);
             if (q.method === 'POST'){
-                this.http.post(q.url,q.data,{headers: this.headers}).toPromise()
+                this.http.post(q.url,q.data,this.options).toPromise()
                 .then((data) => {
-                    console.log('Sync API - Processed request and response', q, data.json());
+                    this.log('Processed request and response', data.json());
                     q.callback(data.json());
                     q.status = 'processed';
-                    console.log(`Sync API - ${this.queue.length} elements in the queue, ${this.queue.filter(q => q.status === 'processed').length} processed, ${this.queue.filter(q => q.status === 'queue').length} not yet processed, ${this.queue.filter(q => q.status === 'error').length} with error`);
+                    this.queueStatus();
+                    this.toStorage();
                 }).catch((err) => {
-                    console.log('Sync API - Error for request', q, err);
+                    this.log('Error for request', [q, err]);
                     q.status = 'error';
+                    this.queueStatus();
+                    this.toStorage();
                 });
             }
 
         });
 
-        console.log(`Sync API - Currently there are ${this.queue.length} elements in the queue`);
-        console.log(`Sync API - Of which ${this.queue.filter(q => q.status === 'queue').length} elements are not yet processed`);
-        console.log(`Sync API - And ${this.queue.filter(q => q.status === 'processed').length} elements are processed`);
-        console.log(`Sync API - And ${this.queue.filter(q => q.status === 'error').length} elements returned an error`);
+    }
+
+    queueStatus(){
+        console.log(`${this.logPrefix} Status is ${this.queue.length} elements in the queue, ${this.queue.filter(q => q.status === 'processed').length} processed, ${this.queue.filter(q => q.status === 'queue').length} not yet processed, ${this.queue.filter(q => q.status === 'error').length} with error`);
+    }
+
+    log(message: string,data?: any){
+        if (!data){
+            console.log(`${this.logPrefix} ${message}`);
+        } else {
+            console.log(`${this.logPrefix} ${message}`, data);
+        }
+    }
+
+    toStorage(){
+        if(typeof(window.localStorage) !== "undefined") {
+            localStorage.setItem("Sync", JSON.stringify(this.queue.filter(q => q.status !== 'processed')));
+            this.queue = this.queue.filter(q => q.status !== 'processed')
+        }
+    }
+
+    fromStorage(){
+        if(typeof(window.localStorage) !== "undefined") {
+            let list: Array<SyncQueue> = JSON.parse(localStorage.getItem("Sync"));
+            return list;
+        }
+        return [];
     }
 }
 
