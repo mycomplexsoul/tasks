@@ -150,6 +150,7 @@
                 </span>
                 <span *ngIf="t.tsk_schedule_date_start"><strong>(start at {{t.tsk_schedule_date_start | date: 'yyyy-MM-dd HH:mm'}})</strong></span>
                 <span [ngClass]="taskAgeClass(t)" *ngIf="options.optViewElapsedDays">{{taskAge(t)}}</span>
+                <span *ngIf="t.not_sync">(Not in sync)</span>
             </div>
         </div>
     </div>
@@ -282,19 +283,25 @@
 </div>
 <div id="closedTaskList" *ngIf="viewAll">
     <strong>Closed Tasks</strong>
-    <div *ngFor="let item of state.closedTasks">
-        - <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
-        <span>[{{item.tsk_id_record}}]</span>
-        <span>{{item.tsk_name}}</span>
-        <span>(done at {{item.tsk_date_done | date: 'yyyy-MM-dd HH:mm:ss'}})</span>
-        <span *ngIf="item.tsk_tags" class="task-tags">
-            <span *ngFor="let tag of item.tsk_tags.split(' ')"
-                (click)="showTagStats(tag)"
-                class="tag">
-                #{{tag}}
+    <div *ngFor="let group of state.closedTasks">
+        <div>
+            <strong>{{group.header | date: "yyyy-MM-dd"}}</strong>
+            <span>(Spent {{formatTime(group.totalTimeSpent)}})</span>
+        </div>
+        <div *ngFor="let item of group.tasks">
+            - <span>[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]</span>
+            <span>[{{item.tsk_id_record}}]</span>
+            <span>{{item.tsk_name}}</span>
+            <span>(done at {{item.tsk_date_done | date: 'yyyy-MM-dd HH:mm:ss'}})</span>
+            <span *ngIf="item.tsk_tags" class="task-tags">
+                <span *ngFor="let tag of item.tsk_tags.split(' ')"
+                    (click)="showTagStats(tag)"
+                    class="tag">
+                    #{{tag}}
+                </span>
             </span>
-        </span>
-        <button (click)="setSelected(item)">details</button>
+            <button (click)="setSelected(item)">details</button>
+        </div>
     </div>
     <hr/>
 </div>

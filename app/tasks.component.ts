@@ -111,7 +111,7 @@ export class TasksComponent implements OnInit {
         this.tasks = this.services.tasksCore.tasks();
         this.state.backlogTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.BACKLOG).sort(this.sortByGroup));
         this.state.openTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) < today : true)).sort(this.sortByGroup));
-        this.state.closedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED).sort(sortByClosedDate);
+        this.state.closedTasks = this.createGroupedClosedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED).sort(sortByClosedDate));
         this.state.closedTodayTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED && new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) <= today).sort(sortByClosedDate);
         this.state.postponedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) > today : false)).sort(sortByDateUntilView);
 
@@ -187,6 +187,9 @@ export class TasksComponent implements OnInit {
         if (this.state.realTimeElapsed){
             this.state.timeManagementRatio = Math.round(this.state.totalTimeSpentToday * 100 / this.state.realTimeElapsed) / 100;
         }
+
+        // identify not synced tasks
+        this.tasksNotInSync();
 
         // reporting
         this.weekStats();
@@ -1199,5 +1202,43 @@ export class TasksComponent implements OnInit {
 
     toggleTimeMode(){
         this.timerModeRemaining = !this.timerModeRemaining;
+    }
+
+    tasksNotInSync(){
+        if (this.services.sync.queue.filter((q: any) => q.status !== 'processed').length === 0){
+            this.tasks.filter((t: any) => t.not_sync === true).forEach((t: any) => t.not_sync = undefined);
+        } else {
+            this.services.sync.queue.filter((q: any) => q.status !== 'processed').forEach((q: any) => {
+                let task = this.tasks.find((t: Task) => t.tsk_id === q.data.tsk_id);
+                task.not_sync = true;
+            });
+        }
+    }
+
+    createGroupedClosedTasks(tasks: Array<any>){
+        let res: Array<any> = [];
+        let lastHeader: Date = new Date();
+
+        tasks.forEach((t) => {
+            if (this.services.tasksCore.dateOnly(new Date(t.tsk_date_done)).getTime() !== lastHeader.getTime()){
+                lastHeader = this.services.tasksCore.dateOnly(new Date(t.tsk_date_done));
+                res.push({
+                    'header': lastHeader
+                    , 'totalTimeSpent': 0
+                    , 'tasks': []
+                });
+            }
+            res[res.length-1].tasks.push(t);
+            res[res.length-1].totalTimeSpent += t.tsk_total_time_spent;
+        });
+
+        // order groups by date desc
+        res = res.sort((a: any, b: any) :number => {
+            return a.header > b.header ? -1 : 1;
+        });
+
+        console.log('closed tasks',res);
+
+        return res;
     }
 }

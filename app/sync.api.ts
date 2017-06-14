@@ -4,7 +4,7 @@ import { Http, Headers, RequestOptions } from '@angular/http';
 @Injectable()
 export class SyncAPI {
     public queue: Array<SyncQueue> = [];
-    private apiRoot: string = 'http://127.0.0.1:8081';
+    private apiRoot: string = 'http://10.230.9.78:8081';
     private headers = new Headers({'Content-Type': 'application/json', 'Access-Control-Allow-Headers': 'Content-Type'});
     private options = new RequestOptions({ headers: this.headers });
     private version = 'v1.2';
@@ -21,7 +21,8 @@ export class SyncAPI {
             this.log('Current queue',this.queue);
             this.isOnline().then((online) => {
                 if (online){
-                    this.processQueue();
+                    //this.processQueue();
+                    this.syncQueue();
                 }
             });
         }
@@ -147,6 +148,39 @@ export class SyncAPI {
             return list;
         }
         return [];
+    }
+
+    syncQueue(){
+        let dataToSend = <any>[];
+        
+        this.queue.filter((q: any) => { // process queue
+            return q.status !== 'processed';
+        }).forEach((q: any) => {
+            dataToSend.push({
+                action: (q.url.indexOf('create') !== -1 ? 'create' : 'update')
+                , data: q.data
+            });
+        });
+
+        this.http.post(`${this.apiRoot}/task/sync`, dataToSend, this.options).toPromise()
+        .then((data) => {
+            this.log('Processed sync, response was', data.json());
+            // q.callback(data.json());
+            //q.status = 'processed';
+            let response = data.json();
+            // get status from response
+            response.batchResultTasks.forEach((r: any) => {
+                let Q = this.queue.find((q: any) => q.data.tsk_id === r.id);
+                Q.status = r.operationOk ? 'processed' : 'error';
+            });
+            this.queueStatus();
+            this.toStorage();
+        }).catch((err) => {
+            this.log('Error for request', err);
+            //q.status = 'error';
+            this.queueStatus();
+            this.toStorage();
+        });
     }
 }
 

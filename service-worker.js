@@ -63,70 +63,72 @@ self.addEventListener('activate', function(e) {
 });
 
 
-self.addEventListener('fetch', function(e) {
-	console.log('[ServiceWorker] Fetch ' + cacheName, e.request.url);
+// self.addEventListener('fetch', function(e) {
+// 	console.log('[ServiceWorker] Fetch ' + cacheName, e.request.url);
 
-    var isNotExcluded = function(url){
-        var exclusions = ['browser-sync'];
-        var doNotExclude = true;
-        exclusions.forEach((e) => {
-            if (url.indexOf(e) !== -1){
-                return false;
-            }
-        });
+//     var isNotExcluded = function(url){
+//         var exclusions = ['browser-sync','/online','/task/sync'];
+//         var doNotExclude = true;
+//         exclusions.forEach((e) => {
+//             if (url.indexOf(e) !== -1){
+//                 doNotExclude = false;
+//             }
+//         });
 
-        return doNotExclude;
-    }
+//         return doNotExclude;
+//     }
 
-    // e.respondWidth Responds to the fetch event
-    e.respondWith(
+//     // e.respondWidth Responds to the fetch event
+//     e.respondWith(
 
-        // Check in cache for the request being made
-        caches.match(e.request)
+//         // Check in cache for the request being made
+//         caches.match(e.request)
 
 
-            .then(function(response) {
+//             .then(function(response) {
 
-                // If the request is in the cache
-                if ( response ) {
-                    console.log("[ServiceWorker] Found in Cache", e.request.url, response);
-                    // Return the cached version
-                    return response;
-                }
+//                 // If the request is in the cache
+//                 if ( response ) {
+//                     console.log("[ServiceWorker] Found in Cache", e.request.url, response);
+//                     // Return the cached version
+//                     return response;
+//                 }
 
-                // If the request is NOT in the cache, fetch and cache
+//                 // If the request is NOT in the cache, fetch and cache
 
-                var requestClone = e.request.clone();
-                fetch(requestClone)
-                    .then(function(response) {
+//                 var requestClone = e.request.clone();
+//                 fetch(requestClone)
+//                     .then(function(response) {
 
-                        if ( !response ) {
-                            console.log("[ServiceWorker] No response from fetch ")
-                            return response;
-                        }
+//                         if ( !response ) {
+//                             console.log("[ServiceWorker] No response from fetch ")
+//                             return response;
+//                         }
 
-                        var responseClone = response.clone();
+//                         var responseClone = response.clone();
 
-                        //  Open the cache
-                        caches.open(cacheName).then(function(cache) {
+//                         //  Open the cache
+//                         caches.open(cacheName).then(function(cache) {
 
-                            if(isNotExcluded(e.request.url) && e.request.method !== 'POST'){
-                                // Put the fetched response in the cache
-                                cache.put(e.request, responseClone);
-                                console.log('[ServiceWorker] New Data Cached', e.request.url);
+//                             if(isNotExcluded(e.request.url) && e.request.method !== 'POST'){
+//                                 // Put the fetched response in the cache
+//                                 cache.put(e.request, responseClone);
+//                                 console.log('[ServiceWorker] New Data Cached', e.request.url);
 
-                                // Return the response
-                                return response;
-                            }
+//                                 // Return the response
+//                                 return response;
+//                             } else {
+//                                 return response;
+//                             }
             
-                        }); // end caches.open
+//                         }); // end caches.open
 
-                    })
-                    .catch(function(err) {
-                        console.log('[ServiceWorker] Error Fetching & Caching New Data', err);
-                    });
+//                     })
+//                     .catch(function(err) {
+//                         console.log('[ServiceWorker] Error Fetching & Caching New Data', err);
+//                     });
 
 
-            }) // end caches.match(e.request)
-    ); // end e.respondWith
-});
+//             }) // end caches.match(e.request)
+//     ); // end e.respondWith
+// });
