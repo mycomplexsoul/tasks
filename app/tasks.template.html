@@ -25,7 +25,8 @@
         <button (click)="toggleViewOptions()">{{viewOptions ? 'hide': 'show'}} options</button>
     </span>
     <div *ngIf="viewETABeforeAdd">
-        <strong>[TOTAL: {{formatTime(state.beforeAddTotalETA * 60)}}]</strong>
+        <strong>[{{state.beforeAddTotalTasksWritten}} Tasks to Add]</strong>
+        <strong>[TOTAL ETA: {{formatTime(state.beforeAddTotalETA * 60)}}]</strong>
         <span *ngFor="let r of state.beforeAddETA">
             [{{r.record}}: {{formatTime(r.totalETA * 60)}}]
         </span>
@@ -56,6 +57,20 @@
             [(ngModel)]="options.optShowFinishedToday"
             (click)="toggleOption('optShowFinishedToday')" />
         <label for="optCheckShowFinishedToday">Show Finished Today</label>
+    </span>
+    <span>
+        <input type="checkbox" name="optCheckShowQualifiedTasksOnly" id="optCheckShowQualifiedTasksOnly"
+            ng-checked="options.optShowQualifiedTasksOnly"
+            [(ngModel)]="options.optShowQualifiedTasksOnly"
+            (click)="toggleOption('optShowQualifiedTasksOnly');updateState();" />
+        <label for="optCheckShowQualifiedTasksOnly">Show only tasks that have Qualifiers</label>
+    </span>
+    <span>
+        <input type="checkbox" name="optCheckNewTaskStatusIsBacklog" id="optCheckNewTaskStatusIsBacklog"
+            ng-checked="options.optNewTaskStatusIsBacklog"
+            [(ngModel)]="options.optNewTaskStatusIsBacklog"
+            (click)="toggleOption('optNewTaskStatusIsBacklog');" />
+        <label for="optCheckNewTaskStatusIsBacklog">When a new task is added, add it to BACKLOG instead (of adding it to OPEN)</label>
     </span>
     <div id="optionsMessages"></div>
     <hr/>
@@ -171,6 +186,18 @@
         <br/>Karma Score: <span>{{state.karmaScore}} ({{state.karmaCount}} / {{state.closedTodayTasks.length}})</span>
         <br/>Tasks not in sync: {{services.sync.queue.length}}
         <br/><strong>{{isOnline() ? '' : 'You are OFFLINE'}}</strong>
+        <table>
+            <tr>
+                <td>Indicator</td>
+                <td *ngFor="let c of state.indicatorLabels">{{c}}</td>
+                <td>Completed?</td>
+            </tr>
+            <tr *ngFor="let indicator of state.indicators">
+                <td>{{indicator.name}}</td>
+                <td *ngFor="let v of indicator.values">{{v}}</td>
+                <td>{{indicator.isCompleted ? 'SI' : 'NO'}} / {{indicator.percentageCompleted}}</td>
+            </tr>
+        </table>
     </div>
     <hr/>
 </div>
@@ -350,4 +377,20 @@
         </tr>
     </table>
     <hr/>
+</div>
+
+<div *ngIf="comparisonData">
+    Client Task Count: {{comparisonData.clientTaskCount}}
+    <br/>Server Task Count: {{comparisonData.serverTaskCount}}
+    <br/>Comparison Task Count: {{comparisonData.results.length}}
+    <table>
+        <tr *ngFor="let c of comparisonData.results">
+            <td *ngFor="let f of c">
+                id: {{f.id}} |
+                name: {{f.name}} | 
+                comparison: {{f.isEqual}} |
+                data: {{f.client}} / {{f.server}}
+            </td>
+        </tr>
+    </table>
 </div>

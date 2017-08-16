@@ -17,9 +17,11 @@ var cacheFiles = [
 	'./app/sync.api.js',
 	'./app/tasks.component.js',
 	'./app/tasks.core.js',
-	'./app/tasks.types.js',
+	'./app/task.type.js',
 	'./app/tasks.template.html',
-	'./styles.css'
+	'./styles.css',
+	'./app/task.indicator.service.js',
+	'./app/date.common.js'
 	// 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic'
 ]
 
@@ -62,6 +64,30 @@ self.addEventListener('activate', function(e) {
 
 });
 
+/* Cache handle just for files listed */
+self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    caches.match(event.request).then(function(response) {
+      return response || fetch(event.request);
+    })
+  );
+});
+
+/*self.addEventListener('sync', function(event) {
+  self.registration.showNotification("Sync event fired!");
+  if (event.tag === 'syncTest') {
+    event.waitUntil(doSomeStuff());
+  }
+});
+
+function doSomeStuff() {
+	let p = new Promise((resolve,reject) => {
+		setTimeout(() => {
+			self.registration.showNotification("test Sync finished!");
+			resolve('is this working?');
+		},3000);
+	});
+}*/
 
 // self.addEventListener('fetch', function(e) {
 // 	console.log('[ServiceWorker] Fetch ' + cacheName, e.request.url);

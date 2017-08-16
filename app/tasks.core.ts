@@ -11,9 +11,8 @@ export class TasksCore {
         taskList: <Array<Task>>[]
         , user: 'anon'
     };
-    serverData: any = {
-
-    };
+    serverData: any = {};
+    comparisonData: any = {};
     apiRoot: string = 'http://10.230.9.78:8081';
     private headers = new Headers({'Content-Type': 'application/json'});
 
@@ -31,10 +30,10 @@ export class TasksCore {
      * @param {object} task A basic task model, for simplicity to be extended and added to the task collection.
      * @return {object} The task added to the collection (as a complete task model).
      */
-    addTask(task: any){
+    addTask(task: any, options: any){
         let T = this.data.taskList;
 
-        let parsedTask = this.parseTask(task);
+        let parsedTask = this.parseTask(task,options);
 
         T.push(this.newTaskTemplate(parsedTask));
         // console.log(T[T.length-1]);
@@ -43,7 +42,7 @@ export class TasksCore {
         return T[T.length-1];
     }
 
-    parseTask(task: any){
+    parseTask(task: any, options: any){
         // detect group list for the task (at start of text)
         if (task.tsk_name.startsWith('[')){
             task.tsk_id_record = task.tsk_name.substr(task.tsk_name.indexOf('[')+1,task.tsk_name.indexOf(']')-1);
@@ -151,12 +150,19 @@ export class TasksCore {
         }
 
         // detect [OPEN] token, creates task as an OPEN task
-        if (task.tsk_name.indexOf('[OPEN]') !== -1){
-            task.tsk_name = task.tsk_name.replace('[OPEN] ','');
-            task.tsk_name = task.tsk_name.replace(' [OPEN]','');
-            task.tsk_name = task.tsk_name.replace('[OPEN]','');
+        const tokenBacklog = '[BACKLOG]';
+        if (task.tsk_name.indexOf(tokenBacklog) !== -1){
+            task.tsk_name = task.tsk_name.replace(`${tokenBacklog} `,'');
+            task.tsk_name = task.tsk_name.replace(` ${tokenBacklog}`,'');
+            task.tsk_name = task.tsk_name.replace(`${tokenBacklog}`,'');
 
-            task.tsk_ctg_status = 2 // OPEN
+            task.tsk_ctg_status = 1 // BACKLOG
+        } else {
+            if (options.optNewTaskStatusIsBacklog){
+                task.tsk_ctg_status = 1 // BACKLOG
+            } else {
+                task.tsk_ctg_status = 2 // OPEN
+            }
         }
 
         // detects $[] qualifiers
@@ -224,7 +230,7 @@ export class TasksCore {
             , 'tsk_id_user_asigned': task.tsk_id_user_asigned || this.data.user
             , 'tsk_date_add': task.tsk_date_add || new Date()
             , 'tsk_date_mod': new Date()
-            , 'tsk_ctg_status': task.tsk_ctg_status || 1
+            , 'tsk_ctg_status': task.tsk_ctg_status
         }
     }
 
@@ -631,6 +637,57 @@ export class TasksCore {
         }).catch((err) => {
             console.log('err',err);
         });
+    }
+
+    computeComparisonData(){
+        return this.getTasks().then((serverData) => {
+            let clientData = this.data.taskList;
+            let singleTask: any;
+            let comparisonResults: Array<any> = [];
+            let result: any;
+
+            // compare tasks, client first
+            clientData.forEach((t: any) => {
+                singleTask = serverData.find((s: any) => s.tsk_id === t.tsk_id);
+
+                if (singleTask){
+                    result = this.compareTask(t,singleTask);
+                    if (result.length > 0){
+                        comparisonResults.push(result);
+                    }
+                } else {
+                    comparisonResults.push(this.compareTask(t,{}));
+                }
+            });
+
+            this.comparisonData = {
+                results: comparisonResults
+                , clientTaskCount: clientData.length
+                , serverTaskCount: serverData.length
+            };
+            return this.comparisonData;
+        });
+    }
+
+    compareTask(t: any, s: any){
+        //let fields = ['tsk_id_container','tsk_id_record','tsk_name','tsk_notes', 'tsk_parent', 'tsk_order', 'tsk_date_done', 'tsk_total_time_spent', 'tsk_ctg_in_process', 'tsk_qualifiers', 'tsk_tags', 'tsk_estimated_duration', 'tsk_schedule_date_start', 'tsk_schedule_date_end', 'tsk_date_view_until', 'tsk_id_user_added', 'tsk_id_user_asigned', 'tsk_date_add', 'tsk_date_mod', 'tsk_ctg_status'];
+        let fields = ['tsk_date_done'];
+        let comparison: Array<any> = [];
+        let field: any = {};
+
+        fields.forEach((f: string) => {
+            field = {};
+            field.id = t.tsk_id;
+            field.name = f;
+            field.client = t[f];
+            field.server = s[f];
+            field.isEqual = t[f] === s[f];
+            if (!field.isEqual){
+                comparison.push(field);
+            }
+        });
+
+        return comparison;
     }
 
 }

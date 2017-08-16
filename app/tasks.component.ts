@@ -2,11 +2,13 @@ import { Component, OnInit, Renderer } from '@angular/core';
 import { TasksCore } from '../app/tasks.core';
 import { SyncAPI } from '../app/sync.api';
 import { Task } from './task.type';
+import { TaskIndicator } from './task.indicator.service';
+import { DateCommon } from './date.common';
 
 @Component({
     selector: 'tasks',
     templateUrl: './app/tasks.template.html',
-    providers: [TasksCore, SyncAPI]
+    providers: [TasksCore, SyncAPI, TaskIndicator]
 })
 export class TasksComponent implements OnInit {
     public item: any;
@@ -37,27 +39,32 @@ export class TasksComponent implements OnInit {
     public optionsInput: string = "default";
     public showButtonSection: boolean = false;
     public tagInfo: any = {};
-    public options: any = {
+    public options: any;
+    public defaultOptions: any = {
         optViewElapsedDays: false
         , optShowFinishedToday: false
+        , optShowQualifiedTasksOnly: false
+        , optNewTaskStatusIsBacklog: false
     };
     public timerModeRemaining: boolean = false;
+    public comparisonData: any;
 
-    constructor(tasksCore: TasksCore, private sync: SyncAPI, private rendered: Renderer){
+    constructor(tasksCore: TasksCore, private sync: SyncAPI, private taskIndicator: TaskIndicator, private dateUtils: DateCommon, private rendered: Renderer){
         this.services.tasksCore = tasksCore;
         this.services.sync = sync;
+        this.services.taskIndicator = taskIndicator;
+        this.services.dateUtils = dateUtils;
+        if (typeof(window.localStorage) !== "undefined") {
+            this.options = JSON.parse(localStorage.getItem('Options'));
+            if(!this.options){
+                this.options = this.defaultOptions;
+            }
+        }
         this.updateState();
         this.notification({
             body: 'Hello there!! you have ' + this.state.openTasksCount + ' tasks open'
         });
-        if (typeof(window.localStorage) !== "undefined") {
-            this.options = JSON.parse(localStorage.getItem('Options'));
-            if(!this.options){
-                this.options = {
-                    optViewElapsedDays: false
-                };
-            }
-        }
+        //this.services.tasksCore.computeComparisonData().then((data: any) => this.comparisonData = data);
     }
 
     ngOnInit(){
@@ -70,7 +77,7 @@ export class TasksComponent implements OnInit {
                 this.services.tasksCore.addTask({
                     'tsk_date_add': new Date(),
                     'tsk_name': form.value.tsk_name
-                });
+                },this.options);
                 this.tasks = this.services.tasksCore.tasks();
                 this.updateState();
                 form.controls.tsk_name.reset();
@@ -84,7 +91,7 @@ export class TasksComponent implements OnInit {
                         t = this.services.tasksCore.addTask({
                             'tsk_date_add': new Date(),
                             'tsk_name': text
-                        });
+                        },this.options);
                         console.log("added task:",t);
                     }
                 });
@@ -100,6 +107,8 @@ export class TasksComponent implements OnInit {
     updateState(){
         let today = new Date();
         let today0 = new Date(today.getFullYear(),today.getMonth(),today.getDate());
+        let yesterday0 = new Date(today.getFullYear(),today.getMonth(),today.getDate()-1);
+        let tomorrow0 = new Date(today.getFullYear(),today.getMonth(),today.getDate()+1);
         let sortByClosedDate = (a: any, b: any) => {
             let res = new Date(a.tsk_date_done) > new Date(b.tsk_date_done);
             return res ? -1 : 1;
@@ -110,7 +119,7 @@ export class TasksComponent implements OnInit {
         };
         this.tasks = this.services.tasksCore.tasks();
         this.state.backlogTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.BACKLOG).sort(this.sortByGroup));
-        this.state.openTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) < today : true)).sort(this.sortByGroup));
+        this.state.openTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) < today : true) && ((this.options.optShowQualifiedTasksOnly ? t.tsk_qualifiers !== '' : true) || t.tsk_ctg_in_process == 2)).sort(this.sortByGroup));
         this.state.closedTasks = this.createGroupedClosedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED).sort(sortByClosedDate));
         this.state.closedTodayTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED && new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) <= today).sort(sortByClosedDate);
         this.state.postponedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) > today : false)).sort(sortByDateUntilView);
@@ -187,6 +196,9 @@ export class TasksComponent implements OnInit {
         if (this.state.realTimeElapsed){
             this.state.timeManagementRatio = Math.round(this.state.totalTimeSpentToday * 100 / this.state.realTimeElapsed) / 100;
         }
+
+        // indicators array
+        this.calculateIndicators();
 
         // identify not synced tasks
         this.tasksNotInSync();
@@ -295,6 +307,9 @@ export class TasksComponent implements OnInit {
         }
         if (event.altKey && (event.keyCode==67 || event.keyCode==54)){ // detect 'c' || '6'
             this.markTaskAs(t,'call');
+        }
+        if (event.altKey && event.keyCode==107){ // detect '+'
+            this.focusElement('input[name=tsk_name]');
         }
         // event.preventDefault();
         // event.returnValue = false;
@@ -563,12 +578,13 @@ export class TasksComponent implements OnInit {
         // console.log('event',event);
         // console.log(value.split('\n'));
         if (value){
+            let totalTasksWritten = 0;
             value.split('\n').forEach((text: string) => {
                 if (!text.startsWith('//') && text !== ''){
                     t = this.services.tasksCore.parseTask({
                         'tsk_date_add': new Date(),
                         'tsk_name': text
-                    });
+                    },this.options);
                     if (totalPerRecord.find((r: any) => r.record === t.tsk_id_record)){
                         totalPerRecord.find((r: any) => r.record === t.tsk_id_record).totalETA += t.tsk_estimated_duration || 0;
                     } else {
@@ -578,12 +594,14 @@ export class TasksComponent implements OnInit {
                         });
                     }
                     totalETA += t.tsk_estimated_duration || 0;
+                    totalTasksWritten++;
                     // console.log("totals",totalPerRecord);
                 }
             });
             this.viewETABeforeAdd = true;
             this.state.beforeAddETA = totalPerRecord;
             this.state.beforeAddTotalETA = totalETA;
+            this.state.beforeAddTotalTasksWritten = totalTasksWritten;
             // console.log('ETA',totalETA);
         } else {
             this.viewETABeforeAdd = false;
@@ -1110,6 +1128,13 @@ export class TasksComponent implements OnInit {
                 .register('./service-worker.js')
                 .then(function(registration: any) {
                     console.log("Service Worker Registered");
+                    return registration.sync.getTags();
+                }).then(function() {
+                    return navigator['serviceWorker'].ready;
+                }).then(function(reg: any) {
+                    return reg.sync.register('syncTest');
+                }).then(function() {
+                    console.log('Sync registered');
                 })
                 .catch(function(err: any) {
                     console.log("Service Worker Failed to Register", err);
@@ -1241,4 +1266,88 @@ export class TasksComponent implements OnInit {
 
         return res;
     }
+
+    calculateIndicators(){
+        let today = new Date();
+        let today0 = new Date(today.getFullYear(),today.getMonth(),today.getDate());
+        let days: Array<Date> = [];
+        let dayLabels: Array<String> = [];
+        let nextDay: Date;
+        for(let i = 0 ; i < 7 ; i++){
+            nextDay = this.services.dateUtils.addDays(today0,-1*i);
+            if (nextDay.getDay() !== 0 && nextDay.getDay() !== 6){
+                days.push(nextDay);
+                dayLabels.push(i===0 ? 'Today' : (i===1 ? 'Yesterday' : i + ' days ago'));
+            }
+        }
+        days.reverse();
+        dayLabels.reverse();
+        let values = [];
+
+        let yesterdayValue: number = 0, todayValue: number = 0;
+        this.state.indicators = [];
+        this.state.indicatorLabels = dayLabels;
+        this.services.taskIndicator.tasks = this.tasks;
+
+        let addIndicator = (name: string, values: Array<number>,formatMethod?: (v: number) => String,completedCriteria?: (prev: number,current: number) => any): void => {
+            let formattedValues: Array<String> = [];
+            if (formatMethod){
+                formattedValues = values.map((v: number) => formatMethod(v));
+            } else {
+                formattedValues = values.map((v: number) => v + '');
+            }
+            let completed = {
+                isCompleted: values[values.length-2] <= values[values.length-1]
+                , percentageCompleted: values[values.length-2] !== 0 ? Math.round(values[values.length-1] / values[values.length-2] * 100) / 100 : 0
+            };
+
+            if (completedCriteria){
+                completed = completedCriteria(values[values.length-2],values[values.length-1]);
+            }
+
+            this.state.indicators.push({
+                name
+                , values: formattedValues
+                , isCompleted: completed.isCompleted
+                , percentageCompleted: completed.percentageCompleted
+            });
+        }
+
+        let calculateForAllDays = (days: Array<any>,method: (d1: Date, d2: Date) => number): Array<number> => {
+            let calculatedValues: Array<number> = [];
+            let context = this.services.taskIndicator;
+
+            days.forEach((d,index,array) => {
+                calculatedValues.push(method.call(context,d,this.services.dateUtils.addDays(d,1)));
+            });
+
+            return calculatedValues;
+        };
+        
+        // added ETA
+        addIndicator('Added ETA',calculateForAllDays(days,this.services.taskIndicator.addedETA),(v: number) => this.formatTime(v * 60),(prev: number,curr: number) => ({ isCompleted: prev >= curr, percentageCompleted: prev !== 0 ? Math.round(curr * 100/prev) / 100 : 0 }));
+        
+        // added count
+        addIndicator('Added Count',calculateForAllDays(days,this.services.taskIndicator.addedTaskCount),null,(prev: number,curr: number) => ({ isCompleted: prev >= curr, percentageCompleted: prev !== 0 ? Math.round(curr * 100/prev) / 100 : 0 }));
+
+        // closed ETA
+        addIndicator('Closed ETA',calculateForAllDays(days,this.services.taskIndicator.closedETA),(v: number) => this.formatTime(v * 60));
+
+        // spent
+        addIndicator('Closed Spent',calculateForAllDays(days,(d1: Date, d2: Date): number => this.services.taskIndicator.calculateTotalTimeSpent(d1,d2).totalTimeSpentTodayOnClosedTasks),(v: number) => this.formatTime(v));
+
+        // closed count
+        addIndicator('Closed Count',calculateForAllDays(days,this.services.taskIndicator.closedTaskCount));
+
+        // productivity ratio
+        addIndicator('Productivity Ratio',calculateForAllDays(days,this.services.taskIndicator.calculateProductivityRatio));
+
+        // time management ratio
+        addIndicator('Time Management Ratio',calculateForAllDays(days,this.services.taskIndicator.calculateTimeManagementRatio));
+
+        // karma
+
+    }
+
+    
 }
