@@ -5,7 +5,7 @@
 //
 // AND THEN EVERYTIME ...
 //   1. Compile with `tsc`
-//   2. Make sure the test server (e.g., http-server: localhost:8080) is running.
+//   2. Make sure the test server (e.g., lite-server: localhost:8080) is running.
 //   3. ./node_modules/.bin/protractor protractor.config.js
 //
 //   To do all steps, try:  `npm run e2e`
@@ -49,8 +49,6 @@ exports.config = {
     // console.log('browser.params:' + JSON.stringify(browser.params));
     jasmine.getEnv().addReporter(new Reporter( browser.params )) ;
 
-    global.sendKeys = sendKeys;
-
     // Allow changing bootstrap mode to NG1 for upgrade tests
     global.setProtractorToNg1Mode = function() {
       browser.useAllAngular2AppRoots = false;
@@ -65,16 +63,6 @@ exports.config = {
     print: function() {}
   }
 };
-
-// Hack - because of bug with protractor send keys
-function sendKeys(element, str) {
-  return str.split('').reduce(function (promise, char) {
-    return promise.then(function () {
-      return element.sendKeys(char);
-    });
-  }, element.getAttribute('value'));
-  // better to create a resolved promise here but ... don't know how with protractor;
-  }
 
 // Custom reporter
 function Reporter(options) {

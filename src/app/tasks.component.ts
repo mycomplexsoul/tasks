@@ -1,13 +1,13 @@
 import { Component, OnInit, Renderer } from '@angular/core';
-import { TasksCore } from '../app/tasks.core';
-import { SyncAPI } from '../app/sync.api';
+import { TasksCore } from './tasks.core';
+import { SyncAPI } from './sync.api';
 import { Task } from './task.type';
 import { TaskIndicator } from './task.indicator.service';
 import { DateCommon } from './date.common';
 
 @Component({
     selector: 'tasks',
-    templateUrl: './app/tasks.template.html',
+    templateUrl: './tasks.template.html',
     providers: [TasksCore, SyncAPI, TaskIndicator]
 })
 export class TasksComponent implements OnInit {
@@ -1125,7 +1125,7 @@ export class TasksComponent implements OnInit {
     registerServiceWorker(){
         if ('serviceWorker' in navigator) {
             navigator['serviceWorker']
-                .register('./service-worker.js')
+                .register('../service-worker.js')
                 .then(function(registration: any) {
                     console.log("Service Worker Registered");
                     return registration.sync.getTags();
