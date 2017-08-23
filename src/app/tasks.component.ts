@@ -45,6 +45,7 @@ export class TasksComponent implements OnInit {
         , optShowFinishedToday: false
         , optShowQualifiedTasksOnly: false
         , optNewTaskStatusIsBacklog: false
+        , optShowIndicatorsTable: false
     };
     public timerModeRemaining: boolean = false;
     public comparisonData: any;

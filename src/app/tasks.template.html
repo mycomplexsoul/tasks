@@ -44,33 +44,40 @@
     <button (click)="sendAllToServer()">all tasks to server</button>
     <button (click)="getTasksFromServer()">get tasks from server</button>
     <br/>
-    <span>
+    <span class="option-item">
         <input type="checkbox" name="optCheckViewElapsedDays" id="optCheckViewElapsedDays"
             ng-checked="options.optViewElapsedDays"
             [(ngModel)]="options.optViewElapsedDays"
             (click)="toggleOption('optViewElapsedDays')" />
         <label for="optCheckViewElapsedDays">Display days elapsed since task was added</label>
     </span>
-    <span>
+    <span class="option-item">
         <input type="checkbox" name="optCheckShowFinishedToday" id="optCheckShowFinishedToday"
             ng-checked="options.optShowFinishedToday"
             [(ngModel)]="options.optShowFinishedToday"
             (click)="toggleOption('optShowFinishedToday')" />
         <label for="optCheckShowFinishedToday">Show Finished Today</label>
     </span>
-    <span>
+    <span class="option-item">
         <input type="checkbox" name="optCheckShowQualifiedTasksOnly" id="optCheckShowQualifiedTasksOnly"
             ng-checked="options.optShowQualifiedTasksOnly"
             [(ngModel)]="options.optShowQualifiedTasksOnly"
             (click)="toggleOption('optShowQualifiedTasksOnly');updateState();" />
         <label for="optCheckShowQualifiedTasksOnly">Show only tasks that have Qualifiers</label>
     </span>
-    <span>
+    <span class="option-item">
         <input type="checkbox" name="optCheckNewTaskStatusIsBacklog" id="optCheckNewTaskStatusIsBacklog"
             ng-checked="options.optNewTaskStatusIsBacklog"
             [(ngModel)]="options.optNewTaskStatusIsBacklog"
             (click)="toggleOption('optNewTaskStatusIsBacklog');" />
         <label for="optCheckNewTaskStatusIsBacklog">When a new task is added, add it to BACKLOG instead (of adding it to OPEN)</label>
+    </span>
+    <span class="option-item">
+        <input type="checkbox" name="optCheckShowIndicatorsTable" id="optCheckShowIndicatorsTable"
+            ng-checked="options.optShowIndicatorsTable"
+            [(ngModel)]="options.optShowIndicatorsTable"
+            (click)="toggleOption('optShowIndicatorsTable');" />
+        <label for="optCheckShowIndicatorsTable">Show Indicators Table</label>
     </span>
     <div id="optionsMessages"></div>
     <hr/>
@@ -186,18 +193,21 @@
         <br/>Karma Score: <span>{{state.karmaScore}} ({{state.karmaCount}} / {{state.closedTodayTasks.length}})</span>
         <br/>Tasks not in sync: {{services.sync.queue.length}}
         <br/><strong>{{isOnline() ? '' : 'You are OFFLINE'}}</strong>
-        <table>
-            <tr>
-                <td>Indicator</td>
-                <td *ngFor="let c of state.indicatorLabels">{{c}}</td>
-                <td>Completed?</td>
-            </tr>
-            <tr *ngFor="let indicator of state.indicators">
-                <td>{{indicator.name}}</td>
-                <td *ngFor="let v of indicator.values">{{v}}</td>
-                <td>{{indicator.isCompleted ? 'SI' : 'NO'}} / {{indicator.percentageCompleted}}</td>
-            </tr>
-        </table>
+        <div *ngIf="options.optShowIndicatorsTable">
+            <strong>Indicators</strong>
+            <table class="indicators-table">
+                <tr>
+                    <td>Indicator</td>
+                    <td *ngFor="let c of state.indicatorLabels">{{c}}</td>
+                    <td>Completed?</td>
+                </tr>
+                <tr *ngFor="let indicator of state.indicators">
+                    <td>{{indicator.name}}</td>
+                    <td *ngFor="let v of indicator.values">{{v}}</td>
+                    <td>{{indicator.isCompleted ? 'SI' : 'NO'}} / {{indicator.percentageCompleted}}</td>
+                </tr>
+            </table>
+        </div>
     </div>
     <hr/>
 </div>
