@@ -16,6 +16,7 @@ export class TasksComponent implements OnInit {
     public services: any = {};
     public state: any = {};
     public format: string = 'yyyy-MM-dd HH:mm:ss';
+    public delayOnUpdateState: number = 100;
     public groupHeader: string;
     public timers: any = {};
     public viewAll: boolean = false;
@@ -329,7 +330,7 @@ export class TasksComponent implements OnInit {
         });
         setTimeout(() => {
             this.updateState();
-        }, 3000);
+        }, this.delayOnUpdateState);
     }
 
     updateTask(tsk_id: string, newData: any){
