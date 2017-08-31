@@ -256,7 +256,7 @@ textarea.task-multiple {
   flex: 0 0 31%;
   margin: 5px;
   padding: 5px;
-  border: 1px solid slategray;
+  border: 1px solid lightgray;
 }
 
 .option-item {

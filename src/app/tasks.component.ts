@@ -19,7 +19,6 @@ export class TasksComponent implements OnInit {
     public groupHeader: string;
     public timers: any = {};
     public viewAll: boolean = false;
-    // public viewFinishedToday: boolean = false;
     public viewBacklog: boolean = false;
     public viewPostponed: boolean = false;
     public viewReportsWeek: boolean = false;
@@ -46,6 +45,7 @@ export class TasksComponent implements OnInit {
         , optShowQualifiedTasksOnly: false
         , optNewTaskStatusIsBacklog: false
         , optShowIndicatorsTable: false
+        , optServerAddress: "http://localhost:8081"
     };
     public timerModeRemaining: boolean = false;
     public comparisonData: any;
@@ -60,6 +60,7 @@ export class TasksComponent implements OnInit {
             if(!this.options){
                 this.options = this.defaultOptions;
             }
+            // this.services.tasksCore.setApiRoot(this.options.optServerAddress);
         }
         this.updateState();
         this.notification({
@@ -1222,6 +1223,13 @@ export class TasksComponent implements OnInit {
     toggleOption(optionName: string){
         this.options[optionName] = !this.options[optionName];
         if(typeof(window.localStorage) !== "undefined") {
+            localStorage.setItem("Options", JSON.stringify(this.options));
+        }
+    }
+    
+    saveOption(optionName: string,value: string){
+        this.options[optionName] = value;
+        if (typeof(window.localStorage) !== "undefined") {
             localStorage.setItem("Options", JSON.stringify(this.options));
         }
     }

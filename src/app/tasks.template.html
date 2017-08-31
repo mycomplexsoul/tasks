@@ -79,6 +79,12 @@
             (click)="toggleOption('optShowIndicatorsTable');" />
         <label for="optCheckShowIndicatorsTable">Show Indicators Table</label>
     </span>
+    <span class="option-item">
+        <label for="optInputServerAddress">Server Address</label>
+        <input type="text" id="optInputServerAddress" name="optInputServerAddress"
+            [(ngModel)]="options.optServerAddress"
+            (blur)="saveOption('optServerAddress',$event.target['value'])" />
+    </span>
     <div id="optionsMessages"></div>
     <hr/>
 </div>

@@ -690,4 +690,9 @@ export class TasksCore {
         return comparison;
     }
 
+    setApiRoot(root: string){
+        this.apiRoot = root;
+        console.log('api root has changed to:',root);
+    }
+
 }
