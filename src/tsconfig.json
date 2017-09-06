@@ -8,10 +8,6 @@
     "experimentalDecorators": true,
     "lib": [ "es2015", "dom" ],
     "noImplicitAny": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "outDir": "./build"
-  },
-  "include": [
-    "../src/*"
-  ]
+    "suppressImplicitAnyIndexErrors": true
+  }
 }

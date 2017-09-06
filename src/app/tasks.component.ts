@@ -50,6 +50,7 @@ export class TasksComponent implements OnInit {
     };
     public timerModeRemaining: boolean = false;
     public comparisonData: any;
+    public nextTasks: any[];
 
     constructor(tasksCore: TasksCore, private sync: SyncAPI, private taskIndicator: TaskIndicator, private dateUtils: DateCommon, private rendered: Renderer){
         this.services.tasksCore = tasksCore;
@@ -63,6 +64,7 @@ export class TasksComponent implements OnInit {
             }
             // this.services.tasksCore.setApiRoot(this.options.optServerAddress);
         }
+        this.nextTasks = [];
         this.updateState();
         this.notification({
             body: 'Hello there!! you have ' + this.state.openTasksCount + ' tasks open'
@@ -216,6 +218,36 @@ export class TasksComponent implements OnInit {
             setTimeout(() => this.showTimersOnLoad(), 100);
             this.scheduleNotificationsForStartingTasks();
         }
+
+        // next tasks to do today
+        if (this.nextTasks.length === 0){
+            this.nextTasks.push({
+                'estimatedDuration': 0
+                , 'tasks': []
+            });
+            if (typeof(window.localStorage) !== "undefined") {
+                let nextTasksIds = JSON.parse(localStorage.getItem('NextTasks'));
+                if(nextTasksIds){
+                    nextTasksIds.forEach((id: string) => {
+                        let nt = this.tasks.find((e: any) => e.tsk_id === id && e.tsk_ctg_status === this.taskStatus.OPEN);
+                        if (nt) {
+                            this.nextTasks[0].tasks.push(nt);
+                        }
+                    });
+                    localStorage.setItem("NextTasks", JSON.stringify(this.nextTasks[0].tasks.map((e: any) => e.tsk_id)));
+                }
+            }
+        }
+        this.nextTasks[0].estimatedDuration = 0;
+        this.nextTasks[0].tasks.forEach((t: any) => {
+            if (t.tsk_ctg_status === this.taskStatus.OPEN){
+                this.nextTasks[0].estimatedDuration += t.tsk_estimated_duration;
+            } else {
+                let index = this.nextTasks[0].tasks.findIndex((e: any) => e.tsk_id === t.tsk_id);
+                this.nextTasks[0].tasks.splice(index,1);
+                localStorage.setItem("NextTasks", JSON.stringify(this.nextTasks[0].tasks.map((e: any) => e.tsk_id)));
+            }
+        });
     }
 
     showTimersOnLoad(){
@@ -313,6 +345,12 @@ export class TasksComponent implements OnInit {
         }
         if (event.altKey && event.keyCode==107){ // detect '+'
             this.focusElement('input[name=tsk_name]');
+        }
+        if (event.altKey && event.keyCode==78){ // detect 'n'
+            this.asNextToDo(t,true);
+        }
+        if (event.altKey && event.keyCode==82){ // detect 'r'
+            this.asNextToDo(t,false);
         }
         // event.preventDefault();
         // event.returnValue = false;
@@ -1357,6 +1395,21 @@ export class TasksComponent implements OnInit {
 
         // karma
 
+    }
+
+    asNextToDo(t: any, add: boolean){
+        let p = this.nextTasks[0].tasks;
+        let index = p.findIndex((e: any) => e.tsk_id === t.tsk_id);
+        if (add){
+            if (index === -1){
+                p.push(t);
+            }
+        } else {
+            if (index !== -1){
+                p.splice(index,1);
+            }
+        }
+        localStorage.setItem("NextTasks", JSON.stringify(p.map((e: any) => e.tsk_id)));
     }
 
     
