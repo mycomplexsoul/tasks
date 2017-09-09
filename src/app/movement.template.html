@@ -1,0 +1,106 @@
+<strong>Movements</strong>
+
+<table>
+    <tr>
+        <th>Id</th>
+        <th>Date</th>
+        <th>Account</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Budget</th>
+        <th>Category</th>
+        <th>Place</th>
+        <th>Description</th>
+        <th>Notes</th>
+        <th>Status</th>
+    </tr>
+    <tr *ngFor="let m of movementList">
+        <td>{{m.mov_id}}</td>
+        <td>{{m.mov_date | date: 'yyyy-MM-dd'}}</td>
+        <td>{{m.mov_txt_account}}</td>
+        <td>{{m.mov_txt_type}}</td>
+        <td>{{m.mov_amount}}</td>
+        <td>{{m.mov_budget}}</td>
+        <td>{{m.mov_txt_category}}</td>
+        <td>{{m.mov_txt_place}}</td>
+        <td>{{m.mov_desc}}</td>
+        <td>{{m.mov_notes}}</td>
+        <td>{{m.mov_txt_status}}</td>
+    </tr>
+</table>
+
+<a routerLink="/new" routerLinkActive="active">New Movement</a>
+
+<form #newMovementForm="ngForm" (ngSubmit)="newMovement(newMovementForm)">
+    <input type="radio" value="preset" name="fMovementFlowType"><label for="fMovementType">Preset</label>
+    <input type="radio" value="custom" name="fMovementFlowType"><label for="fMovementType">Custom</label>
+    <input type="radio" value="transfer" name="fMovementFlowType"><label for="fMovementType">Transfer</label>
+
+    <div>
+        <h3>Custom</h3>
+        <span>
+            <label for="fDescription" class="label-left">Description</label>
+            <input type="text" name="fDescription" id="fDescription" ngModel>
+        </span>
+        <br>
+        <span>
+            <label for="fAmount" class="label-left">Amount</label>
+            <input type="number" name="fAmount" id="fAmount" step="0.01" ngModel>
+        </span>
+        <br>
+        <span>
+            <label for="fAccount" class="label-left">Account</label>
+            <select name="fAccount" id="fAccount" ngModel>
+                <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}}</option>
+            </select>
+        </span>
+        <br>
+        <span>
+            <input type="radio" [value]="1" name="fMovementType" id="fMovementType_1" [(ngModel)]="model.type">
+            <label for="fMovementType_1" class="label-radio">Expense</label>
+            
+            <input type="radio" [value]="2" name="fMovementType" id="fMovementType_2" [(ngModel)]="model.type">
+            <label for="fMovementType_2" class="label-radio">Income</label>
+        </span>
+        <br>
+        <span>
+            <label for="fDate" class="label-left">Movement Date</label>
+            <input type="date" name="fDate" [(ngModel)]="model.date">
+        </span>
+        <br>
+        <span>
+            <label for="fBudget" class="label-left">Budget</label>
+            <select name="fBudget" id="fBudget" ngModel>
+                <option *ngFor="let opt of viewData.budgets" value="{{opt}}">{{opt}}</option>
+            </select>
+        </span>
+        <br>
+        <span>
+            <label for="fCategory" class="label-left">Category</label>
+            <select name="fCategory" id="fCategory" [(ngModel)]="model.category">
+                <option *ngFor="let opt of viewData.categories" [value]="opt.mct_id" [selected]="opt.mct_id === newMovementForm.value.fCategory">{{opt.mct_name}}</option>
+            </select>
+            <button (click)="viewAddCategoryForm = !viewAddCategoryForm;false;">+</button>
+            <div *ngIf="viewAddCategoryForm">
+                <label for="fNewCategory">New Category</label>
+                <input type="text" name="fNewCategory" id="fNewCategory" ngModel>
+                <button (click)="addNewCategoryForUser(newMovementForm.value.fNewCategory,user);viewAddCategoryForm = false;">Add Category</button>
+            </div>
+        </span>
+        <br>
+        <span>
+            <label for="fPlace" class="label-left">Place</label>
+            <select name="fPlace" id="fPlace" ngModel>
+                <option *ngFor="let opt of viewData.places" value="{{opt.mpl_id}}">{{opt.mpl_name}}</option>
+            </select>
+        </span>
+        <br>
+        <span>
+            <label for="fNotes" class="label-left">Notes</label>
+            <input type="text" name="fNotes" id="fNotes" ngModel>
+        </span>
+
+        <br>
+        <button>Apply Movement</button>
+    </div>
+</form>

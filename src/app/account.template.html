@@ -1,0 +1,19 @@
+<div>
+    <strong>Account List</strong>
+    <button (click)="showNewAccountForm()">New Account</button>
+    <div id="newAccountFormSection">
+        <form name="accountForm">
+            <label for="accountName">Account Name</label>
+            <input type="text" name="accountName" />
+        </form>
+    </div>
+    <div *ngFor="let item of accountList">
+        <span contenteditable="true">{{item.acc_name}}</span>
+        <br/>
+        <span>Type: {{item.acc_ctg_type}}</span>
+        <span> | Comment: {{item.acc_comment}}</span>
+        <span> | Check day: {{item.acc_check_day}}</span>
+        <span> | Average min balance: {{item.acc_average_min_balance}}</span>
+        <span> | Payment day: {{item.acc_payment_day}}</span>
+    </div>
+</div>

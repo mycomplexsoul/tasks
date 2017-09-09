@@ -1,0 +1,7 @@
+<button (click)="viewAddForm = !viewAddForm">+</button>
+
+<div *ngIf="viewAddForm">
+    <label for="fNewItem">{{inputLabel}}</label>
+    <input type="text" name="fNewItem" id="fNewItem" [(ngModel)]="model">
+    <button (click)="addNewItem(model);viewAddForm = false;">{{buttonLabel}}</button>
+</div>

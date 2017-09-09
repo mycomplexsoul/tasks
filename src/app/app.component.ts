@@ -5,7 +5,7 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
     selector: 'my-app',
-    template: `<tasks></tasks>`
+    template: `<router-outlet></router-outlet>`
     // ,directives: [ROUTER_DIRECTIVES]
 })
 // @Routes([

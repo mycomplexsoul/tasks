@@ -262,3 +262,8 @@ textarea.task-multiple {
 .option-item {
   display: block;
 }
+
+label.label-left{
+  width: 150px;
+  display: inline-block;
+}
