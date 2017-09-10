@@ -1,7 +1,8 @@
-<button (click)="viewAddForm = !viewAddForm">+</button>
+<button (click)="toggleView()">{{addLabel}}</button>
 
 <div *ngIf="viewAddForm">
-    <label for="fNewItem">{{inputLabel}}</label>
-    <input type="text" name="fNewItem" id="fNewItem" [(ngModel)]="model">
-    <button (click)="addNewItem(model);viewAddForm = false;">{{buttonLabel}}</button>
+    <label for="{{name}}">{{inputLabel}}</label>
+    <input type="text" name="{{name}}" id="{{name}}" [(ngModel)]="value"
+        (keydown.enter)="onNewItem(value)">
+    <button (click)="onNewItem(value)">{{buttonLabel}}</button>
 </div>

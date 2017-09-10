@@ -8,7 +8,25 @@ import { NgForm } from '@angular/forms';
 })
 export class ComboItemComponent {
     public viewAddForm: boolean = false;
+    public value: string;
+    public addLabel: string = '+';
+    @Input() addNewItem: Function;
+    @Input() name: string;
     @Input() inputLabel: string = 'New Item';
     @Input() buttonLabel: string = 'Add Item';
-    
+
+    /* TODO: template does not have custom name/id */
+    // TODO: input needs to be focused when displayed
+
+    toggleView(){
+        this.viewAddForm = !this.viewAddForm;
+        this.addLabel = this.viewAddForm ? '-' : '+';
+        return false;
+    }
+
+    onNewItem(value: string){
+        this.addNewItem(value);
+        this.value = '';
+        return this.toggleView();
+    }
 }

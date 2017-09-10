@@ -10,6 +10,7 @@ export class Movement {
     public mov_ctg_place: number;
     public mov_desc: string;
     public mov_notes: string;
+    public mov_id_user: string;
     public mov_ctg_status: number;
 
     public mov_txt_type: string;
@@ -33,6 +34,7 @@ export class Movement {
             this.mov_ctg_place = base.mov_ctg_place;
             this.mov_desc = base.mov_desc;
             this.mov_notes = base.mov_notes;
+            this.mov_id_user = base.mov_id_user;
             this.mov_ctg_status = base.mov_ctg_status;
 
             this.mov_txt_type = base.mov_txt_type;

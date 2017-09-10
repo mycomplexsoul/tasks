@@ -217,7 +217,7 @@
     </div>
     <hr/>
 </div>
-<div id="nextToDoTodayList">
+<div id="nextToDoTodayList" *ngIf="nextTasks[0].tasks.length">
         <div class="task-open-task-list-container">
                 <div *ngFor="let item of nextTasks" class="task-record">
                     <div>

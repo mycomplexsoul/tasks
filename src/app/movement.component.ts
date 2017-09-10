@@ -1,49 +1,75 @@
 import { Component, OnInit, Renderer } from '@angular/core';
+import { NgForm } from '@angular/forms';
+// types
 import { Movement } from './movement.type';
 import { Account } from './account.type';
 import { Catalog } from './catalog.type';
 import { Category } from './category.type';
+import { Place } from './place.type';
 import { Entry } from './entry.type';
-import { NgForm } from '@angular/forms';
+// services
 import { StorageService }  from './storage.service';
 import { AccountService } from './account.service';
 import { CategoryService } from './category.service';
+import { PlaceService } from './place.service';
+import { MovementService } from './movement.service';
 
 @Component({
     selector: 'movement',
     templateUrl: './movement.template.html',
-    providers: [ AccountService, CategoryService ]
+    providers: [
+        AccountService
+        , CategoryService
+        , PlaceService
+        , MovementService
+    ]
 })
 export class MovementComponent implements OnInit {
-    public movementList: Array<Movement> = [];
     public entryList: Array<Entry> = [];
     private accounts: Array<Account> = [] //this.getAccounts();
     private user: string = 'anon';
-    private categories: Array<Category> = []; //this.getCategoriesForUser(this.user);
-    private places: Array<Place> = this.getPlacesForUser(this.user);
-    public viewData = {
-        accounts: <any>[]
-        , types: <any>[]
-        , budgets: <any>[]
-        , categories: this.categories
-        , places: this.places
+    public viewData: {
+        accounts: Array<any>
+        , types: Array<any>
+        , budgets: Array<any>
+        , categories: Array<Category>
+        , places: Array<Place>
+        , movements: Array<Movement>
+    } = {
+        accounts: []
+        , types: []
+        , budgets: []
+        , categories: []
+        , places: []
+        , movements: []
     };
     public model: any = { /* UI default form data */
         type: 1
         , date: ''
         , category: 0
+        , place: 0
+        , movementFlowType: 'custom'
     };
     public viewAddCategoryForm: boolean = false;
     public services = {
         account: <AccountService>null
         , category: <CategoryService>null
+        , place: <PlaceService>null
+        , movement: <MovementService>null
     };
 
-    constructor(accountService: AccountService, categoryService: CategoryService){
+    constructor(
+        accountService: AccountService
+        , categoryService: CategoryService
+        , placeService: PlaceService
+        , movementService: MovementService
+    ){
         this.services.account = accountService;
         this.services.category = categoryService;
+        this.services.place = placeService;
+        this.services.movement = movementService;
 
-        let a = new Movement(undefined);
+        /*let a = new Movement(undefined);
         a.mov_id = "1";
         a.mov_date = new Date(2017,4,8,16,54,0);
         a.mov_amount = 100.00;
@@ -57,8 +83,9 @@ export class MovementComponent implements OnInit {
         a.mov_desc = 'Initial Balance';
         a.mov_notes = null;
 
-        this.movementList.push(a);
+        this.movementList.push(a);*/
 
+        // TODO: this data should come from localStorage, if not present then fetch from BE
         this.viewData.types = [{
             ctg_ctg_value: 1
             , ctg_desc: 'Expense'
@@ -67,6 +94,7 @@ export class MovementComponent implements OnInit {
             , ctg_desc: 'Income'
         }];
 
+        // TODO: this data should have an entity
         this.viewData.budgets = [
             'Food'
             , 'Services'
@@ -80,15 +108,25 @@ export class MovementComponent implements OnInit {
     }
 
     ngOnInit(){
-        this.accounts = this.services.account.getAll(); // this.getAccounts();
+        // TODO: this should be refactored the same way as categories and places
+        this.accounts = this.services.account.getAll();
+        this.services.category.getAllForUser(this.user);
+        this.services.place.getAllForUser(this.user);
+        this.services.movement.getAllForUser(this.user);
+        
         this.viewData.accounts = this.accounts;
-        this.categories = this.services.category.getAllForUser(this.user); // this.getAccounts();
-        this.viewData.categories = this.categories;
+        this.viewData.categories = this.services.category.list;
+        this.viewData.places = this.services.place.list;
+        this.viewData.movements = this.services.movement.list;
+
+        this.addNewCategoryForUser = this.addNewCategoryForUser.bind(this);
+        this.addNewPlaceForUser = this.addNewPlaceForUser.bind(this);
     }
 
     newMovement(form: NgForm){
         let m = new Movement(undefined);
-        m.mov_id = (this.movementList.length + 1) + '';
+        // TODO: implement a hash generator for IDs
+        m.mov_id = this.services.movement.newId();
         m.mov_desc = form.value.fDescription;
         m.mov_amount = form.value.fAmount;
         m.mov_account = form.value.fAccount;
@@ -102,10 +140,10 @@ export class MovementComponent implements OnInit {
         m.mov_txt_account = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == m.mov_account,'acc_name');
         m.mov_txt_type = this.findIn(this.viewData.types,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_type,'ctg_desc');
         m.mov_txt_budget = m.mov_budget;
-        m.mov_txt_category = this.findIn(this.viewData.categories,(e: any) => e.ctg_id === 'MONEY_CATEGORIES' && e.ctg_sequential == m.mov_ctg_category,'ctg_name');
-        m.mov_txt_place = this.findIn(this.viewData.places,(e: any) => e.ctg_id === 'MONEY_PLACES' && e.ctg_sequential == m.mov_ctg_place,'ctg_name');
+        m.mov_txt_category = this.findIn(this.viewData.categories,(e: any) => e.mct_id === m.mov_ctg_category,'mct_name');
+        m.mov_txt_place = this.findIn(this.viewData.places,(e: any) => e.mpl_id === m.mov_ctg_place,'mpl_name');
 
-        this.movementList.push(m);
+        this.services.movement.newItem(m);
 
         // Entries
         let e = new Entry();
@@ -149,12 +187,14 @@ export class MovementComponent implements OnInit {
         e.ent_txt_place = m.mov_txt_place;
 
         this.entryList.push(e);
+        // TODO: Entries should be using a service and saved to Storage
 
         console.log(this.entryList);
 
         return false;
     }
 
+    // TODO: local methods that can be used as generic should be moved to utils.service
     findIn(arr: Array<any>, findCriteria: Function, returnField: string){
         const f = arr.find((e: any) => findCriteria(e));
         if (f) {
@@ -182,80 +222,14 @@ export class MovementComponent implements OnInit {
                 ].join('-');
     }
 
-    /*getAccounts(): Array<Account>{
-        return this.services.account.getAll();
-    }*/
-
-    /*getCatalog(catalogName: string): Array<Catalog>{
-        let list: Array<Catalog>;
-        // data
-        let data = this.getCatalogList().filter((e) => e.ctg_id === catalogName);
-        
-        list = data.map((d: any) => new Catalog(d));
-
-        return list;
+    addNewCategoryForUser(category: string){
+        let id = this.services.category.newItem(category, this.user).mct_id;
+        this.model.category = id;
+    }
+    
+    addNewPlaceForUser(place: string){
+        let id = this.services.place.newItem(place, this.user).mpl_id;
+        this.model.place = id;
     }
 
-    getCatalogList(){
-        return [{
-            ctg_id: 'MONEY_CATEGORIES'
-            , ctg_sequential: 1
-            , ctg_name: 'Food'
-        }, {
-            ctg_id: 'MONEY_CATEGORIES'
-            , ctg_sequential: 2
-            , ctg_name: 'Services'
-        }, {
-            ctg_id: 'MONEY_CATEGORIES'
-            , ctg_sequential: 3
-            , ctg_name: 'Groceries'
-        }, {
-            ctg_id: 'MONEY_PLACES'
-            , ctg_sequential: 1
-            , ctg_name: 'Walmart'
-        }, {
-            ctg_id: 'MONEY_PLACES'
-            , ctg_sequential: 2
-            , ctg_name: 'Vips'
-        }, {
-            ctg_id: 'MONEY_PLACES'
-            , ctg_sequential: 3
-            , ctg_name: 'Sams Club'
-        }, {
-            ctg_id: 'MONEY_PLACES'
-            , ctg_sequential: 4
-            , ctg_name: 'Cinepolis'
-        }];
-    }*/
-
-    getPlacesForUser(user: string){
-        const all: Array<Place> = [];
-        const user1 = 'anon';
-        all.push(new Place(1,'Walmart',user1));
-        all.push(new Place(2,'Vips',user1));
-        all.push(new Place(3,'Sams Club',user1));
-        all.push(new Place(4,'Cinepolis',user1));
-        all.push(new Place(4,'The Home Depot',user1));
-        
-        return all.filter((x: Place) => x.mpl_user === user);
-    }
-
-    addNewCategoryForUser(category: string, user: string){
-        let newId: string = this.categories.length + 1 + '';
-        this.categories.push(new Category({mct_id: newId,mct_name: category,mct_user: user}));
-        this.model.category = newId;
-    }
-
-}
-
-class Place {
-    public mpl_id: number;
-    public mpl_name: string;
-    public mpl_user: string;
-
-    constructor(mpl_id: number,mpl_name: string,mpl_user: string){
-        this.mpl_id = mpl_id;
-        this.mpl_name = mpl_name;
-        this.mpl_user = mpl_user;
-    }
 }

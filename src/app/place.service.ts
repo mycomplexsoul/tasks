@@ -1,13 +1,13 @@
-import { Category } from './category.type';
+import { Place } from './place.type';
 import { StorageService } from './storage.service';
 import { Injectable } from '@angular/core';
 
 @Injectable()
-export class CategoryService {
-    private data: Array<Category> = [];
+export class PlaceService {
+    private data: Array<Place> = [];
     private storage: StorageService = null;
     private config = {
-        storageKey: 'categories'
+        storageKey: 'places'
         , defaultUser: 'anon'
     }
 
@@ -15,23 +15,26 @@ export class CategoryService {
         this.storage = storage;
     }
 
-    get list(): Array<Category> {
+    get list(): Array<Place> {
         return this.data;
     }
 
     initialData(){
-        let list: Array<Category>;
+        let list: Array<Place>;
 
-        let newData = (mct_id: string, mct_name: string) => {
-            return {mct_id, mct_name};
+        let newData = (mpl_id: string, mpl_name: string) => {
+            return {mpl_id, mpl_name};
         };
         let data = [];
-        data.push(newData('1','Cap'));
-        data.push(newData('2','Cart'));
+        data.push(newData('1','Walmart'));
+        data.push(newData('2','Vips'));
+        data.push(newData('3','Sams Club'));
+        data.push(newData('4','Cinepolis'));
+        data.push(newData('5','The Home Depot'));
         
         list = data.map((d: any) => {
-            d.mct_user = this.config.defaultUser;
-            return new Category(d);
+            d.mpl_user = this.config.defaultUser;
+            return new Place(d);
         });
 
         return list;
@@ -48,9 +51,9 @@ export class CategoryService {
     }
 
     getAllForUser(user: string){
-        const all: Array<Category> = this.getAll();
+        const all: Array<Place> = this.getAll();
 
-        return all.filter((x: Category) => x.mct_user === user);
+        return all.filter((x: Place) => x.mpl_user === user);
     }
 
     saveToStorage(){
@@ -61,12 +64,12 @@ export class CategoryService {
         return this.data.length + 1 + '';
     }
 
-    newItem(category: string, user: string): Category{
+    newItem(place: string, user: string): Place{
         let newId: string = this.newId();
-        let newItem = new Category({
-            mct_id: newId
-            , mct_name: category
-            , mct_user: user
+        let newItem = new Place({
+            mpl_id: newId
+            , mpl_name: place
+            , mpl_user: user
         });
         this.data.push(newItem);
         this.saveToStorage();
