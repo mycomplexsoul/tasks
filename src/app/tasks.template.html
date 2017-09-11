@@ -152,7 +152,7 @@
                     [ngClass]="{'task-open-with-tt': (t.tsk_ctg_status === this.taskStatus.OPEN && t.tsk_time_history.length > 0)}"
                     >[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]
                     <span *ngIf="t.tsk_ctg_in_process !== 2">
-                        [<span contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'start')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_start | date: 'HH:mm:ss'}}</span> - <span contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'end')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_end | date: 'HH:mm:ss'}}</span>]
+                        [<span class="tt-start" contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'start')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_start | date: 'HH:mm:ss'}}</span> - <span class="tt-end" contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'end')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_end | date: 'HH:mm:ss'}}</span>]
                     </span>
                 </span>
                 <span *ngIf="t.tsk_ctg_in_process === 2">
@@ -237,7 +237,7 @@
                             [ngClass]="{'task-open-with-tt': (t.tsk_ctg_status === this.taskStatus.OPEN && t.tsk_time_history.length > 0)}"
                             >[{{t.tsk_time_history.length}}/{{formatTime(t.tsk_total_time_spent)}}]
                             <span *ngIf="t.tsk_ctg_in_process !== 2">
-                                [<span contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'start')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_start | date: 'HH:mm:ss'}}</span> - <span contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'end')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_end | date: 'HH:mm:ss'}}</span>]
+                                [<span class="tt-start" contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'start')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_start | date: 'HH:mm:ss'}}</span> - <span class="tt-end" contenteditable="true" (keyup)="timeTrackingQuickEdit(t,$event,'end')">{{t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_end | date: 'HH:mm:ss'}}</span>]
                             </span>
                         </span>
                         <span *ngIf="t.tsk_ctg_in_process === 2">
@@ -358,7 +358,7 @@
             [ngClass]="{'task-open-with-tt': (item.tsk_ctg_status === this.taskStatus.OPEN && item.tsk_time_history.length > 0)}"
             >[{{item.tsk_time_history.length}}/{{formatTime(item.tsk_total_time_spent)}}]
             <span *ngIf="item.tsk_ctg_in_process !== 2">
-                [<span contenteditable="true" (keyup)="timeTrackingQuickEdit(item,$event,'start')">{{item.tsk_time_history[item.tsk_time_history.length-1].tsh_date_start | date: 'HH:mm:ss'}}</span> - <span contenteditable="true" (keyup)="timeTrackingQuickEdit(item,$event,'end')">{{item.tsk_time_history[item.tsk_time_history.length-1].tsh_date_end | date: 'HH:mm:ss'}}</span>]
+                [<span class="tt-start" contenteditable="true" (keyup)="timeTrackingQuickEdit(item,$event,'start')">{{item.tsk_time_history[item.tsk_time_history.length-1].tsh_date_start | date: 'HH:mm:ss'}}</span> - <span class="tt-end" contenteditable="true" (keyup)="timeTrackingQuickEdit(item,$event,'end')">{{item.tsk_time_history[item.tsk_time_history.length-1].tsh_date_end | date: 'HH:mm:ss'}}</span>]
             </span>
         </span>
         <span>(Done at: <span contenteditable="true" (keyup)="editDateDone(item,$event)">{{item.tsk_date_done | date: format}}</span>)</span>

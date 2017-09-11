@@ -317,10 +317,10 @@ export class TasksComponent implements OnInit {
             this.taskMoveDown(parent);
         }
         if (!event.altKey && event.keyCode==38){ // detect jump up
-            this.taskJumpUp(parent);
+            this.taskJumpUp(parent,"span.task-text[contenteditable=true]");
         }
         if (!event.altKey && event.keyCode==40){ // detect jump down
-            this.taskJumpDown(parent);
+            this.taskJumpDown(parent,"span.task-text[contenteditable=true]");
         }
         if (event.keyCode==113){ // detect "F2" = start/stop time tracking
             this.taskToggleTimeTracking(t,parent);
@@ -410,8 +410,7 @@ export class TasksComponent implements OnInit {
         this.updateTask(tsk_id2,{tsk_order: t1});
     }
 
-    taskJumpUp(current: any){
-        let selector = "span.task-text[contenteditable=true]";
+    taskJumpUp(current: any, selector: string){
         if (current.previousElementSibling.querySelector(selector)){
             current.previousElementSibling.querySelector(selector).focus();
         } else {
@@ -431,8 +430,7 @@ export class TasksComponent implements OnInit {
         document.querySelector(selector)["focus"]();
     }
 
-    taskJumpDown(current: any){
-        let selector = "span.task-text[contenteditable=true]";
+    taskJumpDown(current: any, selector: string){
         if (current.nextElementSibling && current.nextElementSibling.querySelector(selector)){
             current.nextElementSibling.querySelector(selector).focus();
         } else {
@@ -1265,6 +1263,13 @@ export class TasksComponent implements OnInit {
                 this.showTimer(task,dom);
             }
             this.calculateTotalTimeSpentToday();
+        }
+        let parent = event.target["parentNode"]["parentNode"]["parentNode"];
+        if (!event.altKey && event.keyCode==38){ // detect jump up
+            this.taskJumpUp(parent,`span.tt-${target}[contenteditable=true]`);
+        }
+        if (!event.altKey && event.keyCode==40){ // detect jump down
+            this.taskJumpDown(parent,`span.tt-${target}[contenteditable=true]`);
         }
     }
 
