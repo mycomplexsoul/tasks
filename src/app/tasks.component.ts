@@ -334,6 +334,9 @@ export class TasksComponent implements OnInit {
         if (event.altKey && event.keyCode==66){ // detect 'b'
             this.taskToBacklog(t);
         }
+        if (event.altKey && (event.keyCode==106 || event.keyCode==49)){ // detect '*' || '1'
+            document.querySelector(`input[type=checkbox]#${t.tsk_id}`)['click']();
+        }
         if (event.altKey && (event.keyCode==73 || event.keyCode==50)){ // detect 'i' || '2'
             this.markTaskAs(t,'important');
         }
