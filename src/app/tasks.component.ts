@@ -248,6 +248,12 @@ export class TasksComponent implements OnInit {
                 localStorage.setItem("NextTasks", JSON.stringify(this.nextTasks[0].tasks.map((e: any) => e.tsk_id)));
             }
         });
+        // sort next tasks by order field
+        let sortByOrder = (a: any, b: any) => {
+            let res = a.tsk_order > b.tsk_order;
+            return res ? 1 : -1;
+        };
+        this.nextTasks[0].tasks = this.nextTasks[0].tasks.sort(sortByOrder);
     }
 
     showTimersOnLoad(){
@@ -1403,10 +1409,12 @@ export class TasksComponent implements OnInit {
         if (add){
             if (index === -1){
                 p.push(t);
+                this.nextTasks[0].estimatedDuration += t.tsk_estimated_duration;
             }
         } else {
             if (index !== -1){
                 p.splice(index,1);
+                this.nextTasks[0].estimatedDuration -= t.tsk_estimated_duration;
             }
         }
         localStorage.setItem("NextTasks", JSON.stringify(p.map((e: any) => e.tsk_id)));
