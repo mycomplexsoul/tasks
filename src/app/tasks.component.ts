@@ -750,7 +750,7 @@ export class TasksComponent implements OnInit {
             // if schedule date end is set, update it as well
             let newEnd = t.tsk_schedule_date_end;
             if (t.tsk_schedule_date_end){
-                newEnd = new Date(t.tsk_schedule_date_start.getTime() + parseInt(newDuration) * 60 * 1000);
+                newEnd = new Date((new Date(t.tsk_schedule_date_start)).getTime() + parseInt(newDuration) * 60 * 1000);
             }
             this.updateTask(t.tsk_id,{
                 tsk_estimated_duration: newDuration

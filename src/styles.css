@@ -253,10 +253,15 @@ textarea.task-multiple {
 .task-record {
   max-width: 500px;
   min-width: 300px;
-  flex: 0 0 31%;
+  flex: 1 0;
   margin: 5px;
   padding: 5px;
   border: 1px solid lightgray;
+}
+@media (min-width: 505px){
+  .task-record {
+    flex: 0 0 31%;
+  }
 }
 
 .option-item {
