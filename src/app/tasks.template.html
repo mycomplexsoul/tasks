@@ -371,6 +371,7 @@
                 #{{tag}}
             </span>
         </span>
+        <span *ngIf="item.not_sync">(Not in sync)</span>
         <button (click)="setSelected(item)">details</button>
     </div>
     <hr/>

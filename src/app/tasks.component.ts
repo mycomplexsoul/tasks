@@ -62,7 +62,8 @@ export class TasksComponent implements OnInit {
             if(!this.options){
                 this.options = this.defaultOptions;
             }
-            // this.services.tasksCore.setApiRoot(this.options.optServerAddress);
+            this.services.tasksCore.setApiRoot(this.options.optServerAddress);
+            this.services.sync.setApiRoot(this.options.optServerAddress);
         }
         this.nextTasks = [];
         this.updateState();

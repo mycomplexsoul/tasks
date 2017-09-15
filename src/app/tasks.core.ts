@@ -19,7 +19,7 @@ export class TasksCore {
     constructor(private http: Http, private sync: SyncAPI) {
         let tasks: Array<Task> = this.tasksFromStorage();
         this.data.taskList = tasks;
-        this.getTasks();
+        //this.getTasks();
         this.http = http;
         this.sync = sync;
     }

@@ -9,6 +9,7 @@ export class SyncAPI {
     private options = new RequestOptions({ headers: this.headers });
     private version = 'v1.2';
     private logPrefix = `Sync API ${this.version} -`;
+    private currentOperation: any = null;
     
     constructor(private http: Http){
         this.http = http;
@@ -30,6 +31,10 @@ export class SyncAPI {
 
     request(method: string, url: string, data: any, matchMethod: (val: any) => boolean, objNameMethod: (e: any) => string, callback: Function){
         this.log(`Handling new request`);
+        if (this.currentOperation) {
+            this.log('Cancelling sync operation with timer id',this.currentOperation);
+            clearTimeout(this.currentOperation);
+        }
         if (matchMethod){
             let foundIndex = this.queue.findIndex((val: any) => matchMethod(val.data) && (val.status === 'queue' || val.status === 'error'));
 
@@ -54,7 +59,12 @@ export class SyncAPI {
 
         this.isOnline().then((online) => {
             if (online){
-                this.processQueue();
+                this.currentOperation = setTimeout(() => {
+                    //this.processQueue();
+                    this.syncQueue();
+                    this.currentOperation = null;
+                }, 5000);
+                this.log('Scheduled sync with timer id',this.currentOperation);
             }
         });
     }
@@ -171,7 +181,12 @@ export class SyncAPI {
             // get status from response
             response.batchResultTasks.forEach((r: any) => {
                 let Q = this.queue.find((q: any) => q.data.tsk_id === r.id);
-                Q.status = r.operationOk ? 'processed' : 'error';
+                if (Q) {
+                    Q.status = r.operationOk ? 'processed' : 'error';
+                    if (r.operationOk) {
+                        Q.callback(data.json());
+                    }
+                }
             });
             this.queueStatus();
             this.toStorage();
@@ -181,6 +196,11 @@ export class SyncAPI {
             this.queueStatus();
             this.toStorage();
         });
+    }
+
+    setApiRoot(root: string){
+        this.apiRoot = root;
+        console.log('api root has changed to:',root);
     }
 }
 
