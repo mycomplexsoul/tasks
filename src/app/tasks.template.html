@@ -139,7 +139,7 @@
                 <strong>{{item.header}}</strong>
                 / {{item.tasks.length}} tasks ({{formatTime(item.estimatedDuration * 60)}})
             </div>
-            <div *ngFor="let t of item.tasks" data-id="{{t.tsk_id}}">
+            <div *ngFor="let t of item.tasks" data-id="{{t.tsk_id}}" [ngStyle]="{'font-size-2': ageFontSizeNormalization(t) + 'px'}">
                 <input type="checkbox" id="{{t.tsk_id}}"
                     (click)="taskCheckboxHandler(t,$event)" />
                 <span class="mobile-only">

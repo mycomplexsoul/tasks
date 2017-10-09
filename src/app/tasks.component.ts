@@ -92,15 +92,7 @@ export class TasksComponent implements OnInit {
             // Batch add
             let t: any;
             if (form.value.tsk_multiple_name){
-                form.value.tsk_multiple_name.split('\n').forEach((text: string) => {
-                    if (!text.startsWith('//') && text !== ''){
-                        t = this.services.tasksCore.addTask({
-                            'tsk_date_add': new Date(),
-                            'tsk_name': text
-                        },this.options);
-                        console.log("added task:",t);
-                    }
-                });
+                this.services.tasksCore.batchAddTasks(form.value.tsk_multiple_name.split('\n'),this.options);
                 this.tasks = this.services.tasksCore.tasks();
                 form.controls.tsk_multiple_name.reset();
                 this.showBatchAdd = false;
@@ -466,12 +458,14 @@ export class TasksComponent implements OnInit {
 
     showTimer(task: any, dom: HTMLElement){
         let timer: number = 0;
+        let start: Date = new Date();
 
         // if task was running previously, get current running time
         if ( task.tsk_time_history.length > 0 ){
             let h = task.tsk_time_history[task.tsk_time_history.length-1];
             if (h.tsh_time_spent === 0){
                 h.tsh_date_start = new Date(h.tsh_date_start);
+                start = h.tsh_date_start;
                 timer = this.elapsedTime(h.tsh_date_start,new Date());
             }
         }
@@ -485,8 +479,13 @@ export class TasksComponent implements OnInit {
             }
         };
 
+        let calcTimer = (start: Date) => {
+            return this.elapsedTime(start,new Date());
+        }
+
         let watch = setInterval(() => {
-            this.timers[task.tsk_id].timerString = formatTimerString(++timer);
+            timer = calcTimer(start);
+            this.timers[task.tsk_id].timerString = formatTimerString(timer);
             if (task.tsk_estimated_duration * 60 - 60 < task.tsk_total_time_spent + timer && !this.timers[task.tsk_id].burnoutNotified){
                 this.timers[task.tsk_id].burnoutNotified = true;
                 if (this.tasks.find(t => t.tsk_id === task.tsk_id).tsk_ctg_status === this.taskStatus.OPEN){
@@ -681,6 +680,16 @@ export class TasksComponent implements OnInit {
         this.viewOptions = !this.viewOptions;
     }
 
+    ageFontSizeNormalization(t: any) {
+        // range from 8px to 80px
+        let age = this.taskAgeRaw(t) / 2;
+        return age >= 72 ? 80 : age + 8;
+    }
+
+    taskAgeRaw(t: any){
+        return this.services.tasksCore.elapsedDays(new Date(t.tsk_date_add),new Date());
+    }
+    
     taskAge(t: any){
         let diff = this.services.tasksCore.elapsedDays(new Date(t.tsk_date_add),new Date());
         return `${(diff > 1 ? '(' + diff + ' days ago)' : (diff === 1 ? '(yesterday)' : ''))}`;
@@ -1407,6 +1416,9 @@ export class TasksComponent implements OnInit {
 
         // time management ratio
         addIndicator('Time Management Ratio',calculateForAllDays(days,this.services.taskIndicator.calculateTimeManagementRatio));
+        
+        // total task count overall
+        addIndicator('Overall Task Count',calculateForAllDays(days,this.services.taskIndicator.totalTaskCountUntil));
 
         // karma
 

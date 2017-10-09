@@ -10,6 +10,7 @@ export class SyncAPI {
     private version = 'v1.2';
     private logPrefix = `Sync API ${this.version} -`;
     private currentOperation: any = null;
+    private lastOnlineStamp: Date = null;
     
     constructor(private http: Http){
         this.http = http;
@@ -69,13 +70,59 @@ export class SyncAPI {
         });
     }
 
-    isOnline(){
-        let nav = navigator.onLine;
-        this.log(`Your navigator reports online status as: ${nav}`)
-        return this.isServerReachable().then((data) => { // some request to BE
-            this.log(`Tried to contact the server, answer was`,data);
-            return nav && data;
+    multipleRequest(list: any, objNameMethod: (e: any) => string){
+        this.log(`Handling new multiple requests`);
+        if (this.currentOperation) {
+            this.log('Cancelling sync operation with timer id',this.currentOperation);
+            clearTimeout(this.currentOperation);
+        }
+        list.forEach((e: any) => {
+            if (e.matchMethod){
+                let foundIndex = this.queue.findIndex((val: any) => e.matchMethod(val.data) && (val.status === 'queue' || val.status === 'error'));
+    
+                if (foundIndex !== -1) { // if record has a match, replace data only
+                    this.log(`Recieved a request, found record with id ${objNameMethod(e.data)} and updated it`);
+                    this.queue[foundIndex].data = e.data;
+                } else { // if not found, add it
+                    this.queue.push({
+                        method: e.method, url: e.url, data: e.data, callback: e.callback
+                        , status: 'queue'
+                    });
+                }
+            } else {
+                // by request
+                this.queue.push({
+                    method: e.method, url: e.url, data: e.data, callback: e.callback
+                    , status: 'queue'
+                });
+            }
+    
+            this.log(`Recieved a request to ${e.url} and added it to the queue`);
         });
+
+        this.isOnline().then((online) => {
+            if (online){
+                this.currentOperation = setTimeout(() => {
+                    //this.processQueue();
+                    this.syncQueue();
+                    this.currentOperation = null;
+                }, 5000);
+                this.log('Scheduled sync with timer id',this.currentOperation);
+            }
+        });
+    }
+
+    isOnline(){
+        if (!this.lastOnlineStamp || (new Date()).getTime() - this.lastOnlineStamp.getTime() > 30000 ) {
+            let nav = navigator.onLine;
+            this.log(`Your navigator reports online status as: ${nav}`)
+            return this.isServerReachable().then((data) => { // some request to BE
+                this.log(`Tried to contact the server, answer was`,data);
+                return nav && data;
+            });
+        } else {
+            return Promise.resolve(true);
+        }
     }
 
     isServerReachable(){
@@ -184,7 +231,7 @@ export class SyncAPI {
                 if (Q) {
                     Q.status = r.operationOk ? 'processed' : 'error';
                     if (r.operationOk) {
-                        Q.callback(data.json());
+                        Q.callback(Q.data, data.json());
                     }
                 }
             });

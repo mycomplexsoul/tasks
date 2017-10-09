@@ -42,6 +42,31 @@ export class TasksCore {
         return T[T.length-1];
     }
 
+    batchAddTasks(tasks: Array<any>, options: any){
+        let T = this.data.taskList;
+        let parsedTask: any;
+        tasks.forEach((text: string) => {
+            if (!text.startsWith('//') && text !== ''){
+                //t = this.addTask({
+                //    'tsk_date_add': new Date(),
+                //    'tsk_name': text
+                //}, options);
+                
+                parsedTask = this.parseTask({
+                    'tsk_date_add': new Date(),
+                    'tsk_name': text
+                },options);
+        
+                T.push(this.newTaskTemplate(parsedTask));
+                //this.postTask(T[T.length-1]);
+                //return T[T.length-1];
+                //console.log("added task:",t);
+            }
+        });
+        this.tasksToStorage();
+        
+    }
+
     parseTask(task: any, options: any){
         // detect group list for the task (at start of text)
         if (task.tsk_name.startsWith('[')){
@@ -577,6 +602,25 @@ export class TasksCore {
             , (data: any) => {
                 t.not_sync = false;
             }
+        );
+    }
+
+    postMultipleTasks(list: Array<any>){
+        let syncList: Array<any> = [];
+        list.forEach((t: any) => {
+            t.not_sync = true;
+            syncList.push({
+                method: 'POST'
+                , url: `${this.apiRoot}/task/create`
+                , data: t
+                , matchMethod: (val: any) => val.tsk_id === t.tsk_id
+                , callback: (task: any, data: any) => {
+                    task.not_sync = false;
+                }
+            });
+        });
+        this.sync.multipleRequest(list
+            , (e: Task) => e.tsk_id + ' / ' + e.tsk_name
         );
     }
 
