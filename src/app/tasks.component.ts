@@ -1418,7 +1418,7 @@ export class TasksComponent implements OnInit {
         addIndicator('Time Management Ratio',calculateForAllDays(days,this.services.taskIndicator.calculateTimeManagementRatio));
         
         // total task count overall
-        addIndicator('Overall Task Count',calculateForAllDays(days,this.services.taskIndicator.totalTaskCountUntil));
+        addIndicator('Overall Task Count EOD',calculateForAllDays(days,this.services.taskIndicator.totalTaskCountUntil));
 
         // karma
 

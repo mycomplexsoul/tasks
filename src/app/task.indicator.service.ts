@@ -149,9 +149,9 @@ export class TaskIndicator {
      * @param initialDate ignore this param.
      * @param finalDate Date until total task count should be calculated, including this day.
      */
-    totalTaskCountUntil(initialDate: Date, finalDate: Date) {
-        let total: number = 0;
-        total = this.tasks.filter((t: any) => new Date(t.tsk_date_add) <= finalDate).length;
-        return total;
+    totalTaskCountUntil(initialDate: Date, finalDate: Date): number {
+        let total: Array<any>;
+        total = this.tasks.filter((t: any) => new Date(t.tsk_date_add) <= finalDate && (new Date(t.tsk_date_done) >= finalDate || (t.tsk_ctg_status !== TaskStatus.CLOSED && t.tsk_ctg_status !== TaskStatus.CANCELLED)));
+        return total.length;
     }
 }
