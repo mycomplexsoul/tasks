@@ -70,7 +70,7 @@ export class TasksComponent implements OnInit {
         this.notification({
             body: 'Hello there!! you have ' + this.state.openTasksCount + ' tasks open'
         });
-        //this.services.tasksCore.computeComparisonData().then((data: any) => this.comparisonData = data);
+        this.services.tasksCore.computeComparisonData().then((data: any) => this.comparisonData = data);
     }
 
     ngOnInit(){
@@ -81,7 +81,7 @@ export class TasksComponent implements OnInit {
         if (!this.showBatchAdd){
             if (form.value.tsk_name){
                 this.services.tasksCore.addTask({
-                    'tsk_date_add': new Date(),
+                    'tsk_date_add': this.services.dateUtils.newDateUpToSeconds(),
                     'tsk_name': form.value.tsk_name
                 },this.options);
                 this.tasks = this.services.tasksCore.tasks();
@@ -100,10 +100,11 @@ export class TasksComponent implements OnInit {
             }
         }
         this.viewETABeforeAdd = false;
+        this.scheduleNotificationsForStartingTasks();
     }
 
     updateState(){
-        let today = new Date();
+        let today = this.services.dateUtils.newDateUpToSeconds();
         let today0 = new Date(today.getFullYear(),today.getMonth(),today.getDate());
         let yesterday0 = new Date(today.getFullYear(),today.getMonth(),today.getDate()-1);
         let tomorrow0 = new Date(today.getFullYear(),today.getMonth(),today.getDate()+1);
@@ -366,7 +367,7 @@ export class TasksComponent implements OnInit {
         }
         this.updateTask(t.tsk_id,{
             tsk_ctg_status: event.target['checked'] ? this.taskStatus.CLOSED : this.taskStatus.OPEN
-            , tsk_date_done: new Date()
+            , tsk_date_done: this.services.dateUtils.newDateUpToSeconds()
         });
         setTimeout(() => {
             this.updateState();
@@ -458,7 +459,7 @@ export class TasksComponent implements OnInit {
 
     showTimer(task: any, dom: HTMLElement){
         let timer: number = 0;
-        let start: Date = new Date();
+        let start: Date = this.services.dateUtils.newDateUpToSeconds();
 
         // if task was running previously, get current running time
         if ( task.tsk_time_history.length > 0 ){
@@ -466,7 +467,7 @@ export class TasksComponent implements OnInit {
             if (h.tsh_time_spent === 0){
                 h.tsh_date_start = new Date(h.tsh_date_start);
                 start = h.tsh_date_start;
-                timer = this.elapsedTime(h.tsh_date_start,new Date());
+                timer = this.elapsedTime(h.tsh_date_start,this.services.dateUtils.newDateUpToSeconds());
             }
         }
 
@@ -480,7 +481,7 @@ export class TasksComponent implements OnInit {
         };
 
         let calcTimer = (start: Date) => {
-            return this.elapsedTime(start,new Date());
+            return this.elapsedTime(start,this.services.dateUtils.newDateUpToSeconds());
         }
 
         let watch = setInterval(() => {
@@ -630,7 +631,7 @@ export class TasksComponent implements OnInit {
             value.split('\n').forEach((text: string) => {
                 if (!text.startsWith('//') && text !== ''){
                     t = this.services.tasksCore.parseTask({
-                        'tsk_date_add': new Date(),
+                        'tsk_date_add': this.services.dateUtils.newDateUpToSeconds(),
                         'tsk_name': text
                     },this.options);
                     if (totalPerRecord.find((r: any) => r.record === t.tsk_id_record)){
@@ -854,7 +855,7 @@ export class TasksComponent implements OnInit {
 
     setUnpostpone(t: any){
         this.updateTask(t.tsk_id,{
-            tsk_date_view_until: new Date()
+            tsk_date_view_until: this.services.dateUtils.newDateUpToSeconds()
         });
         if (this.state.postponedTasks.length === 0){
             this.viewPostponed = false;
@@ -863,7 +864,7 @@ export class TasksComponent implements OnInit {
     }
 
     scheduleNotificationsForStartingTasks(){
-        let now = new Date();
+        let now = this.services.dateUtils.newDateUpToSeconds();
         let tomorrow0 = new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
         if (!this.state.startingTasksSchedule){
             this.state.startingTasksSchedule = [];
@@ -873,6 +874,16 @@ export class TasksComponent implements OnInit {
         }).forEach((t) =>{
             let diff = this.services.tasksCore.elapsedTime(now, new Date(t.tsk_schedule_date_start));
             diff = diff - (5 * 60); // date minus 5 minutes
+            // validate if there is no current schedule set
+            let found = this.state.startingTasksSchedule.find((s: any) => s.task.tsk_id == t.tsk_id && s.timeoutHandler != -1);
+            if (found) {
+                if (new Date(found.task.tsk_schedule_date_start) != new Date(t.tsk_schedule_date_start)){
+                    clearTimeout(found.timeoutHandler);
+                    found.timeoutHandler = -1;
+                } else {
+                    return false; // date is the same, do nothing
+                }
+            }
             let timeout = setTimeout(() => {
                 this.notification({
                     body: `Task "${t.tsk_name}" is about to start!`
@@ -899,7 +910,7 @@ export class TasksComponent implements OnInit {
         let dayTasks = <any>[];
         let currentDay = mondayDate;
         let tomorrow = this.addDays(currentDay,1);
-        let today = this.services.tasksCore.dateOnly(new Date());
+        let today = this.services.tasksCore.dateOnly(this.services.dateUtils.newDateUpToSeconds());
         let dailyCount = <any>[];
         let estimatedTotalPerDay = 0;
         let spentTotalPerDay = 0;
@@ -1263,7 +1274,7 @@ export class TasksComponent implements OnInit {
         if (newValue.length === 8 && /[0-2][0-9]:[0-5][0-9]:[0-5][0-9]/.test(newValue)){
             let parts = newValue.split(':');
             let data = {};
-            data[`tsh_date_${target}`] = new Date(this.services.tasksCore.dateOnly(new Date()).getTime() + (parseInt(parts[0]) * 60 * 60 * 1000) + (parseInt(parts[1]) * 60 * 1000) + (parseInt(parts[2]) * 1000));
+            data[`tsh_date_${target}`] = new Date(this.services.tasksCore.dateOnly(this.services.dateUtils.newDateUpToSeconds()).getTime() + (parseInt(parts[0]) * 60 * 60 * 1000) + (parseInt(parts[1]) * 60 * 1000) + (parseInt(parts[2]) * 1000));
             task.tsk_time_history[task.tsk_time_history.length-1][`tsh_date_${target}`] = data[`tsh_date_${target}`];
             this.updateTaskTimeTracking(task.tsk_id,task.tsk_time_history.length,data);
 
@@ -1314,7 +1325,7 @@ export class TasksComponent implements OnInit {
 
     createGroupedClosedTasks(tasks: Array<any>){
         let res: Array<any> = [];
-        let lastHeader: Date = new Date();
+        let lastHeader: Date = this.services.dateUtils.newDateUpToSeconds();
 
         tasks.forEach((t) => {
             if (this.services.tasksCore.dateOnly(new Date(t.tsk_date_done)).getTime() !== lastHeader.getTime()){
@@ -1340,7 +1351,7 @@ export class TasksComponent implements OnInit {
     }
 
     calculateIndicators(){
-        let today = new Date();
+        let today = this.services.dateUtils.newDateUpToSeconds();
         let today0 = new Date(today.getFullYear(),today.getMonth(),today.getDate());
         let days: Array<Date> = [];
         let dayLabels: Array<String> = [];
@@ -1418,7 +1429,7 @@ export class TasksComponent implements OnInit {
         addIndicator('Time Management Ratio',calculateForAllDays(days,this.services.taskIndicator.calculateTimeManagementRatio));
         
         // total task count overall
-        addIndicator('Overall Task Count EOD',calculateForAllDays(days,this.services.taskIndicator.totalTaskCountUntil));
+        addIndicator('Overall Task Count EOD',calculateForAllDays(days,this.services.taskIndicator.totalTaskCountUntil),null,(prev: number,curr: number) => ({ isCompleted: prev >= curr, percentageCompleted: prev !== 0 ? Math.round(curr * 100/prev) / 100 : 0 }));
 
         // karma
 
