@@ -7,7 +7,7 @@ export class Account {
     public acc_average_min_balance: number;
     public acc_payment_day: number;
 
-    constructor(base: any) {
+    constructor(base?: any) {
         if (base !== undefined){
             this.acc_id = base.acc_id;
             this.acc_name = base.acc_name;

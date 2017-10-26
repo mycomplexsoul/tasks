@@ -7,12 +7,15 @@ import { Catalog } from './catalog.type';
 import { Category } from './category.type';
 import { Place } from './place.type';
 import { Entry } from './entry.type';
+
 // services
 import { StorageService }  from './storage.service';
 import { AccountService } from './account.service';
 import { CategoryService } from './category.service';
 import { PlaceService } from './place.service';
 import { MovementService } from './movement.service';
+import { EntryService } from './entry.service';
+import { BalanceService } from './balance.service';
 
 @Component({
     selector: 'movement',
@@ -22,26 +25,31 @@ import { MovementService } from './movement.service';
         , CategoryService
         , PlaceService
         , MovementService
+        , EntryService
+        , BalanceService
     ]
 })
 export class MovementComponent implements OnInit {
-    public entryList: Array<Entry> = [];
     private accounts: Array<Account> = [] //this.getAccounts();
     private user: string = 'anon';
     public viewData: {
         accounts: Array<any>
         , types: Array<any>
+        , statuses: Array<any>
         , budgets: Array<any>
         , categories: Array<Category>
         , places: Array<Place>
         , movements: Array<Movement>
+        , entries: Array<Entry>
     } = {
         accounts: []
         , types: []
+        , statuses: []
         , budgets: []
         , categories: []
         , places: []
         , movements: []
+        , entries: []
     };
     public model: any = { /* UI default form data */
         type: 1
@@ -56,6 +64,8 @@ export class MovementComponent implements OnInit {
         , category: <CategoryService>null
         , place: <PlaceService>null
         , movement: <MovementService>null
+        , entry: <EntryService>null
+        , balance: <BalanceService>null
     };
 
     constructor(
@@ -63,27 +73,15 @@ export class MovementComponent implements OnInit {
         , categoryService: CategoryService
         , placeService: PlaceService
         , movementService: MovementService
+        , entryService: EntryService
+        , balanceService: BalanceService
     ){
         this.services.account = accountService;
         this.services.category = categoryService;
         this.services.place = placeService;
         this.services.movement = movementService;
-
-        /*let a = new Movement(undefined);
-        a.mov_id = "1";
-        a.mov_date = new Date(2017,4,8,16,54,0);
-        a.mov_amount = 100.00;
-        a.mov_account = 2;
-        a.mov_txt_account = 'Cartera';
-        a.mov_ctg_type = 1;
-        a.mov_txt_type = 'Income';
-        a.mov_budget = '1705-Other';
-        a.mov_ctg_category = 1;
-        a.mov_ctg_place = 1;
-        a.mov_desc = 'Initial Balance';
-        a.mov_notes = null;
-
-        this.movementList.push(a);*/
+        this.services.entry = entryService;
+        this.services.balance = balanceService;
 
         // TODO: this data should come from localStorage, if not present then fetch from BE
         this.viewData.types = [{
@@ -92,6 +90,18 @@ export class MovementComponent implements OnInit {
         }, {
             ctg_ctg_value: 2
             , ctg_desc: 'Income'
+        }];
+
+        // TODO: this data should come from localStorage, if not present then fetch from BE
+        this.viewData.statuses = [{
+            ctg_ctg_value: 1
+            , ctg_desc: 'Active'
+        }, {
+            ctg_ctg_value: 2
+            , ctg_desc: 'Cancelled'
+        }, {
+            ctg_ctg_value: 3
+            , ctg_desc: 'Pending'
         }];
 
         // TODO: this data should have an entity
@@ -113,83 +123,100 @@ export class MovementComponent implements OnInit {
         this.services.category.getAllForUser(this.user);
         this.services.place.getAllForUser(this.user);
         this.services.movement.getAllForUser(this.user);
+        this.services.entry.getAllForUser(this.user);
         
         this.viewData.accounts = this.accounts;
         this.viewData.categories = this.services.category.list;
         this.viewData.places = this.services.place.list;
         this.viewData.movements = this.services.movement.list;
+        this.viewData.entries = this.services.entry.list;
 
         this.addNewCategoryForUser = this.addNewCategoryForUser.bind(this);
         this.addNewPlaceForUser = this.addNewPlaceForUser.bind(this);
     }
 
     newMovement(form: NgForm){
-        let m = new Movement(undefined);
+        let m = new Movement();
         // TODO: implement a hash generator for IDs
         m.mov_id = this.services.movement.newId();
         m.mov_desc = form.value.fDescription;
         m.mov_amount = form.value.fAmount;
-        m.mov_account = form.value.fAccount;
+        m.mov_id_account = form.value.fAccount;
         m.mov_ctg_type = form.value.fMovementType;
         m.mov_date = this.stringDateToDate(form.value.fDate);
         m.mov_budget = form.value.fBudget;
         m.mov_ctg_category = form.value.fCategory;
         m.mov_ctg_place = form.value.fPlace;
         m.mov_notes = form.value.fNotes;
+        m.mov_id_user = this.user;
+        m.mov_ctg_status = 1;
 
-        m.mov_txt_account = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == m.mov_account,'acc_name');
+        m.mov_txt_account = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == m.mov_id_account,'acc_name');
         m.mov_txt_type = this.findIn(this.viewData.types,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_type,'ctg_desc');
         m.mov_txt_budget = m.mov_budget;
         m.mov_txt_category = this.findIn(this.viewData.categories,(e: any) => e.mct_id === m.mov_ctg_category,'mct_name');
         m.mov_txt_place = this.findIn(this.viewData.places,(e: any) => e.mpl_id === m.mov_ctg_place,'mpl_name');
+        m.mov_txt_status = this.findIn(this.viewData.statuses,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_status,'ctg_desc');
 
         this.services.movement.newItem(m);
+        console.log('this is the movement',m);
 
         // Entries
+        let localEntries: Array<Entry> = [];
+        // TODO: Entry creation should be inside entry.service, just pass the movement as argument
         let e = new Entry();
         e.ent_id = m.mov_id;
         e.ent_sequential = 1;
         e.ent_desc = m.mov_desc;
         e.ent_amount = m.mov_amount;
-        e.ent_account = m.mov_account;
+        e.ent_id_account = m.mov_id_account;
         e.ent_ctg_type = m.mov_ctg_type;
         e.ent_date = m.mov_date;
         e.ent_budget = m.mov_budget;
         e.ent_ctg_category = m.mov_ctg_category;
         e.ent_ctg_place = m.mov_ctg_place;
         e.ent_notes = m.mov_notes;
+        e.ent_id_user = m.mov_id_user;
+        e.ent_ctg_status = m.mov_ctg_status;
 
         e.ent_txt_account = m.mov_txt_account;
         e.ent_txt_type = m.mov_txt_type;
         e.ent_txt_budget = m.mov_txt_budget;
         e.ent_txt_category = m.mov_txt_category;
         e.ent_txt_place = m.mov_txt_place;
+        e.ent_txt_status = m.mov_txt_status;
 
-        this.entryList.push(e);
-
+        localEntries.push(this.services.entry.newItem(e));
+        
         e = new Entry();
         e.ent_id = m.mov_id;
         e.ent_sequential = 2;
         e.ent_desc = m.mov_desc;
         e.ent_amount = m.mov_amount;
-        e.ent_account = 1;
+        e.ent_id_account = "1";
         e.ent_ctg_type = m.mov_ctg_type === 1 ? 2 : 1;
         e.ent_date = m.mov_date;
         e.ent_budget = m.mov_budget;
         e.ent_ctg_category = m.mov_ctg_category;
         e.ent_ctg_place = m.mov_ctg_place;
         e.ent_notes = m.mov_notes;
-
-        e.ent_txt_account = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == e.ent_account,'acc_name');
-        e.ent_txt_type = this.findIn(this.viewData.types,(e: any) =>  e.ctg_ctg_value == e.ent_ctg_type,'ctg_desc');
+        e.ent_id_user = m.mov_id_user;
+        e.ent_ctg_status = m.mov_ctg_status;
+        
+        e.ent_txt_account = this.findIn(this.viewData.accounts,(i: any) => i.acc_id == e.ent_id_account,'acc_name');
+        e.ent_txt_type = this.findIn(this.viewData.types,(i: any) => i.ctg_ctg_value == e.ent_ctg_type,'ctg_desc');
         e.ent_txt_budget = m.mov_txt_budget;
         e.ent_txt_category = m.mov_txt_category;
         e.ent_txt_place = m.mov_txt_place;
+        e.ent_txt_status = m.mov_txt_status;
+        
+        localEntries.push(this.services.entry.newItem(e));
 
-        this.entryList.push(e);
-        // TODO: Entries should be using a service and saved to Storage
-
-        console.log(this.entryList);
+        console.log('these are all entries',this.services.entry.list);
+        
+        // add to balance
+        this.services.balance.add(localEntries);
+        console.log('these are all balance',this.services.balance.list);
 
         return false;
     }
