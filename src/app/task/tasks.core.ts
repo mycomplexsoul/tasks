@@ -2,8 +2,8 @@ import { Injectable } from "@angular/core";
 import { Http, Headers } from '@angular/http';
 import { Task } from './task.type';
 import 'rxjs/add/operator/toPromise';
-import { SyncAPI } from './sync.api';
-import { DateCommon } from './date.common';
+import { SyncAPI } from '../common/sync.api';
+import { DateCommon } from '../common/date.common';
 
 @Injectable()
 export class TasksCore {

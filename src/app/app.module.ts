@@ -5,14 +5,16 @@ import { HttpModule } from '@angular/http';
 import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent }  from './app.component';
-import { TasksComponent }  from './tasks.component';
+import { TasksComponent }  from './task/tasks.component';
+import { MenuComponent }  from './common/menu.component';
 
-import { AccountComponent }  from './account.component';
-import { MovementComponent }  from './movement.component';
+import { AccountComponent }  from './money/account.component';
+import { MovementComponent }  from './money/movement.component';
+import { BalanceComponent }  from './money/balance.component';
 
-import { StorageService }  from './storage.service';
-import { DateCommon } from './date.common';
-import { ComboItemComponent } from './comboItem.component';
+import { StorageService }  from './common/storage.service';
+import { DateCommon } from './common/date.common';
+import { ComboItemComponent } from './common/comboItem.component';
 
 const appRoutes: Routes = [
     // { path: 'crisis-center', component: CrisisListComponent },
@@ -30,6 +32,10 @@ const appRoutes: Routes = [
         component: MovementComponent,
         data: { title: 'Movements' }
     },{
+        path: 'balance',
+        component: BalanceComponent,
+        data: { title: 'Balance' }
+    },{
         path: '',
         redirectTo: '/tasks',
         pathMatch: 'full'
@@ -39,7 +45,7 @@ const appRoutes: Routes = [
 
 @NgModule({
   imports: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(appRoutes) ],
-  declarations: [ AppComponent, TasksComponent, AccountComponent, MovementComponent, ComboItemComponent ], // parent & child components
+  declarations: [ AppComponent, TasksComponent, AccountComponent, MovementComponent, BalanceComponent, ComboItemComponent, MenuComponent ], // parent & child components
   bootstrap: [ AppComponent ], // only parent components
   providers: [ DateCommon, StorageService ]
 })

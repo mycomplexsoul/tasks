@@ -1,0 +1,27 @@
+<div>
+    <strong>Balance</strong>
+
+    <select>
+        <option value="2017" selected>2017</option>
+    </select>
+    <select>
+        <option value="10" selected>October</option>
+    </select>
+    
+    <table>
+        <tr>
+            <th>Account</th>
+            <th>Initial</th>
+            <th>Charges</th>
+            <th>Withdrawals</th>
+            <th>Final</th>
+        </tr>
+        <tr *ngFor="let b of viewData.monthBalance">
+            <td>{{b.bal_txt_account}}</td>
+            <td>{{b.bal_initial}}</td>
+            <td>{{b.bal_charges}}</td>
+            <td>{{b.bal_withdrawals}}</td>
+            <td>{{b.bal_final}}</td>
+        </tr>
+    </table>
+</div>

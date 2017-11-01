@@ -1,13 +1,14 @@
+import { Balance } from './balance.type';
 import { Entry } from './entry.type';
-import { StorageService } from './storage.service';
+import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
 
 @Injectable()
-export class EntryService {
-    private data: Array<Entry> = [];
+export class BalanceService {
+    private data: Array<Balance> = [];
     private storage: StorageService = null;
     private config = {
-        storageKey: 'entries'
+        storageKey: 'balance'
         , defaultUser: 'anon'
     }
 
@@ -15,12 +16,12 @@ export class EntryService {
         this.storage = storage;
     }
 
-    get list(): Array<Entry> {
+    get list(): Array<Balance> {
         return this.data;
     }
 
     initialData(){
-        let list: Array<Entry> = [];
+        let list: Array<Balance> = [];
 
         // let newData = (
         //     mov_id: string
@@ -79,7 +80,7 @@ export class EntryService {
         return list;
     }
 
-    getAll(){
+    getAll(): Array<Balance>{
         let fromStorage = this.storage.get(this.config.storageKey);
         if (fromStorage){
             this.data = JSON.parse(fromStorage);
@@ -90,25 +91,48 @@ export class EntryService {
     }
 
     getAllForUser(user: string){
-        const all: Array<Entry> = this.getAll();
+        const all: Array<Balance> = this.getAll();
 
-        return all.filter((x: Entry) => x.ent_id_user === user);
+        return all.filter((x: Balance) => x.bal_id_user === user);
     }
 
     saveToStorage(){
         this.storage.set(this.config.storageKey,JSON.stringify(this.data));
     }
 
-    newId(){
-        return this.data.length + 1 + '';
-    }
-
-    newItem(item: Entry): Entry{
-        let newId: string = this.newId();
-        item.ent_id = newId;
-        let newItem = new Entry(item);
+    newItem(item: Balance): Balance{
+        let newItem = new Balance(item);
         this.data.push(newItem);
         this.saveToStorage();
         return newItem;
+    }
+
+    add(entryList: Array<Entry>){
+        let balance: Array<Balance> = this.getAll();
+
+        // add up
+        entryList.forEach((e: Entry) => {
+            let b: Balance = balance.find(b => b.bal_year === e.ent_date.getFullYear() && b.bal_month === e.ent_date.getMonth()+1 && b.bal_id_account === e.ent_id_account && b.bal_id_user === e.ent_id_user);
+
+            if (b) { // exists a balance, add entry amount
+                b.bal_charges += e.ent_ctg_type === 2 ? e.ent_amount : 0;
+                b.bal_withdrawals += e.ent_ctg_type === 1 ? e.ent_amount : 0;
+                b.bal_final += e.ent_ctg_type === 1 ? -1 * e.ent_amount : e.ent_amount;
+            } else { // balance does not exist, create one with amount and add it to list
+                b = new Balance();
+                b.bal_year = e.ent_date.getFullYear();
+                b.bal_month = e.ent_date.getMonth() + 1;
+                b.bal_id_account = e.ent_id_account;
+                b.bal_initial = 0;
+                b.bal_charges = e.ent_ctg_type === 2 ? e.ent_amount : 0;
+                b.bal_withdrawals = e.ent_ctg_type === 1 ? e.ent_amount : 0;
+                b.bal_final = b.bal_charges - b.bal_withdrawals;
+                b.bal_id_user = e.ent_id_user;
+                b.bal_txt_account = e.ent_txt_account;
+
+                this.data.push(b);
+                this.saveToStorage();
+            }
+        });
     }
 }

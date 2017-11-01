@@ -1,9 +1,9 @@
 import { Component, OnInit, Renderer } from '@angular/core';
 import { TasksCore } from './tasks.core';
-import { SyncAPI } from './sync.api';
+import { SyncAPI } from '../common/sync.api';
 import { Task } from './task.type';
 import { TaskIndicator } from './task.indicator.service';
-import { DateCommon } from './date.common';
+import { DateCommon } from '../common/date.common';
 
 @Component({
     selector: 'tasks',

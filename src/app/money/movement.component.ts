@@ -3,13 +3,13 @@ import { NgForm } from '@angular/forms';
 // types
 import { Movement } from './movement.type';
 import { Account } from './account.type';
-import { Catalog } from './catalog.type';
+import { Catalog } from '../common/catalog.type';
 import { Category } from './category.type';
 import { Place } from './place.type';
 import { Entry } from './entry.type';
 
 // services
-import { StorageService }  from './storage.service';
+import { StorageService }  from '../common/storage.service';
 import { AccountService } from './account.service';
 import { CategoryService } from './category.service';
 import { PlaceService } from './place.service';

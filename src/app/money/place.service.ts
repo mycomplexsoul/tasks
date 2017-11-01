@@ -1,5 +1,5 @@
 import { Place } from './place.type';
-import { StorageService } from './storage.service';
+import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
 
 @Injectable()
