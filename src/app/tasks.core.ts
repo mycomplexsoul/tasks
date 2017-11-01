@@ -315,6 +315,9 @@ export class TasksCore {
     tasksFromStorage(){
         if(typeof(window.localStorage) !== "undefined") {
             let tasks: Array<Task> = JSON.parse(localStorage.getItem("Tasks"));
+            //console.log('from storage recent',tasks.length);
+            // tasks = tasks.concat(JSON.parse(localStorage.getItem("Tasks.old")));
+            //console.log('from storage all',tasks.length);
             if (tasks){
                 // parse dates
                 // tasks.forEach((t: any) => {
@@ -373,7 +376,15 @@ export class TasksCore {
         //     t.tsk_total_time_spent = total;
         // });
         if(typeof(window.localStorage) !== "undefined") {
+            // let date = new Date();
+            // date = new Date(2017,9,1);
+            // let old = this.data.taskList.filter((t: any) => new Date(t.tsk_date_add) < date && t.tsk_ctg_status === 3);
+            // let recent = this.data.taskList.filter((t: any) => new Date(t.tsk_date_add) >= date || t.tsk_ctg_status !== 3);
+            //console.log('old storage',old.length);
+            //console.log('recent storage',recent.length);
             localStorage.setItem("Tasks", JSON.stringify(this.data.taskList));
+            // localStorage.setItem("Tasks", JSON.stringify(recent));
+            //localStorage.setItem("Tasks.old", JSON.stringify(old));
         }
     }
     /** END Storage */
@@ -616,9 +627,54 @@ export class TasksCore {
     getTasksFromServer(){
         this.http.get(`${this.apiRoot}/task/list`).toPromise()
         .then((data) => {
-            this.data.taskList = data.json();
-            this.data.taskList.forEach((t: any) => {
+            let task;
+            let server = data.json();
+            server.forEach((t: any) => {
                 t.tsk_time_history = t.tsk_time_history || [];
+                
+                task = this.data.taskList.find((d: any) => d.tsk_id == t.tsk_id);
+                if (!task){ // if task was not found on client but it's coming from server, add it
+                    // add one time tracking if task is done
+                    if (t.tsk_ctg_status == 3) {
+                        let dateDone: Date = new Date(t.tsk_date_done);
+                        let dateStart: Date = new Date(t.tsk_date_done);
+                        dateStart = new Date(dateStart.getTime() - ((t.tsk_estimated_duration - 1) * 60 * 1000));
+                        t.tsk_time_history.push({
+                            tsh_id: t.tsk_id
+                            , tsh_num_secuential: 1
+                            , tsh_name: t.tsk_name
+                            , tsh_date_start: dateStart
+                            , tsh_date_end: dateDone
+                            , tsh_time_spent: this.elapsedTime(dateStart, dateDone)
+                            , tsh_id_user: t.tsk_id_user_asigned
+                            , tsh_date_add: dateStart
+                            , tsh_date_mod: dateDone
+                        });
+                    }
+                    this.data.taskList.push(t);
+                } else { // task is in server and client, let's see if it has changes
+                    if ((new Date(t.tsk_date_mod)).getTime() != (new Date(task.tsk_date_mod)).getTime()){
+                        // add one time tracking if task is done
+                        if (t.tsk_ctg_status == 3) {
+                            let dateDone: Date = new Date(t.tsk_date_done);
+                            let dateStart: Date = new Date(t.tsk_date_done);
+                            dateStart = new Date(dateStart.getTime() - ((t.tsk_estimated_duration - 1) * 60 * 1000));
+                            t.tsk_time_history.push({
+                                tsh_id: t.tsk_id
+                                , tsh_num_secuential: 1
+                                , tsh_name: t.tsk_name
+                                , tsh_date_start: dateStart
+                                , tsh_date_end: dateDone
+                                , tsh_time_spent: this.elapsedTime(dateStart, dateDone)
+                                , tsh_id_user: t.tsk_id_user_asigned
+                                , tsh_date_add: dateStart
+                                , tsh_date_mod: dateDone
+                            });
+                            this.data.taskList[this.data.taskList.findIndex((d: any) => d.tsk_id == t.tsk_id)] = t;
+                            //task = t;
+                        }
+                    }
+                }
             });
             this.tasksToStorage();
         }).catch((err) => {

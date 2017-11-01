@@ -70,7 +70,7 @@ export class TasksComponent implements OnInit {
         this.notification({
             body: 'Hello there!! you have ' + this.state.openTasksCount + ' tasks open'
         });
-        this.services.tasksCore.computeComparisonData().then((data: any) => this.comparisonData = data);
+        //this.services.tasksCore.computeComparisonData().then((data: any) => this.comparisonData = data);
     }
 
     ngOnInit(){
