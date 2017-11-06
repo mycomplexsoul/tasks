@@ -319,7 +319,7 @@ export class TasksComponent implements OnInit {
         if (event.keyCode==113){ // detect "F2" = start/stop time tracking
             this.taskToggleTimeTracking(t,parent);
         }
-        if (event.altKey && event.keyCode==83){ // detect move down
+        if (event.altKey && event.keyCode==83){ // detect 's'
             this.setSelected(t);
         }
         if (event.altKey && event.keyCode==46){ // detect supr (delete)
@@ -354,6 +354,15 @@ export class TasksComponent implements OnInit {
         }
         if (event.altKey && event.keyCode==82){ // detect 'r'
             this.asNextToDo(t,false);
+        }
+        if (event.altKey && event.keyCode==84){ // detect 't'
+            let tt = this.lastTTEntryFromDay(this.services.dateUtils.dateOnly(new Date()));
+            if (tt && t.tsk_time_history.length) {
+                t.tsk_time_history[t.tsk_time_history.length - 1].tsh_date_start = tt;
+                this.services.tasksCore.tasksToStorage(); // TODO: move this sentence to tasksCore
+                // TODO: update time tracking history on server
+                this.updateState();
+            }
         }
         // event.preventDefault();
         // event.returnValue = false;
