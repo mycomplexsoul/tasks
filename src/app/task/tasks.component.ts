@@ -494,7 +494,8 @@ export class TasksComponent implements OnInit {
         }
 
         let watch = setInterval(() => {
-            timer = calcTimer(start);
+            let h = task.tsk_time_history[task.tsk_time_history.length-1];
+            timer = calcTimer(new Date(h.tsh_date_start));
             this.timers[task.tsk_id].timerString = formatTimerString(timer);
             if (task.tsk_estimated_duration * 60 - 60 < task.tsk_total_time_spent + timer && !this.timers[task.tsk_id].burnoutNotified){
                 this.timers[task.tsk_id].burnoutNotified = true;
