@@ -10,6 +10,7 @@ import { StorageService }  from '../common/storage.service';
 @Component({
     selector: 'menu',
     templateUrl: './menu.template.html',
+    styleUrls: ['./menu.css'],
     providers: [
         //BalanceService
     ]

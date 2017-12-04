@@ -1,0 +1,13 @@
+.menu-container ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.menu-container ul li {
+    display: inline;
+}
+
+.menu-container ul li a {
+    text-decoration: none;
+}
