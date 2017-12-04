@@ -229,6 +229,17 @@ export class TasksCore {
             task.tsk_tags = task.tsk_tags ? task.tsk_tags + ' ' + expression : expression;
         }
 
+        // detects URLs
+        this.doThisWithAToken(task, (t: Task, expression: string) => {
+            t.tsk_url = 'http://' + expression;
+            console.log('task with url',t);
+        }, 'http://');
+
+        this.doThisWithAToken(task, (t: Task, expression: string) => {
+            t.tsk_url = 'https://' + expression;
+            console.log('task with url',t);
+        }, 'https://');
+
         return task;
     }
 
@@ -238,8 +249,9 @@ export class TasksCore {
      * @return {object} A complete task model extended with the data of the basic task model.
      */
     newTaskTemplate(task: any){
+        let id = this.generateId();
         return {
-            'tsk_id': this.generateId()
+            'tsk_id': id
             , 'tsk_id_container': 'tasks'
             , 'tsk_id_record': task.tsk_id_record || 'general'
             , 'tsk_name': task.tsk_name
@@ -260,6 +272,21 @@ export class TasksCore {
             , 'tsk_notifications': <any>[]
             , 'tsk_id_user_added': task.tsk_id_user_added || this.data.user
             , 'tsk_id_user_asigned': task.tsk_id_user_asigned || this.data.user
+            , 'tsk_template': task.tsk_template || ''
+            , 'tsk_template_state': task.tsk_template_state || ''
+            , 'tsk_date_due': task.tsk_date_due || <Date>undefined
+            , 'tsk_id_related': task.tsk_id_related || 0
+            , 'tsk_url': task.tsk_url || ''
+            , 'tsk_ctg_repeats': task.tsk_ctg_repeats || 0
+            , 'tsk_id_main': task.tsk_id_main || id
+            , 'tsk_ctg_rep_type': task.tsk_ctg_rep_type || 0
+            , 'tsk_ctg_rep_after_completion': task.tsk_ctg_rep_after_completion || 0
+            , 'tsk_ctg_rep_end': task.tsk_ctg_rep_end || 0
+            , 'tsk_rep_end_iteration': task.tsk_rep_end_iteration || 0
+            , 'tsk_rep_iteration': task.tsk_rep_iteration || 0
+            , 'tsk_rep_frequency': task.tsk_rep_frequency || 0
+            , 'tsk_ctg_rep_frequency_rule': task.tsk_ctg_rep_frequency_rule || 0
+            , 'tsk_rep_weekdays': task.tsk_rep_weekdays || ''
             , 'tsk_date_add': task.tsk_date_add || this.services.dateUtils.newDateUpToSeconds()
             , 'tsk_date_mod': this.services.dateUtils.newDateUpToSeconds()
             , 'tsk_ctg_status': task.tsk_ctg_status

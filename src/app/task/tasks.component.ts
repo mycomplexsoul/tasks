@@ -359,6 +359,14 @@ export class TasksComponent implements OnInit {
             let tt = this.lastTTEntryFromDay(this.services.dateUtils.dateOnly(new Date()));
             if (tt && t.tsk_time_history.length) {
                 t.tsk_time_history[t.tsk_time_history.length - 1].tsh_date_start = tt;
+                if (t.tsk_ctg_in_process == 1){
+                    let randomFinish = ((t.tsk_estimated_duration - 2) * 60) + Math.floor(Math.random() * 2 * 10 * 6);
+                    t.tsk_time_history[t.tsk_time_history.length - 1].tsh_date_end = new Date(tt.getTime() + randomFinish * 1000);
+                    t.tsk_total_time_spent = 0;
+                    t.tsk_time_history.forEach((tth: any) => {
+                        t.tsk_total_time_spent += tth.tsh_time_spent;
+                    });
+                }
                 this.services.tasksCore.tasksToStorage(); // TODO: move this sentence to tasksCore
                 // TODO: update time tracking history on server
                 this.updateState();
@@ -848,6 +856,26 @@ export class TasksComponent implements OnInit {
                 tsk_tags: command,
             });
             this.updateState();
+        }
+        if (command.indexOf('http://') !== -1){ // set url
+            this.services.tasksCore.doThisWithAToken(t, (t: Task, expression: string) => {
+                //t.tsk_url = 'http://' + expression;
+                this.updateTask(t.tsk_id,{
+                    tsk_name: t.tsk_name,
+                    tsk_url: 'http://' + expression,
+                });
+                this.updateState();
+            }, 'http://');
+        }
+        if (command.indexOf('https://') !== -1){ // set url
+            this.services.tasksCore.doThisWithAToken(t, (t: Task, expression: string) => {
+                //t.tsk_url = 'https://' + expression;
+                this.updateTask(t.tsk_id,{
+                    tsk_name: t.tsk_name,
+                    tsk_url: 'https://' + expression,
+                });
+                this.updateState();
+            }, 'https://');
         }
     }
 
