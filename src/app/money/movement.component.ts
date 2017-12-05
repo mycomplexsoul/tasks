@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer } from '@angular/core';
+import { Component, OnInit, Renderer, transition } from '@angular/core';
 import { NgForm } from '@angular/forms';
 // types
 import { Movement } from './movement.type';
@@ -7,6 +7,7 @@ import { Catalog } from '../common/catalog.type';
 import { Category } from './category.type';
 import { Place } from './place.type';
 import { Entry } from './entry.type';
+import { Preset } from './preset.type';
 
 // services
 import { StorageService }  from '../common/storage.service';
@@ -16,6 +17,7 @@ import { PlaceService } from './place.service';
 import { MovementService } from './movement.service';
 import { EntryService } from './entry.service';
 import { BalanceService } from './balance.service';
+import { PresetService } from './preset.service';
 
 @Component({
     selector: 'movement',
@@ -27,10 +29,11 @@ import { BalanceService } from './balance.service';
         , MovementService
         , EntryService
         , BalanceService
+        , PresetService
     ]
 })
 export class MovementComponent implements OnInit {
-    private accounts: Array<Account> = [] //this.getAccounts();
+    private accounts: Array<Account> = []
     private user: string = 'anon';
     public viewData: {
         accounts: Array<any>
@@ -41,6 +44,7 @@ export class MovementComponent implements OnInit {
         , places: Array<Place>
         , movements: Array<Movement>
         , entries: Array<Entry>
+        , presets: Array<Preset>
     } = {
         accounts: []
         , types: []
@@ -50,15 +54,19 @@ export class MovementComponent implements OnInit {
         , places: []
         , movements: []
         , entries: []
+        , presets: []
     };
     public model: any = { /* UI default form data */
         type: 1
         , date: ''
         , category: 0
         , place: 0
-        , movementFlowType: 'custom'
     };
     public viewAddCategoryForm: boolean = false;
+    public _movementFlowType: string = 'custom';
+    public isTransfer: boolean = false;
+    public isCustom: boolean = true;
+    public isPreset: boolean = false;
     public services = {
         account: <AccountService>null
         , category: <CategoryService>null
@@ -66,6 +74,7 @@ export class MovementComponent implements OnInit {
         , movement: <MovementService>null
         , entry: <EntryService>null
         , balance: <BalanceService>null
+        , preset: <PresetService>null
     };
 
     constructor(
@@ -75,6 +84,7 @@ export class MovementComponent implements OnInit {
         , movementService: MovementService
         , entryService: EntryService
         , balanceService: BalanceService
+        , presetService: PresetService
     ){
         this.services.account = accountService;
         this.services.category = categoryService;
@@ -82,6 +92,7 @@ export class MovementComponent implements OnInit {
         this.services.movement = movementService;
         this.services.entry = entryService;
         this.services.balance = balanceService;
+        this.services.preset = presetService;
 
         // TODO: this data should come from localStorage, if not present then fetch from BE
         this.viewData.types = [{
@@ -124,15 +135,45 @@ export class MovementComponent implements OnInit {
         this.services.place.getAllForUser(this.user);
         this.services.movement.getAllForUser(this.user);
         this.services.entry.getAllForUser(this.user);
+        this.services.preset.getAllForUser(this.user);
         
         this.viewData.accounts = this.accounts;
         this.viewData.categories = this.services.category.list;
         this.viewData.places = this.services.place.list;
         this.viewData.movements = this.services.movement.list;
         this.viewData.entries = this.services.entry.list;
+        this.viewData.presets = this.services.preset.list;
 
         this.addNewCategoryForUser = this.addNewCategoryForUser.bind(this);
         this.addNewPlaceForUser = this.addNewPlaceForUser.bind(this);
+    }
+
+    get movementFlowType(){
+        return this._movementFlowType;
+    }
+
+    set movementFlowType(value: string){
+        this._movementFlowType = value;
+        this.isTransfer = false;
+        this.isCustom = false;
+        this.isPreset = false;
+        switch(value){
+            case 'custom': {
+                this.isCustom = true;
+                break;
+            }
+            case 'transfer': {
+                this.isTransfer = true;                
+                break;
+            }
+            case 'preset': {
+                this.isPreset = true;
+                break;
+            }
+            default: {
+
+            }
+        }
     }
 
     newMovement(form: NgForm){
@@ -142,16 +183,30 @@ export class MovementComponent implements OnInit {
         m.mov_desc = form.value.fDescription;
         m.mov_amount = form.value.fAmount;
         m.mov_id_account = form.value.fAccount;
-        m.mov_ctg_type = form.value.fMovementType;
+        if (this.isTransfer){
+            m.mov_id_account_to = form.value.fAccountTo;
+            m.mov_ctg_type = 1;
+        } else {
+            m.mov_ctg_type = form.value.fMovementType;
+        }
         m.mov_date = this.stringDateToDate(form.value.fDate);
-        m.mov_budget = form.value.fBudget;
-        m.mov_ctg_category = form.value.fCategory;
-        m.mov_ctg_place = form.value.fPlace;
+        if (!this.isTransfer){
+            m.mov_budget = form.value.fBudget;
+            m.mov_ctg_category = form.value.fCategory;
+            m.mov_ctg_place = form.value.fPlace;
+        } else {
+            m.mov_budget = null;
+            m.mov_ctg_category = 0;
+            m.mov_ctg_place = 0;
+        }
         m.mov_notes = form.value.fNotes;
         m.mov_id_user = this.user;
         m.mov_ctg_status = 1;
 
         m.mov_txt_account = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == m.mov_id_account,'acc_name');
+        if (m.mov_id_account_to){
+            m.mov_txt_account_to = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == m.mov_id_account_to,'acc_name');
+        }
         m.mov_txt_type = this.findIn(this.viewData.types,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_type,'ctg_desc');
         m.mov_txt_budget = m.mov_budget;
         m.mov_txt_category = this.findIn(this.viewData.categories,(e: any) => e.mct_id === m.mov_ctg_category,'mct_name');
@@ -193,8 +248,13 @@ export class MovementComponent implements OnInit {
         e.ent_sequential = 2;
         e.ent_desc = m.mov_desc;
         e.ent_amount = m.mov_amount;
-        e.ent_id_account = "1";
-        e.ent_ctg_type = m.mov_ctg_type === 1 ? 2 : 1;
+        if (this.isTransfer){
+            e.ent_id_account = m.mov_id_account_to;
+            e.ent_ctg_type = 2;
+        } else {
+            e.ent_id_account = "1";
+            e.ent_ctg_type = m.mov_ctg_type === 1 ? 2 : 1;
+        }        
         e.ent_date = m.mov_date;
         e.ent_budget = m.mov_budget;
         e.ent_ctg_category = m.mov_ctg_category;
@@ -219,6 +279,10 @@ export class MovementComponent implements OnInit {
         console.log('these are all balance',this.services.balance.list);
 
         return false;
+    }
+
+    saveAsPreset(form: NgForm){
+        
     }
 
     // TODO: local methods that can be used as generic should be moved to utils.service

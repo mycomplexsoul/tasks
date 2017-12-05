@@ -13,6 +13,7 @@ import { MovementComponent }  from './money/movement.component';
 import { BalanceComponent }  from './money/balance.component';
 
 import { StorageService }  from './common/storage.service';
+import { EntryService }  from './money/entry.service';
 import { DateCommon } from './common/date.common';
 import { ComboItemComponent } from './common/comboItem.component';
 
@@ -47,6 +48,6 @@ const appRoutes: Routes = [
   imports: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(appRoutes) ],
   declarations: [ AppComponent, TasksComponent, AccountComponent, MovementComponent, BalanceComponent, ComboItemComponent, MenuComponent ], // parent & child components
   bootstrap: [ AppComponent ], // only parent components
-  providers: [ DateCommon, StorageService ]
+  providers: [ DateCommon, StorageService, EntryService ]
 })
 export class AppModule { }

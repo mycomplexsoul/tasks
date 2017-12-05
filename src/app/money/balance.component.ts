@@ -42,10 +42,13 @@ export class BalanceComponent implements OnInit {
 
     ngOnInit(){
         this.services.balance.getAllForUser(this.user);
+        this.model.year = (new Date()).getFullYear();
+        this.model.month = (new Date()).getMonth();
         
         this.viewData.balance = this.services.balance.list;
         this.viewData.monthBalance = this.services.balance.list.filter((b: Balance) => {
             return b.bal_year == this.model.year && b.bal_month == this.model.month;
         });
+        this.viewData.monthBalance = this.services.balance.list;
     }
 }
