@@ -31,7 +31,7 @@ export class BalanceComponent implements OnInit {
         , month: number
     } = {
         year: 2017
-        , month: 10
+        , month: 12
     };
 
     constructor(
@@ -49,6 +49,13 @@ export class BalanceComponent implements OnInit {
         this.viewData.monthBalance = this.services.balance.list.filter((b: Balance) => {
             return b.bal_year == this.model.year && b.bal_month == this.model.month;
         });
-        this.viewData.monthBalance = this.services.balance.list;
+        //this.viewData.monthBalance = this.services.balance.list;
+        // TODO: add list of year/months of balance for combo box
+    }
+
+    reloadBalance(){
+        this.viewData.monthBalance = this.services.balance.list.filter((b: Balance) => {
+            return b.bal_year == this.model.year && b.bal_month == this.model.month;
+        });
     }
 }

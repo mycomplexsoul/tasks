@@ -61,6 +61,8 @@ export class MovementComponent implements OnInit {
         , date: ''
         , category: 0
         , place: 0
+        , asPreset: false
+        , selectedPreset: null
     };
     public viewAddCategoryForm: boolean = false;
     public _movementFlowType: string = 'custom';
@@ -177,112 +179,139 @@ export class MovementComponent implements OnInit {
     }
 
     newMovement(form: NgForm){
-        let m = new Movement();
-        // TODO: implement a hash generator for IDs
-        m.mov_id = this.services.movement.newId();
-        m.mov_desc = form.value.fDescription;
-        m.mov_amount = form.value.fAmount;
-        m.mov_id_account = form.value.fAccount;
-        if (this.isTransfer){
-            m.mov_id_account_to = form.value.fAccountTo;
-            m.mov_ctg_type = 1;
+        console.log('as preset?',form.value.fAsPreset);
+        if (form.value.fAsPreset){
+            let p = new Preset();
+            // TODO: hash generator for IDs
+            p.pre_id = this.services.preset.newId();
+            p.pre_name = form.value.fName;
+            p.pre_date = this.stringDateToDate(form.value.fDate);
+            p.pre_amount = form.value.fAmount;
+            p.pre_id_account = form.value.fAccount;
+            //p.pre_id_account_to = 0;
+            p.pre_ctg_type = form.value.fMovementType;
+            p.pre_budget = form.value.fBudget;
+            p.pre_ctg_category = form.value.fCategory;
+            p.pre_ctg_place = form.value.fPlace;
+            p.pre_desc = form.value.fDescription;
+            p.pre_notes = form.value.fNotes;
+            p.pre_id_user = this.user;
+            p.pre_ctg_status = 1;
+
+            p.pre_txt_type = this.findIn(this.viewData.types,(e: any) => e.ctg_ctg_value == p.pre_ctg_type,'ctg_desc');
+            p.pre_txt_account = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == p.pre_id_account,'acc_name');
+            //p.pre_txt_account_to = '';
+            p.pre_txt_budget = p.pre_budget;
+            p.pre_txt_category = this.findIn(this.viewData.categories,(e: any) => e.mct_id === p.pre_ctg_category,'mct_name');
+            p.pre_txt_place = this.findIn(this.viewData.places,(e: any) => e.mpl_id === p.pre_ctg_place,'mpl_name');
+            p.pre_txt_status = this.findIn(this.viewData.statuses,(e: any) =>  e.ctg_ctg_value == p.pre_ctg_status,'ctg_desc');
+
+            this.services.preset.newItem(p);
+            console.log('this is the preset',p);
         } else {
-            m.mov_ctg_type = form.value.fMovementType;
+            let m = new Movement();
+            // TODO: implement a hash generator for IDs
+            m.mov_id = this.services.movement.newId();
+            m.mov_desc = form.value.fDescription;
+            m.mov_amount = form.value.fAmount;
+            m.mov_id_account = form.value.fAccount;
+            if (this.isTransfer){
+                m.mov_id_account_to = form.value.fAccountTo;
+                m.mov_ctg_type = 1;
+            } else {
+                m.mov_ctg_type = form.value.fMovementType;
+            }
+            m.mov_date = this.stringDateToDate(form.value.fDate);
+            if (!this.isTransfer){
+                m.mov_budget = form.value.fBudget;
+                m.mov_ctg_category = form.value.fCategory;
+                m.mov_ctg_place = form.value.fPlace;
+            } else {
+                m.mov_budget = null;
+                m.mov_ctg_category = 0;
+                m.mov_ctg_place = 0;
+            }
+            m.mov_notes = form.value.fNotes;
+            m.mov_id_user = this.user;
+            m.mov_ctg_status = 1;
+    
+            m.mov_txt_account = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == m.mov_id_account,'acc_name');
+            if (m.mov_id_account_to){
+                m.mov_txt_account_to = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == m.mov_id_account_to,'acc_name');
+            }
+            m.mov_txt_type = this.findIn(this.viewData.types,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_type,'ctg_desc');
+            m.mov_txt_budget = m.mov_budget;
+            m.mov_txt_category = this.findIn(this.viewData.categories,(e: any) => e.mct_id === m.mov_ctg_category,'mct_name');
+            m.mov_txt_place = this.findIn(this.viewData.places,(e: any) => e.mpl_id === m.mov_ctg_place,'mpl_name');
+            m.mov_txt_status = this.findIn(this.viewData.statuses,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_status,'ctg_desc');
+    
+            this.services.movement.newItem(m);
+            console.log('this is the movement',m);
+    
+            // Entries
+            let localEntries: Array<Entry> = [];
+            // TODO: Entry creation should be inside entry.service, just pass the movement as argument
+            let e = new Entry();
+            e.ent_id = m.mov_id;
+            e.ent_sequential = 1;
+            e.ent_desc = m.mov_desc;
+            e.ent_amount = m.mov_amount;
+            e.ent_id_account = m.mov_id_account;
+            e.ent_ctg_type = m.mov_ctg_type;
+            e.ent_date = m.mov_date;
+            e.ent_budget = m.mov_budget;
+            e.ent_ctg_category = m.mov_ctg_category;
+            e.ent_ctg_place = m.mov_ctg_place;
+            e.ent_notes = m.mov_notes;
+            e.ent_id_user = m.mov_id_user;
+            e.ent_ctg_status = m.mov_ctg_status;
+    
+            e.ent_txt_account = m.mov_txt_account;
+            e.ent_txt_type = m.mov_txt_type;
+            e.ent_txt_budget = m.mov_txt_budget;
+            e.ent_txt_category = m.mov_txt_category;
+            e.ent_txt_place = m.mov_txt_place;
+            e.ent_txt_status = m.mov_txt_status;
+    
+            localEntries.push(this.services.entry.newItem(e));
+            
+            e = new Entry();
+            e.ent_id = m.mov_id;
+            e.ent_sequential = 2;
+            e.ent_desc = m.mov_desc;
+            e.ent_amount = m.mov_amount;
+            if (this.isTransfer){
+                e.ent_id_account = m.mov_id_account_to;
+                e.ent_ctg_type = 2;
+            } else {
+                e.ent_id_account = "1";
+                e.ent_ctg_type = m.mov_ctg_type === 1 ? 2 : 1;
+            }        
+            e.ent_date = m.mov_date;
+            e.ent_budget = m.mov_budget;
+            e.ent_ctg_category = m.mov_ctg_category;
+            e.ent_ctg_place = m.mov_ctg_place;
+            e.ent_notes = m.mov_notes;
+            e.ent_id_user = m.mov_id_user;
+            e.ent_ctg_status = m.mov_ctg_status;
+            
+            e.ent_txt_account = this.findIn(this.viewData.accounts,(i: any) => i.acc_id == e.ent_id_account,'acc_name');
+            e.ent_txt_type = this.findIn(this.viewData.types,(i: any) => i.ctg_ctg_value == e.ent_ctg_type,'ctg_desc');
+            e.ent_txt_budget = m.mov_txt_budget;
+            e.ent_txt_category = m.mov_txt_category;
+            e.ent_txt_place = m.mov_txt_place;
+            e.ent_txt_status = m.mov_txt_status;
+            
+            localEntries.push(this.services.entry.newItem(e));
+    
+            console.log('these are all entries',this.services.entry.list);
+            
+            // add to balance
+            this.services.balance.add(localEntries);
+            console.log('these are all balance',this.services.balance.list);
         }
-        m.mov_date = this.stringDateToDate(form.value.fDate);
-        if (!this.isTransfer){
-            m.mov_budget = form.value.fBudget;
-            m.mov_ctg_category = form.value.fCategory;
-            m.mov_ctg_place = form.value.fPlace;
-        } else {
-            m.mov_budget = null;
-            m.mov_ctg_category = 0;
-            m.mov_ctg_place = 0;
-        }
-        m.mov_notes = form.value.fNotes;
-        m.mov_id_user = this.user;
-        m.mov_ctg_status = 1;
-
-        m.mov_txt_account = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == m.mov_id_account,'acc_name');
-        if (m.mov_id_account_to){
-            m.mov_txt_account_to = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == m.mov_id_account_to,'acc_name');
-        }
-        m.mov_txt_type = this.findIn(this.viewData.types,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_type,'ctg_desc');
-        m.mov_txt_budget = m.mov_budget;
-        m.mov_txt_category = this.findIn(this.viewData.categories,(e: any) => e.mct_id === m.mov_ctg_category,'mct_name');
-        m.mov_txt_place = this.findIn(this.viewData.places,(e: any) => e.mpl_id === m.mov_ctg_place,'mpl_name');
-        m.mov_txt_status = this.findIn(this.viewData.statuses,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_status,'ctg_desc');
-
-        this.services.movement.newItem(m);
-        console.log('this is the movement',m);
-
-        // Entries
-        let localEntries: Array<Entry> = [];
-        // TODO: Entry creation should be inside entry.service, just pass the movement as argument
-        let e = new Entry();
-        e.ent_id = m.mov_id;
-        e.ent_sequential = 1;
-        e.ent_desc = m.mov_desc;
-        e.ent_amount = m.mov_amount;
-        e.ent_id_account = m.mov_id_account;
-        e.ent_ctg_type = m.mov_ctg_type;
-        e.ent_date = m.mov_date;
-        e.ent_budget = m.mov_budget;
-        e.ent_ctg_category = m.mov_ctg_category;
-        e.ent_ctg_place = m.mov_ctg_place;
-        e.ent_notes = m.mov_notes;
-        e.ent_id_user = m.mov_id_user;
-        e.ent_ctg_status = m.mov_ctg_status;
-
-        e.ent_txt_account = m.mov_txt_account;
-        e.ent_txt_type = m.mov_txt_type;
-        e.ent_txt_budget = m.mov_txt_budget;
-        e.ent_txt_category = m.mov_txt_category;
-        e.ent_txt_place = m.mov_txt_place;
-        e.ent_txt_status = m.mov_txt_status;
-
-        localEntries.push(this.services.entry.newItem(e));
-        
-        e = new Entry();
-        e.ent_id = m.mov_id;
-        e.ent_sequential = 2;
-        e.ent_desc = m.mov_desc;
-        e.ent_amount = m.mov_amount;
-        if (this.isTransfer){
-            e.ent_id_account = m.mov_id_account_to;
-            e.ent_ctg_type = 2;
-        } else {
-            e.ent_id_account = "1";
-            e.ent_ctg_type = m.mov_ctg_type === 1 ? 2 : 1;
-        }        
-        e.ent_date = m.mov_date;
-        e.ent_budget = m.mov_budget;
-        e.ent_ctg_category = m.mov_ctg_category;
-        e.ent_ctg_place = m.mov_ctg_place;
-        e.ent_notes = m.mov_notes;
-        e.ent_id_user = m.mov_id_user;
-        e.ent_ctg_status = m.mov_ctg_status;
-        
-        e.ent_txt_account = this.findIn(this.viewData.accounts,(i: any) => i.acc_id == e.ent_id_account,'acc_name');
-        e.ent_txt_type = this.findIn(this.viewData.types,(i: any) => i.ctg_ctg_value == e.ent_ctg_type,'ctg_desc');
-        e.ent_txt_budget = m.mov_txt_budget;
-        e.ent_txt_category = m.mov_txt_category;
-        e.ent_txt_place = m.mov_txt_place;
-        e.ent_txt_status = m.mov_txt_status;
-        
-        localEntries.push(this.services.entry.newItem(e));
-
-        console.log('these are all entries',this.services.entry.list);
-        
-        // add to balance
-        this.services.balance.add(localEntries);
-        console.log('these are all balance',this.services.balance.list);
 
         return false;
-    }
-
-    saveAsPreset(form: NgForm){
-        
     }
 
     // TODO: local methods that can be used as generic should be moved to utils.service
@@ -323,4 +352,47 @@ export class MovementComponent implements OnInit {
         this.model.place = id;
     }
 
+    selectPreset(presetId: string, form: HTMLFormElement){
+        let preset: Preset = this.services.preset.getAll()
+            .find((p: Preset) => p.pre_id === presetId);
+        
+        let fields: Array<any> = [{
+            'control': 'fDescription'
+            , 'value': 'pre_desc'
+        },{
+            'control': 'fAmount'
+            , 'value': 'pre_amount'
+        },{
+            'control': 'fAccount'
+            , 'value': 'pre_id_account'
+        },{
+            'control': 'fAccountTo'
+            , 'value': 'pre_id_account_to'
+        },{
+            'control': 'fMovementType'
+            , 'value': 'pre_ctg_type'
+        }/*,{
+            'control': 'fDate'
+            , 'value': 'pre_date'
+        }*/,{
+            'control': 'fBudget'
+            , 'value': 'pre_budget'
+        },{
+            'control': 'fCategory'
+            , 'value': 'pre_ctg_category'
+        },{
+            'control': 'fPlace'
+            , 'value': 'pre_ctg_place'
+        },{
+            'control': 'fNotes'
+            , 'value': 'pre_notes'
+        }];
+
+        fields.forEach((f: any) => {
+            if (form.controls[f.control] && preset[f.value]){
+                form.controls[f.control].setValue(preset[f.value]);
+            }
+        });
+
+    }
 }

@@ -280,3 +280,11 @@ menu {
   padding: 0;
   list-style: none;
 }
+
+.field {
+  display: block;
+}
+
+input[type="radio"] {
+  vertical-align: bottom;
+}

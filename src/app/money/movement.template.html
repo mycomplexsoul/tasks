@@ -34,101 +34,90 @@
 <a routerLink="/new" routerLinkActive="active">New Movement</a>
 
 <form #newMovementForm="ngForm" (ngSubmit)="newMovement(newMovementForm)">
-    <input type="radio" name="fMovementFlowType"
-        [(ngModel)]="movementFlowType"
-        value="preset">
-    <label for="fMovementType">Preset</label>
-    <input type="radio" name="fMovementFlowType"
+    <input type="radio" name="fMovementFlowType" id="fMovementFlowTypeCustom"
         [(ngModel)]="movementFlowType"
         value="custom">
-    <label for="fMovementType">Custom</label>
-    <input type="radio" name="fMovementFlowType"
+    <label for="fMovementFlowTypeCustom">Custom</label>
+    <input type="radio" name="fMovementFlowType" id="fMovementFlowTypeTransfer"
         [(ngModel)]="movementFlowType"
         value="transfer">
-    <label for="fMovementType">Transfer</label>
+    <label for="fMovementFlowTypeTransfer">Transfer</label>
 
     <div>
-        <h3 *ngIf="isCustom">Custom</h3>
-        <h3 *ngIf="isTransfer">Transfer</h3>
-        <h3 *ngIf="isPreset">Preset</h3>
+        <h4 *ngIf="isCustom">Custom</h4>
+        <h4 *ngIf="isTransfer">Transfer</h4>
 
-        <span>
+        <span class="field" *ngIf="isCustom">
+            <label for="fPreset" class="label-left">Use a Preset</label>
+            <select name="fPreset" id="fPreset" [(ngModel)]="model.selectedPreset" (change)="selectPreset(model.selectedPreset,newMovementForm)">
+                <option *ngFor="let opt of viewData.presets" value="{{opt.pre_id}}">{{opt.pre_name}}</option>
+            </select>
+            <hr>
+        </span>
+        <span class="field">
             <label for="fDescription" class="label-left">Description</label>
             <input type="text" name="fDescription" id="fDescription" ngModel>
         </span>
-        <br>
-        <span>
+        <span class="field">
             <label for="fAmount" class="label-left">Amount</label>
             <input type="number" name="fAmount" id="fAmount" step="0.01" ngModel>
         </span>
-        <br>
-        <span>
+        <span class="field">
             <label for="fAccount" class="label-left">Account</label>
             <select name="fAccount" id="fAccount" ngModel>
                 <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}}</option>
             </select>
         </span>
-        <br>
-        <span *ngIf="isTransfer">
+        <span class="field" *ngIf="isTransfer">
             <label for="fAccountTo" class="label-left">Account To</label>
             <select name="fAccountTo" id="fAccountTo" ngModel>
                 <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}}</option>
             </select>
         </span>
-        <br>
-        <span *ngIf="!isTransfer">
+        <span class="field" *ngIf="!isTransfer">
             <input type="radio" [value]="1" name="fMovementType" id="fMovementType_1" [(ngModel)]="model.type">
             <label for="fMovementType_1" class="label-radio">Expense</label>
             
             <input type="radio" [value]="2" name="fMovementType" id="fMovementType_2" [(ngModel)]="model.type">
             <label for="fMovementType_2" class="label-radio">Income</label>
         </span>
-        <br>
-        <span>
+        <span class="field">
             <label for="fDate" class="label-left">Movement Date</label>
             <input type="date" name="fDate" [(ngModel)]="model.date">
         </span>
-        <br>
-        <span *ngIf="!isTransfer">
+        <span class="field" *ngIf="!isTransfer">
             <label for="fBudget" class="label-left">Budget</label>
             <select name="fBudget" id="fBudget" ngModel>
                 <option *ngFor="let opt of viewData.budgets" value="{{opt}}">{{opt}}</option>
             </select>
         </span>
-        <br>
-        <span *ngIf="!isTransfer">
+        <span class="field" *ngIf="!isTransfer">
             <label for="fCategory" class="label-left">Category</label>
             <select name="fCategory" id="fCategory" [(ngModel)]="model.category">
                 <option *ngFor="let opt of viewData.categories" [value]="opt.mct_id" [selected]="opt.mct_id === newMovementForm.value.fCategory">{{opt.mct_name}}</option>
             </select>
             <combo-item [name]="category" [addNewItem]="addNewCategoryForUser"></combo-item>
         </span>
-        <br>
-        <span *ngIf="!isTransfer">
+        <span class="field" *ngIf="!isTransfer">
             <label for="fPlace" class="label-left">Place</label>
             <select name="fPlace" id="fPlace" [(ngModel)]="model.place">
                 <option *ngFor="let opt of viewData.places" [value]="opt.mpl_id" [selected]="opt.mpl_id === newMovementForm.value.fPlace">{{opt.mpl_name}}</option>
             </select>
             <combo-item [name]="place" [addNewItem]="addNewPlaceForUser"></combo-item>
         </span>
-        <br>
-        <span>
+        <span class="field">
             <label for="fNotes" class="label-left">Notes</label>
             <input type="text" name="fNotes" id="fNotes" ngModel>
-        </span><br>
-
-        <span>
+        </span>
+        <span class="field" *ngIf="isCustom">
+            <hr>
             <label for="fAsPreset" class="label-left">As Preset</label>
-            <input type="checkbox" name="fAsPreset" id="fAsPreset" (click)="asPreset = !asPreset" ngModel>
+            <input type="checkbox" name="fAsPreset" id="fAsPreset" [(ngModel)]="model.asPreset">
         </span>
-
-
-        <br>
-        <button>Apply Movement</button>
-        <span *ngIf="isCustom && asPreset">
-            <label for="fName" class="label-left">Preset Name</label>
+        <span class="field" *ngIf="isCustom && model.asPreset">
             <input type="text" name="fName" id="fName" ngModel>
+            <label for="fName" class="label-left">Preset Name</label>
         </span>
-        <button *ngIf="isCustom" (click)="saveAsPreset(newMovementForm)">Save as Preset</button>
+        <button>{{asPreset ? 'Save as Preset' : 'Apply Movement'}}</button>
     </div>
 </form>
