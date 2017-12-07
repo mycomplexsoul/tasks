@@ -10,6 +10,7 @@ import { BalanceService } from './balance.service';
 @Component({
     selector: 'balance',
     templateUrl: './balance.template.html',
+    styleUrls: ['./balance.css'],
     providers: [
         BalanceService
     ]
@@ -43,7 +44,7 @@ export class BalanceComponent implements OnInit {
     ngOnInit(){
         this.services.balance.getAllForUser(this.user);
         this.model.year = (new Date()).getFullYear();
-        this.model.month = (new Date()).getMonth();
+        this.model.month = (new Date()).getMonth() + 1;
         
         this.viewData.balance = this.services.balance.list;
         this.viewData.monthBalance = this.services.balance.list.filter((b: Balance) => {

@@ -2,12 +2,12 @@
     <strong>Balance</strong>
 
     <select (change)="reloadBalance()" [(ngModel)]="model.year">
-        <option value="2017" selected>2017</option>
+        <option value="2017">2017</option>
     </select>
     <select (change)="reloadBalance()" [(ngModel)]="model.month">
-        <option value="10" selected>October</option>
-        <option value="11" selected>November</option>
-        <option value="12" selected>December</option>
+        <option value="10">October</option>
+        <option value="11">November</option>
+        <option value="12">December</option>
     </select>
     
     <table>
@@ -20,10 +20,10 @@
         </tr>
         <tr *ngFor="let b of viewData.monthBalance">
             <td>{{b.bal_txt_account}}</td>
-            <td>{{b.bal_initial}}</td>
-            <td>{{b.bal_charges}}</td>
-            <td>{{b.bal_withdrawals}}</td>
-            <td>{{b.bal_final}}</td>
+            <td class="currency-cell-right">{{b.bal_initial | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+            <td class="currency-cell-right">{{b.bal_charges | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+            <td class="currency-cell-right">{{b.bal_withdrawals | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+            <td class="currency-cell-right">{{b.bal_final | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
         </tr>
     </table>
 </div>

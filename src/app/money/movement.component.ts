@@ -1,5 +1,6 @@
 import { Component, OnInit, Renderer, transition } from '@angular/core';
 import { NgForm } from '@angular/forms';
+//import { CurrencyPipe } from '@angular/common';
 // types
 import { Movement } from './movement.type';
 import { Account } from './account.type';
@@ -309,8 +310,19 @@ export class MovementComponent implements OnInit {
             // add to balance
             this.services.balance.add(localEntries);
             console.log('these are all balance',this.services.balance.list);
+
+            // if movement applies to other than current month
+            // rebuild until current month
+            let currentDate: Date = new Date();
+            if (currentDate.getFullYear() * 100 + currentDate.getMonth() > m.mov_date.getFullYear() * 100 + m.mov_date.getMonth()){
+                this.services.balance.rebuildAndTransferRange(m.mov_date.getFullYear(), m.mov_date.getMonth() + 1, currentDate.getFullYear(), currentDate.getMonth() + 1, this.user);
+            }
         }
 
+        //form.reset();
+        // this.movementFlowType = 'custom';
+        // this.model.type = '1';
+        // this.model.date = this.DateToStringDate(new Date());
         return false;
     }
 
@@ -352,7 +364,7 @@ export class MovementComponent implements OnInit {
         this.model.place = id;
     }
 
-    selectPreset(presetId: string, form: HTMLFormElement){
+    selectPreset(presetId: string, form: any){
         let preset: Preset = this.services.preset.getAll()
             .find((p: Preset) => p.pre_id === presetId);
         
@@ -393,6 +405,9 @@ export class MovementComponent implements OnInit {
                 form.controls[f.control].setValue(preset[f.value]);
             }
         });
+    }
 
+    cancelMovement(){
+        // TODO: upon cancellation, change status, modify other movement references to filter active movements, rebuild and transfer
     }
 }

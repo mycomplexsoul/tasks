@@ -1,0 +1,13 @@
+<div>
+    <span class="field">
+        <label for="fYear" class="label-left">Year-Month</label>
+        <select [(ngModel)]="model.month" name="fMonth" id="fMonth">
+            <option *ngFor="let opt of viewData.monthList" value="{{opt.iterable}}">{{opt.name}}</option>
+        </select>
+    </span>
+
+    <button (click)="rebuild()">Rebuild</button>
+    <button (click)="transfer()">Transfer</button>
+    <button (click)="rebuildAndTransfer()">Rebuild & Transfer</button>
+    <button (click)="rebuildAndTransferUntilCurrentMonth()">Rebuild & Transfer Until Current Month</button>
+</div>

@@ -11,6 +11,7 @@ import { MenuComponent }  from './common/menu.component';
 import { AccountComponent }  from './money/account.component';
 import { MovementComponent }  from './money/movement.component';
 import { BalanceComponent }  from './money/balance.component';
+import { RebuildComponent }  from './money/rebuild.component';
 
 import { StorageService }  from './common/storage.service';
 import { EntryService }  from './money/entry.service';
@@ -37,6 +38,10 @@ const appRoutes: Routes = [
         component: BalanceComponent,
         data: { title: 'Balance' }
     },{
+        path: 'rebuild',
+        component: RebuildComponent,
+        data: { title: 'Rebuild' }
+    },{
         path: '',
         redirectTo: '/tasks',
         pathMatch: 'full'
@@ -46,7 +51,7 @@ const appRoutes: Routes = [
 
 @NgModule({
   imports: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(appRoutes) ],
-  declarations: [ AppComponent, TasksComponent, AccountComponent, MovementComponent, BalanceComponent, ComboItemComponent, MenuComponent ], // parent & child components
+  declarations: [ AppComponent, TasksComponent, AccountComponent, MovementComponent, BalanceComponent, ComboItemComponent, MenuComponent, RebuildComponent ], // parent & child components
   bootstrap: [ AppComponent ], // only parent components
   providers: [ DateCommon, StorageService, EntryService ]
 })

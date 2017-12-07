@@ -86,6 +86,17 @@ export class MovementService {
         } else {
             this.data = this.initialData();
         }
+        // sort data
+        let sort = (a: Movement, b: Movement) => {
+            if (a.mov_date < b.mov_date) {
+                return -1;
+            } else if (a.mov_date > b.mov_date) {
+                return 1;
+            } else {
+                return 0;
+            }
+        };
+        this.data = this.data.sort(sort);
         return this.data;
     }
 

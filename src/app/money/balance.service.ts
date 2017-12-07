@@ -146,8 +146,14 @@ export class BalanceService {
     rebuild(year: number, month: number, user: string){
         const entryList: Array<Entry> = this.entryService.getAllForUser(user)
             .filter((e) => (new Date(e.ent_date)).getFullYear() === year && (new Date(e.ent_date)).getMonth()+1 === month);
-        let balance: Array<Balance> = this.getAllForUser(user);
+        let balance: Array<Balance> = this.getAllForMonth(year, month, user);
         
+        balance.forEach((b: Balance) => {
+            b.bal_charges = 0;
+            b.bal_withdrawals = 0;
+            b.bal_final = b.bal_initial;
+        });
+
         // add up
         entryList.forEach((e: Entry) => {
             let b: Balance = balance.find(b => b.bal_id_account === e.ent_id_account);
@@ -170,13 +176,13 @@ export class BalanceService {
 
                 this.data.push(b);
             }
-            this.saveToStorage();
         });
+        this.saveToStorage();
     }
 
     transfer(year: number, month: number, user: string){
         let currentDate = new Date();
-        if (year * 100 + month < currentDate.getFullYear() * 100 + currentDate.getMonth() + 1){
+        if (year * 100 + month >= currentDate.getFullYear() * 100 + currentDate.getMonth() + 1){
             // cannot transfer current month
             return;
         }
@@ -189,7 +195,8 @@ export class BalanceService {
 
             if(bn){
                 bn.bal_initial = bc.bal_final;
-                bn.bal_final = bn.bal_initial + bn.bal_charges - bn.bal_withdrawals
+                bn.bal_final = bn.bal_initial + bn.bal_charges - bn.bal_withdrawals;
+                console.log('found a balance record, updated',bn);
             } else {
                 bn = new Balance();
                 bn.bal_year = nextMonth.year;
@@ -201,11 +208,12 @@ export class BalanceService {
                 bn.bal_final = bc.bal_final;
                 bn.bal_id_user = user;
                 bn.bal_txt_account = bc.bal_txt_account;
-
+                
+                console.log('new balance record',bn);
                 this.data.push(bn);
             }
-            this.saveToStorage();
         });
+        this.saveToStorage();
     }
 
     rebuildAndTransfer(year: number, month: number, user: string){
@@ -241,4 +249,20 @@ export class BalanceService {
             };
         }
     }
+
+    // getPreviousMonth(year: number, month: number){
+    //     if (month === 1){
+    //         return {
+    //             year: year - 1
+    //             , month: 12
+    //             , iterable: (year - 1) * 100 + 12
+    //         };
+    //     } else {
+    //         return {
+    //             year
+    //             , month: month - 1
+    //             , iterable: (year * 100) + month - 1
+    //         };
+    //     }
+    // }
 }
