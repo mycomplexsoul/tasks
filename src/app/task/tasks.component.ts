@@ -1490,5 +1490,13 @@ export class TasksComponent implements OnInit {
         localStorage.setItem("NextTasks", JSON.stringify(p.map((e: any) => e.tsk_id)));
     }
 
-    
+    setTaskNotes(task: any, event: KeyboardEvent){
+        let newNotes = event.target['textContent'];
+
+        if (task.tsk_notes !== newNotes){
+            this.updateTask(task.tsk_id,{
+                tsk_notes: newNotes
+            });
+        }
+    }    
 }

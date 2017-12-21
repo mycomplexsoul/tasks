@@ -302,7 +302,7 @@
     <div>Container: {{state.selected.tsk_id_container}}</div>
     <div>Record: {{state.selected.tsk_id_record}}</div>
     <div>Name: {{state.selected.tsk_name}}</div>
-    <div>Notes: {{state.selected.tsk_notes}}</div>
+    <div>Notes: <span contenteditable="true" (blur)="setTaskNotes(state.selected,$event)">{{state.selected.tsk_notes ? state.selected.tsk_notes : '-'}}</span></div>
     <div>Parent: {{state.selected.tsk_parent}}</div>
     <div>Order: {{state.selected.tsk_order}}</div>
     <div>Date Done: <span contenteditable="true" (keyup)="editDateDone(state.selected,$event)">{{state.selected.tsk_date_done | date: format}}</span></div>
