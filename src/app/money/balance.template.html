@@ -1,15 +1,13 @@
 <div>
     <strong>Balance</strong>
 
-    <select (change)="reloadBalance()" [(ngModel)]="model.year">
-        <option value="2017">2017</option>
-    </select>
-    <select (change)="reloadBalance()" [(ngModel)]="model.month">
-        <option value="10">October</option>
-        <option value="11">November</option>
-        <option value="12">December</option>
-    </select>
-    
+    <span class="field">
+        <label for="fMonth" class="label-left">Year-Month</label>
+        <select [(ngModel)]="model.iterable" name="fMonth" id="fMonth" (change)="reloadBalance()">
+            <option *ngFor="let opt of viewData.monthList" value="{{opt.iterable}}">{{opt.name}}</option>
+        </select>
+    </span>
+
     <table>
         <tr>
             <th>Account</th>
@@ -18,7 +16,7 @@
             <th>Withdrawals</th>
             <th>Final</th>
         </tr>
-        <tr *ngFor="let b of viewData.monthBalance">
+        <tr *ngFor="let b of viewData.monthBalance" class="balance-row">
             <td>{{b.bal_txt_account}}</td>
             <td class="currency-cell-right">{{b.bal_initial | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
             <td class="currency-cell-right">{{b.bal_charges | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>

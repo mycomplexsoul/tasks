@@ -47,7 +47,7 @@
         <h4 *ngIf="isCustom">Custom</h4>
         <h4 *ngIf="isTransfer">Transfer</h4>
 
-        <span class="field" *ngIf="isCustom">
+        <span class="field" *ngIf="isCustom && viewData.presets.length">
             <label for="fPreset" class="label-left">Use a Preset</label>
             <select name="fPreset" id="fPreset" [(ngModel)]="model.selectedPreset" (change)="selectPreset(model.selectedPreset,newMovementForm)">
                 <option *ngFor="let opt of viewData.presets" value="{{opt.pre_id}}">{{opt.pre_name}}</option>
@@ -121,3 +121,6 @@
         <button>{{asPreset ? 'Save as Preset' : 'Apply Movement'}}</button>
     </div>
 </form>
+<button (click)="import2016()">Import 2016</button>
+<button (click)="import2017()">Import 2017</button>
+<button (click)="import2017b()">Import 2017b</button>

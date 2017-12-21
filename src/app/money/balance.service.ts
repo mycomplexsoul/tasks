@@ -90,6 +90,12 @@ export class BalanceService {
         } else {
             this.data = this.initialData();
         }
+        this.data = this.data.sort((a: Balance, b: Balance) => {
+            if (a.bal_txt_account === 'Capital'){
+                return 1;
+            }
+            return a.bal_txt_account > b.bal_txt_account ? 1 : -1;
+        });
         return this.data;
     }
 
@@ -175,6 +181,7 @@ export class BalanceService {
                 b.bal_txt_account = e.ent_txt_account;
 
                 this.data.push(b);
+                balance.push(b);
             }
         });
         this.saveToStorage();
@@ -248,6 +255,41 @@ export class BalanceService {
                 , iterable: (year * 100) + month + 1
             };
         }
+    }
+
+    parseMonthName(iterable: number){
+        let year: number = Math.floor(iterable / 100);
+        let month: number = iterable % 100;
+        const months: string[] = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        return `${year} / ${months[month - 1]}`;
+    }
+
+    monthList(user: string){
+        let iterable: any = this.getAllForUser(user)
+        .map((b: Balance) => ({
+            iterable: b.bal_year * 100 + b.bal_month
+            , year: b.bal_year
+            , month: b.bal_month
+        })).reduce((previous: any, current: any) => {
+            return previous.iterable < current.iterable ? previous : current;
+        }, 999900);
+
+        if (!iterable){
+            iterable = {
+                iterable: 201602
+                , year: 2016
+                , month: 2
+            }
+        }
+
+        let monthList: Array<any> = [];
+        let currentIterable: number = (new Date()).getFullYear() * 100 + ((new Date()).getMonth() + 1);
+        while (iterable.iterable <= currentIterable){
+            iterable.name = this.parseMonthName(iterable.iterable);
+            monthList.push(iterable);
+            iterable = this.getNextMonth(iterable.year, iterable.month);
+        }
+        return monthList.reverse();
     }
 
     // getPreviousMonth(year: number, month: number){

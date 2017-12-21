@@ -104,8 +104,8 @@ export class EntryService {
     }
 
     newItem(item: Entry): Entry{
-        let newId: string = this.newId();
-        item.ent_id = newId;
+        //let newId: string = this.newId();
+        //item.ent_id = newId;
         let newItem = new Entry(item);
         this.data.push(newItem);
         this.saveToStorage();

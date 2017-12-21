@@ -92,6 +92,15 @@ export class AccountService {
         },{
             acc_id: '25'
             , acc_name: 'Capital CV'
+        },{
+            acc_id: '26'
+            , acc_name: 'Prestamos Mosho a Anibal'
+        },{
+            acc_id: '27'
+            , acc_name: 'Mosho Scotia Credito'
+        },{
+            acc_id: '28'
+            , acc_name: 'LPHT Cred Bancomer'
         }];
         
         list = data.map((d: any) => new Account(d));

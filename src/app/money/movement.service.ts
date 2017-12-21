@@ -122,4 +122,13 @@ export class MovementService {
         this.saveToStorage();
         return newItem;
     }
+
+    newBatch(movements: Array<Movement>){
+        movements.forEach((m: Movement) => {
+            m.mov_id = this.newId();
+            this.data.push(new Movement(m));
+        });
+        this.saveToStorage();
+        return movements;
+    }
 }

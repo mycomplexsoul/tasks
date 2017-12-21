@@ -67,6 +67,9 @@ export class RebuildComponent implements OnInit {
             .reduce((previous, current) => previous <= current ? previous : current, 999999);
         let month: any;
         let list: Array<any> = [];
+        if (min === 999999) {
+            min = 201602;
+        }
         while (min <= max){
             console.log('calculated',min);
             list.push({
