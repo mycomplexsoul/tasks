@@ -4,6 +4,7 @@ import { SyncAPI } from '../common/sync.api';
 import { Task } from './task.type';
 import { TaskIndicator } from './task.indicator.service';
 import { DateCommon } from '../common/date.common';
+import { validateConfig } from '@angular/router/src/config';
 
 @Component({
     selector: 'tasks',
@@ -13,7 +14,17 @@ import { DateCommon } from '../common/date.common';
 export class TasksComponent implements OnInit {
     public item: any;
     public tasks: any[];
-    public services: any = {};
+    public services: {
+        tasksCore: TasksCore
+        , sync: SyncAPI
+        , taskIndicator: TaskIndicator
+        , dateUtils: DateCommon
+    } = {
+        tasksCore: null
+        , sync: null
+        , taskIndicator: null
+        , dateUtils: null
+    };
     public state: any = {};
     public format: string = 'yyyy-MM-dd HH:mm:ss';
     public delayOnUpdateState: number = 100;
@@ -51,6 +62,13 @@ export class TasksComponent implements OnInit {
     public timerModeRemaining: boolean = false;
     public comparisonData: any;
     public nextTasks: any[];
+    public focusedTask: {
+        task: Task
+        , element: HTMLElement
+    } = {
+        task: null
+        , element: null
+    };
 
     constructor(tasksCore: TasksCore, private sync: SyncAPI, private taskIndicator: TaskIndicator, private dateUtils: DateCommon, private rendered: Renderer){
         this.services.tasksCore = tasksCore;
@@ -248,6 +266,21 @@ export class TasksComponent implements OnInit {
             return res ? 1 : -1;
         };
         this.nextTasks[0].tasks = this.nextTasks[0].tasks.sort(sortByOrder);
+
+        if (this.focusedTask.task){
+            if (this.focusedTask.task.tsk_ctg_status === this.taskStatus.OPEN){
+                console.log('trying to set focus for task',this.focusedTask);
+                //let f: HTMLElement = document.getElementById(this.focusedTask.tsk_id).querySelector('span.task-text[contenteditable=true]');
+                //f['tabIndex'] = -1;
+                setTimeout(() => {
+                    this.focusedTask.element.focus();
+                    console.log('focus should be set now');
+                //     f.focus();
+                }, 3000);
+            } else {
+
+            }
+        }
     }
 
     showTimersOnLoad(){
@@ -316,7 +349,7 @@ export class TasksComponent implements OnInit {
         if (!event.altKey && event.keyCode==40){ // detect jump down
             this.taskJumpDown(parent,"span.task-text[contenteditable=true]");
         }
-        if (event.keyCode==113){ // detect "F2" = start/stop time tracking
+        if (!event.shiftKey && event.keyCode==113){ // detect "F2" = start/stop time tracking
             this.taskToggleTimeTracking(t,parent);
         }
         if (event.altKey && event.keyCode==83){ // detect 's'
@@ -346,6 +379,9 @@ export class TasksComponent implements OnInit {
         if (event.altKey && (event.keyCode==67 || event.keyCode==54)){ // detect 'c' || '6'
             this.markTaskAs(t,'call');
         }
+        if (event.altKey && (event.keyCode==55)){ // detect '7'
+            this.markTaskAs(t,'unexpected');
+        }
         if (event.altKey && event.keyCode==107){ // detect '+'
             this.focusElement('input[name=tsk_name]');
         }
@@ -357,20 +393,40 @@ export class TasksComponent implements OnInit {
         }
         if (event.altKey && event.keyCode==84){ // detect 't'
             let tt = this.lastTTEntryFromDay(this.services.dateUtils.dateOnly(new Date()));
+            if (!tt){ // no task today, try yesterday
+                tt = this.lastTTEntryFromDay(this.services.dateUtils.dateOnly(this.services.dateUtils.addDays(new Date(),-1)));
+            }
             if (tt && t.tsk_time_history.length) {
                 t.tsk_time_history[t.tsk_time_history.length - 1].tsh_date_start = tt;
                 if (t.tsk_ctg_in_process == 1){
                     let randomFinish = ((t.tsk_estimated_duration - 2) * 60) + Math.floor(Math.random() * 2 * 10 * 6);
                     t.tsk_time_history[t.tsk_time_history.length - 1].tsh_date_end = new Date(tt.getTime() + randomFinish * 1000);
-                    t.tsk_total_time_spent = 0;
+                    let total: number = 0;
                     t.tsk_time_history.forEach((tth: any) => {
-                        t.tsk_total_time_spent += tth.tsh_time_spent;
+                        total += tth.tsh_time_spent;
+                    });
+                    this.services.tasksCore.updateTask(t,{
+                        tsk_total_time_spent: total
                     });
                 }
+                //this.updateTaskTimeTracking(t.tsk_id,t.tsk_time_history.length,data);
                 this.services.tasksCore.tasksToStorage(); // TODO: move this sentence to tasksCore
                 // TODO: update time tracking history on server
                 this.updateState();
             }
+        }
+        if (event.shiftKey && event.keyCode==113){ // detect "Shift + F2" = find time tracking task, stop it, close the task and start the focused one
+            // find tasks in progress
+            let inprogress: Array<Task> = this.tasks.filter((task: Task) => task.tsk_ctg_in_process === 2);
+            console.log('inprogress now',inprogress);
+            // stop them
+            inprogress.forEach((task: Task) => {
+                // let parent: HTMLElement = document.getElementById(task.tsk_id);
+                // this.taskToggleTimeTracking(task, parent);
+                document.querySelector(`#${task.tsk_id} input[type=checkbox]`)['click']();
+            });
+            // start current task time tracking
+            this.taskToggleTimeTracking(t,parent);
         }
         // event.preventDefault();
         // event.returnValue = false;
@@ -382,9 +438,13 @@ export class TasksComponent implements OnInit {
             // stop time tracking
             this.taskToggleTimeTracking(t,this.getTaskDOMElement(t.tsk_id));
         }
+        let dateDone: Date = this.services.dateUtils.newDateUpToSeconds();
+        if (event['shiftKey'] && t.tsk_time_history.length){ // modifier, use the last time tracking end date record
+            dateDone = new Date(t.tsk_time_history[t.tsk_time_history.length-1].tsh_date_end);
+        }
         this.updateTask(t.tsk_id,{
-            tsk_ctg_status: event.target['checked'] ? this.taskStatus.CLOSED : this.taskStatus.OPEN
-            , tsk_date_done: this.services.dateUtils.newDateUpToSeconds()
+            tsk_ctg_status: event['target']['checked'] ? this.taskStatus.CLOSED : this.taskStatus.OPEN
+            , tsk_date_done: dateDone
         });
         setTimeout(() => {
             this.updateState();
@@ -774,12 +834,12 @@ export class TasksComponent implements OnInit {
     }
 
     taskEstimatedDurationEdit(t: any, event: KeyboardEvent){
-        let newDuration = this.services.tasksCore.parseTime(event.target['textContent']);
+        let newDuration: number = this.services.tasksCore.parseTime(event.target['textContent']);
         if (newDuration !== t.tsk_estimated_duration){
             // if schedule date end is set, update it as well
             let newEnd = t.tsk_schedule_date_end;
             if (t.tsk_schedule_date_end){
-                newEnd = new Date((new Date(t.tsk_schedule_date_start)).getTime() + parseInt(newDuration) * 60 * 1000);
+                newEnd = new Date((new Date(t.tsk_schedule_date_start)).getTime() + newDuration * 60 * 1000);
             }
             this.updateTask(t.tsk_id,{
                 tsk_estimated_duration: newDuration
@@ -1341,6 +1401,7 @@ export class TasksComponent implements OnInit {
     
     saveOption(optionName: string,value: string){
         this.options[optionName] = value;
+        this.sync.setApiRoot(value);
         if (typeof(window.localStorage) !== "undefined") {
             localStorage.setItem("Options", JSON.stringify(this.options));
         }
@@ -1388,6 +1449,15 @@ export class TasksComponent implements OnInit {
         return res;
     }
 
+    dayHasActivity(day: Date): boolean{
+        let nextDay = this.services.dateUtils.addDays(day,1);
+        if (day.getTime() === this.services.dateUtils.dateOnly(new Date()).getTime()){
+            return true;
+        } else {
+            return this.tasks.filter((t: Task) => new Date(t.tsk_date_done).getTime() >= day.getTime() && new Date(t.tsk_date_done).getTime() <= nextDay.getTime()).length > 0;
+        }
+    }
+
     calculateIndicators(){
         let today = this.services.dateUtils.newDateUpToSeconds();
         let today0 = new Date(today.getFullYear(),today.getMonth(),today.getDate());
@@ -1396,7 +1466,7 @@ export class TasksComponent implements OnInit {
         let nextDay: Date;
         for(let i = 0 ; i < 7 ; i++){
             nextDay = this.services.dateUtils.addDays(today0,-1*i);
-            if (nextDay.getDay() !== 0 && nextDay.getDay() !== 6){
+            if (this.dayHasActivity(nextDay)){
                 days.push(nextDay);
                 dayLabels.push(i===0 ? 'Today' : (i===1 ? 'Yesterday' : i + ' days ago'));
             }
@@ -1498,5 +1568,13 @@ export class TasksComponent implements OnInit {
                 tsk_notes: newNotes
             });
         }
-    }    
+    }
+
+    setFocus(task: Task, event: KeyboardEvent){
+        console.log('task on focus by user',task,event.target);
+        this.focusedTask = {
+            task
+            , element: event.target['parentNode']
+        };
+    }
 }

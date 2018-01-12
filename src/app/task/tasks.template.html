@@ -162,8 +162,10 @@
                     {{(timers[t.tsk_id]) ? '[' + timers[t.tsk_id].timerString + ']' : ''}}
                 </span>
                 <span contenteditable="true" (keyup)="taskEdit(t,$event)"
-                    [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1), 'task-urgent': (t.tsk_qualifiers.indexOf('urgent') !== -1), 'task-highlighted': (t.tsk_qualifiers.indexOf('highlighted') !== -1), 'task-progressed': (t.tsk_qualifiers.indexOf('progressed') !== -1), 'task-call': (t.tsk_qualifiers.indexOf('call') !== -1)}"
+                    [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1), 'task-urgent': (t.tsk_qualifiers.indexOf('urgent') !== -1), 'task-highlighted': (t.tsk_qualifiers.indexOf('highlighted') !== -1), 'task-progressed': (t.tsk_qualifiers.indexOf('progressed') !== -1), 'task-unexpected': (t.tsk_qualifiers.indexOf('unexpected') !== -1), 'task-call': (t.tsk_qualifiers.indexOf('call') !== -1)}"
                     (blur)="commandOnTask(t,$event)"
+                    (focus)="setFocus(t,$event)"
+                    tabindex="0"
                     class="editable task-text">{{t.tsk_name}}</span>
                 <span class="task-link" *ngIf="t.tsk_url"><a href="{{t.tsk_url}}" title="{{t.tsk_url}}" target="_blank">link</a></span>
                 <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
@@ -248,7 +250,7 @@
                             {{(timers[t.tsk_id]) ? '[' + timers[t.tsk_id].timerString + ']' : ''}}
                         </span>
                         <span contenteditable="true" (keyup)="taskEdit(t,$event)"
-                            [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1), 'task-urgent': (t.tsk_qualifiers.indexOf('urgent') !== -1), 'task-highlighted': (t.tsk_qualifiers.indexOf('highlighted') !== -1), 'task-progressed': (t.tsk_qualifiers.indexOf('progressed') !== -1), 'task-call': (t.tsk_qualifiers.indexOf('call') !== -1)}"
+                            [ngClass]="{'task-done': (t.tsk_ctg_status === this.taskStatus.CLOSED), 'task-in-process': (t.tsk_ctg_in_process === 2), 'task-important': (t.tsk_qualifiers.indexOf('important') !== -1), 'task-urgent': (t.tsk_qualifiers.indexOf('urgent') !== -1), 'task-highlighted': (t.tsk_qualifiers.indexOf('highlighted') !== -1), 'task-progressed': (t.tsk_qualifiers.indexOf('progressed') !== -1), 'task-unexpected': (t.tsk_qualifiers.indexOf('unexpected') !== -1), 'task-call': (t.tsk_qualifiers.indexOf('call') !== -1)}"
                             (blur)="commandOnTask(t,$event)"
                             class="editable task-text">{{t.tsk_name}}</span>
                         <span contenteditable="true" (blur)="taskEstimatedDurationEdit(t,$event)"
