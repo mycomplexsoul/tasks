@@ -1,13 +1,14 @@
 export class Movement {
     public mov_id: string;
     public mov_date: Date;
+    public mov_ctg_currency: number;
     public mov_amount: number;
     public mov_id_account: string;
     public mov_id_account_to: string;
     public mov_ctg_type: number;
     public mov_budget: string;
-    public mov_ctg_category: number;
-    public mov_ctg_place: number;
+    public mov_id_category: number;
+    public mov_id_place: number;
     public mov_desc: string;
     public mov_notes: string;
     public mov_id_user: string;
@@ -30,8 +31,8 @@ export class Movement {
             this.mov_id_account_to = base.mov_id_account_to;
             this.mov_ctg_type = base.mov_ctg_type;
             this.mov_budget = base.mov_budget;
-            this.mov_ctg_category = base.mov_ctg_category;
-            this.mov_ctg_place = base.mov_ctg_place;
+            this.mov_id_category = base.mov_id_category;
+            this.mov_id_place = base.mov_id_place;
             this.mov_desc = base.mov_desc;
             this.mov_notes = base.mov_notes;
             this.mov_id_user = base.mov_id_user;

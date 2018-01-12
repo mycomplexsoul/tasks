@@ -7,8 +7,8 @@ export class Preset {
     public pre_id_account_to: string;
     public pre_ctg_type: number;
     public pre_budget: string;
-    public pre_ctg_category: number;
-    public pre_ctg_place: number;
+    public pre_id_category: number;
+    public pre_id_place: number;
     public pre_desc: string;
     public pre_notes: string;
     public pre_id_user: string;
@@ -32,8 +32,8 @@ export class Preset {
             this.pre_id_account_to = base.pre_id_account_to;
             this.pre_ctg_type = base.pre_ctg_type;
             this.pre_budget = base.pre_budget;
-            this.pre_ctg_category = base.pre_ctg_category;
-            this.pre_ctg_place = base.pre_ctg_place;
+            this.pre_id_category = base.pre_id_category;
+            this.pre_id_place = base.pre_id_place;
             this.pre_desc = base.pre_desc;
             this.pre_notes = base.pre_notes;
             this.pre_id_user = base.pre_id_user;

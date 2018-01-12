@@ -33,7 +33,7 @@ export class PlaceService {
         data.push(newData('5','The Home Depot'));
         
         list = data.map((d: any) => {
-            d.mpl_user = this.config.defaultUser;
+            d.mpl_id_user = this.config.defaultUser;
             return new Place(d);
         });
 
@@ -53,7 +53,7 @@ export class PlaceService {
     getAllForUser(user: string){
         const all: Array<Place> = this.getAll();
 
-        return all.filter((x: Place) => x.mpl_user === user);
+        return all.filter((x: Place) => x.mpl_id_user === user);
     }
 
     saveToStorage(){
@@ -69,7 +69,7 @@ export class PlaceService {
         let newItem = new Place({
             mpl_id: newId
             , mpl_name: place
-            , mpl_user: user
+            , mpl_id_user: user
         });
         this.data.push(newItem);
         this.saveToStorage();

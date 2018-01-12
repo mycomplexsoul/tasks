@@ -30,7 +30,7 @@ export class CategoryService {
         data.push(newData('2','Cart'));
         
         list = data.map((d: any) => {
-            d.mct_user = this.config.defaultUser;
+            d.mct_id_user = this.config.defaultUser;
             return new Category(d);
         });
 
@@ -50,7 +50,7 @@ export class CategoryService {
     getAllForUser(user: string){
         const all: Array<Category> = this.getAll();
 
-        return all.filter((x: Category) => x.mct_user === user);
+        return all.filter((x: Category) => x.mct_id_user === user);
     }
 
     saveToStorage(){
@@ -66,7 +66,7 @@ export class CategoryService {
         let newItem = new Category({
             mct_id: newId
             , mct_name: category
-            , mct_user: user
+            , mct_id_user: user
         });
         this.data.push(newItem);
         this.saveToStorage();
