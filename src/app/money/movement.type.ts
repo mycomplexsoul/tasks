@@ -1,6 +1,7 @@
 export class Movement {
     public mov_id: string;
     public mov_date: Date;
+    public mov_ctg_currency: number;
     public mov_amount: number;
     public mov_id_account: string;
     public mov_id_account_to: string;

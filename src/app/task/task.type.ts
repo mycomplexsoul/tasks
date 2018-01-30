@@ -30,7 +30,7 @@ export class Task {
     public tsk_ctg_rep_type: number; // repetition type: daily, weekly, bi-weekly, monthly, yearly, frequency (uses 2 frequency fields), some days of week (uses tsk_rep_weekdays), a day of each month (tsk_rep_frequency as 1st, 2nd, etc and tsk_rep_weekdays to just 1 day of the week/month like 1st monday of the month)
     public tsk_ctg_rep_after_completion: number; // repeats after completion: true, false
     public tsk_ctg_rep_end: number; // repetition ends at: forever, end on date, end after n repetitions
-    public tsk_rep_end_date: Date; // date or null
+    public tsk_rep_date_end: Date; // date or null
     public tsk_rep_end_iteration: number; // number or 0
     public tsk_rep_iteration: number; // counts iterations
     public tsk_rep_frequency: number; // 1, 2, 3

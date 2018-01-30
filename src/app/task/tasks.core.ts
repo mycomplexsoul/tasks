@@ -240,6 +240,89 @@ export class TasksCore {
             console.log('task with url',t);
         }, 'https://');
 
+        // detects repetition options
+        this.doThisWithAToken(task, (t: Task, expression: string) => {
+            let repetitionBasis: string = ''; // daily|weekly|monthly
+            let completionCriteria: string = 'onCompletion';
+            let terminationCriteria: string = 'iterations';
+            let terminationValue: string = '10';
+            let frequency: number = 0;
+            let frequencyRule: string = '';
+            const patternDate = /\d{4}-\d{2}-\d{2}/i;
+
+            const repetitionTypeValues: Array<string> = ['','daily','weekly','monthly','workdays','weekends','each','weekdays','onDay'];
+            const completionValues: Array<string> = ['','strict','onCompletion'];
+            const repetitionEndValues: Array<string> = ['','forever','date','iterations'];
+            const frequencyRuleValues: Array<string> = ['','d','w','m'];
+            const weekdaysValues: Array<string> = ['','Mo','Tu','We','Th','Fr','Sa','Su'];
+
+            if (expression){
+                if (expression.indexOf('|') !== -1){
+                    let basis: Array<string> = expression.split('|');
+                    if (basis[0].indexOf('-') !== -1){
+                        repetitionBasis = basis[0].split('-')[0].trim();
+                        completionCriteria = basis[0].split('-')[1].trim();
+                    } else {
+                        completionCriteria = '';
+                        repetitionBasis = basis[0].trim();
+                    }
+                    terminationCriteria = basis[1].split(':')[0].trim();
+                    terminationValue = basis[1].split(':')[1].trim();
+                } else {
+                    if (expression.indexOf('-') !== -1){
+                        repetitionBasis = expression.split('-')[0].trim();
+                        completionCriteria = expression.split('-')[1].trim();
+                    } else {
+                        completionCriteria = '';
+                        repetitionBasis = expression.trim();
+                    }
+                    terminationCriteria = '';
+                    terminationValue = '';
+                }
+
+                if (repetitionBasis.indexOf(':') !== -1){
+                    if (/[A-Z]+/.test(repetitionBasis.split(':')[1].trim())){
+                        // weekdays only
+                        frequencyRule = repetitionBasis.split(':')[1].trim();
+                    }
+                    if (/\d+[a-zA-Z]+/.test(repetitionBasis.split(':')[1].trim())){
+                        // number and literal
+                        frequency = parseInt(repetitionBasis.split(':')[1].trim()); // parse ignoring literal chars
+                        if (repetitionBasis.split(':')[0].trim() === 'each'){
+                            frequencyRule = repetitionBasis.split(':')[1].trim().substr(-1); // last char is literal
+                        }
+                        if (repetitionBasis.split(':')[0].trim() === 'onDay'){
+                            frequencyRule = repetitionBasis.split(':')[1].trim().substr(-2); // last chars is weekday
+                        }
+                    }
+                    repetitionBasis = repetitionBasis.split(':')[0].trim();
+                }
+
+                t.tsk_ctg_rep_type = repetitionTypeValues.indexOf(repetitionBasis);
+                t.tsk_ctg_repeats = t.tsk_ctg_rep_type > 0 ? 2 : 1;
+                t.tsk_ctg_rep_after_completion = completionValues.indexOf(completionCriteria);
+                t.tsk_ctg_rep_end = repetitionEndValues.indexOf(terminationCriteria);
+                if (terminationValue && patternDate.test(terminationValue)){
+                    t.tsk_rep_date_end = new Date(parseInt(terminationValue.split('-')[0]),parseInt(terminationValue.split('-')[1])-1,parseInt(terminationValue.split('-')[2]));
+                }
+                if (terminationValue && /\d+/.test(terminationValue) && !patternDate.test(terminationValue)){
+                    t.tsk_rep_end_iteration = parseInt(terminationValue);
+                }
+                t.tsk_rep_iteration = 1;
+                t.tsk_rep_frequency = frequency;
+                if (repetitionBasis === 'each'){
+                    t.tsk_ctg_rep_frequency_rule = frequencyRuleValues.indexOf(frequencyRule);
+                }
+                if (repetitionBasis === 'onDay'){
+                    t.tsk_ctg_rep_frequency_rule = weekdaysValues.indexOf(frequencyRule);
+                }
+                if (repetitionBasis === 'weekdays'){
+                    t.tsk_rep_weekdays = frequencyRule;
+                }
+            }
+            console.log('task with repetition',t);
+        }, '*[', ']');
+
         return task;
     }
 
@@ -282,6 +365,7 @@ export class TasksCore {
             , 'tsk_ctg_rep_type': task.tsk_ctg_rep_type || 0
             , 'tsk_ctg_rep_after_completion': task.tsk_ctg_rep_after_completion || 0
             , 'tsk_ctg_rep_end': task.tsk_ctg_rep_end || 0
+            , 'tsk_rep_date_end': task.tsk_rep_date_end || <Date>undefined
             , 'tsk_rep_end_iteration': task.tsk_rep_end_iteration || 0
             , 'tsk_rep_iteration': task.tsk_rep_iteration || 0
             , 'tsk_rep_frequency': task.tsk_rep_frequency || 0
@@ -787,7 +871,7 @@ export class TasksCore {
 
     doThisWithAToken(task: any, method: Function, token: string, tokenEnd: string = ' '){
         while (task.tsk_name.indexOf(token) !== -1){
-            let endPosition = task.tsk_name.indexOf(' ',task.tsk_name.indexOf(token)) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(tokenEnd,task.tsk_name.indexOf(token));
+            let endPosition = task.tsk_name.indexOf(tokenEnd,task.tsk_name.indexOf(token)) === -1 ? task.tsk_name.length : task.tsk_name.indexOf(tokenEnd,task.tsk_name.indexOf(token));
             let expression = task.tsk_name.substring(task.tsk_name.indexOf(token) + token.length,endPosition);
 
             task.tsk_name = this.replaceTokenInText(task.tsk_name,token + expression + (tokenEnd === ' ' ? '' : tokenEnd));

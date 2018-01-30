@@ -216,8 +216,8 @@ export class MovementComponent implements OnInit {
             //p.pre_id_account_to = 0;
             p.pre_ctg_type = form.value.fMovementType;
             p.pre_budget = form.value.fBudget;
-            p.pre_ctg_category = form.value.fCategory;
-            p.pre_ctg_place = form.value.fPlace;
+            p.pre_id_category = form.value.fCategory;
+            p.pre_id_place = form.value.fPlace;
             p.pre_desc = form.value.fDescription;
             p.pre_notes = form.value.fNotes;
             p.pre_id_user = this.user;
@@ -227,8 +227,8 @@ export class MovementComponent implements OnInit {
             p.pre_txt_account = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == p.pre_id_account,'acc_name');
             //p.pre_txt_account_to = '';
             p.pre_txt_budget = p.pre_budget;
-            p.pre_txt_category = this.findIn(this.viewData.categories,(e: any) => e.mct_id === p.pre_ctg_category,'mct_name');
-            p.pre_txt_place = this.findIn(this.viewData.places,(e: any) => e.mpl_id === p.pre_ctg_place,'mpl_name');
+            p.pre_txt_category = this.findIn(this.viewData.categories,(e: any) => e.mct_id === p.pre_id_category,'mct_name');
+            p.pre_txt_place = this.findIn(this.viewData.places,(e: any) => e.mpl_id === p.pre_id_place,'mpl_name');
             p.pre_txt_status = this.findIn(this.viewData.statuses,(e: any) =>  e.ctg_ctg_value == p.pre_ctg_status,'ctg_desc');
 
             this.services.preset.newItem(p);
@@ -299,8 +299,8 @@ export class MovementComponent implements OnInit {
         e.ent_ctg_type = m.mov_ctg_type === 3 ? 1 : m.mov_ctg_type;
         e.ent_date = m.mov_date;
         e.ent_budget = m.mov_budget;
-        e.ent_ctg_category = m.mov_id_category;
-        e.ent_ctg_place = m.mov_id_place;
+        e.ent_id_category = m.mov_id_category;
+        e.ent_id_place = m.mov_id_place;
         e.ent_notes = m.mov_notes;
         e.ent_id_user = m.mov_id_user;
         e.ent_ctg_status = m.mov_ctg_status;
@@ -323,8 +323,8 @@ export class MovementComponent implements OnInit {
         e.ent_ctg_type = m.mov_ctg_type === 1 || m.mov_ctg_type === 3 ? 2 : 1;
         e.ent_date = m.mov_date;
         e.ent_budget = m.mov_budget;
-        e.ent_ctg_category = m.mov_id_category;
-        e.ent_ctg_place = m.mov_id_place;
+        e.ent_id_category = m.mov_id_category;
+        e.ent_id_place = m.mov_id_place;
         e.ent_notes = m.mov_notes;
         e.ent_id_user = m.mov_id_user;
         e.ent_ctg_status = m.mov_ctg_status;
@@ -406,10 +406,10 @@ export class MovementComponent implements OnInit {
             , 'value': 'pre_budget'
         },{
             'control': 'fCategory'
-            , 'value': 'pre_ctg_category'
+            , 'value': 'pre_id_category'
         },{
             'control': 'fPlace'
-            , 'value': 'pre_ctg_place'
+            , 'value': 'pre_id_place'
         },{
             'control': 'fNotes'
             , 'value': 'pre_notes'

@@ -12,6 +12,7 @@ h2, h3 {
 body { 
   margin: 2em;
   margin-top: 0;
+  background-color: #eee;
 }
 body, input[text], button { 
   color: #888; 
@@ -232,6 +233,9 @@ textarea.task-multiple {
 }
 .task-call {
   background-color: #81d4fa;
+}
+.task-unexpected {
+  background-color: #f9b97c;
 }
 .clickable{
   cursor: pointer;
