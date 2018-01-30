@@ -1,18 +1,24 @@
 import { Movement } from './movement.type';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
+import { SyncAPI } from '../common/sync.api';
 
 @Injectable()
 export class MovementService {
     private data: Array<Movement> = [];
     private storage: StorageService = null;
+    private sync: SyncAPI = null;
     private config = {
         storageKey: 'movements'
         , defaultUser: 'anon'
     }
+    private apiRoot: string = '';
 
-    constructor(storage: StorageService){
+    constructor(storage: StorageService, sync: SyncAPI){
         this.storage = storage;
+        this.sync = sync;
+        // get api root
+        this.apiRoot = storage.getObject('Options')['optServerAddress'];
     }
 
     get list(): Array<Movement> {
@@ -30,8 +36,8 @@ export class MovementService {
             , mov_account_to: number
             , mov_ctg_type: number
             , mov_budget: string
-            , mov_ctg_category: number
-            , mov_ctg_place: number
+            , mov_id_category: number
+            , mov_id_place: number
             , mov_desc: string
             , mov_notes: string
             , mov_id_user: string
@@ -52,8 +58,8 @@ export class MovementService {
                 , mov_account_to
                 , mov_ctg_type
                 , mov_budget
-                , mov_ctg_category
-                , mov_ctg_place
+                , mov_id_category
+                , mov_id_place
                 , mov_desc
                 , mov_notes
                 , mov_id_user
@@ -128,7 +134,15 @@ export class MovementService {
             m.mov_id = this.newId();
             this.data.push(new Movement(m));
         });
+        this.sendBatchToServer(movements);
         this.saveToStorage();
         return movements;
+    }
+
+    sendBatchToServer(list: Array<Movement>){
+        this.sync.post(`${this.apiRoot}/movement/batch`, list).then((response: any) => {
+            // response: { processOk: true, details: {  } }
+            console.log('response movements batch',response);
+        });
     }
 }

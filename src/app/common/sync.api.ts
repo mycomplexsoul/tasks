@@ -249,6 +249,15 @@ export class SyncAPI {
         this.apiRoot = root;
         console.log('api root has changed to:',root);
     }
+
+    /**
+     * Makes a single request, no tracking for sync process
+     * useful when you need only to make a request for batch
+     */
+    post(url: string, payload: any): Promise<any>{
+        return this.http.post(url, payload, this.options)
+            .toPromise().then((data) => data.json());
+    }
 }
 
 interface SyncQueue {

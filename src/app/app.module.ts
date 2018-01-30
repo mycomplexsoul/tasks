@@ -17,6 +17,7 @@ import { StorageService }  from './common/storage.service';
 import { EntryService }  from './money/entry.service';
 import { DateCommon } from './common/date.common';
 import { ComboItemComponent } from './common/comboItem.component';
+import { SyncAPI } from './common/sync.api';
 
 const appRoutes: Routes = [
     // { path: 'crisis-center', component: CrisisListComponent },
@@ -53,6 +54,6 @@ const appRoutes: Routes = [
   imports: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(appRoutes) ],
   declarations: [ AppComponent, TasksComponent, AccountComponent, MovementComponent, BalanceComponent, ComboItemComponent, MenuComponent, RebuildComponent ], // parent & child components
   bootstrap: [ AppComponent ], // only parent components
-  providers: [ DateCommon, StorageService, EntryService ]
+  providers: [ DateCommon, StorageService, EntryService, SyncAPI ]
 })
 export class AppModule { }
