@@ -235,8 +235,8 @@ export class MovementComponent implements OnInit {
             console.log('this is the preset',p);
         } else {
             let m = new Movement();
-            // TODO: implement a hash generator for IDs
-            m.mov_id = this.services.movement.newId();
+            m.mov_date = this.stringDateToDate(form.value.fDate);
+            m.mov_id = this.services.movement.newId(m.mov_date);
             m.mov_desc = form.value.fDescription;
             m.mov_amount = form.value.fAmount;
             m.mov_id_account = form.value.fAccount;
@@ -246,7 +246,6 @@ export class MovementComponent implements OnInit {
             } else {
                 m.mov_ctg_type = form.value.fMovementType;
             }
-            m.mov_date = this.stringDateToDate(form.value.fDate);
             if (!this.isTransfer){
                 m.mov_budget = form.value.fBudget;
                 m.mov_id_category = form.value.fCategory;

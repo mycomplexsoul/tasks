@@ -2,21 +2,24 @@ import { Movement } from './movement.type';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
 import { SyncAPI } from '../common/sync.api';
+import { UtilsCommon } from '../common/utils.common';
 
 @Injectable()
 export class MovementService {
     private data: Array<Movement> = [];
     private storage: StorageService = null;
     private sync: SyncAPI = null;
+    private utils: UtilsCommon = null;
     private config = {
         storageKey: 'movements'
         , defaultUser: 'anon'
     }
     private apiRoot: string = '';
 
-    constructor(storage: StorageService, sync: SyncAPI){
+    constructor(storage: StorageService, sync: SyncAPI, utils: UtilsCommon){
         this.storage = storage;
         this.sync = sync;
+        this.utils = utils;
         // get api root
         this.apiRoot = storage.getObject('Options')['optServerAddress'];
     }
@@ -116,12 +119,12 @@ export class MovementService {
         this.storage.set(this.config.storageKey,JSON.stringify(this.data));
     }
 
-    newId(){
-        return this.data.length + 1 + '';
+    newId(date: Date){
+        return this.utils.hashId('M',32,date);
     }
 
     newItem(movement: Movement): Movement{
-        let newId: string = this.newId();
+        let newId: string = this.newId(movement.mov_date);
         movement.mov_id = newId;
         let newItem = new Movement(movement);
         this.data.push(newItem);
@@ -131,7 +134,7 @@ export class MovementService {
 
     newBatch(movements: Array<Movement>){
         movements.forEach((m: Movement) => {
-            m.mov_id = this.newId();
+            m.mov_id = this.newId(m.mov_date);
             this.data.push(new Movement(m));
         });
         this.sendBatchToServer(movements);
