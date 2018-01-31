@@ -1,36 +1,5 @@
 <strong>Movements</strong>
 
-<table>
-    <tr>
-        <th>Id</th>
-        <th>Date</th>
-        <th>Account</th>
-        <th>Account To</th>
-        <th>Type</th>
-        <th>Amount</th>
-        <th>Budget</th>
-        <th>Category</th>
-        <th>Place</th>
-        <th>Description</th>
-        <th>Notes</th>
-        <th>Status</th>
-    </tr>
-    <tr *ngFor="let m of viewData.movements">
-        <td>{{m.mov_id}}</td>
-        <td>{{m.mov_date | date: 'yyyy-MM-dd'}}</td>
-        <td>{{m.mov_txt_account}}</td>
-        <td>{{m.mov_txt_account_to}}</td>
-        <td>{{m.mov_txt_type}}</td>
-        <td>{{m.mov_amount | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
-        <td>{{m.mov_budget}}</td>
-        <td>{{m.mov_txt_category}}</td>
-        <td>{{m.mov_txt_place}}</td>
-        <td>{{m.mov_desc}}</td>
-        <td>{{m.mov_notes}}</td>
-        <td>{{m.mov_txt_status}}</td>
-    </tr>
-</table>
-
 <a routerLink="/new" routerLinkActive="active">New Movement</a>
 
 <form #newMovementForm="ngForm" (ngSubmit)="newMovement(newMovementForm)">
@@ -124,3 +93,35 @@
 <button (click)="import2016()">Import 2016</button>
 <button (click)="import2017()">Import 2017</button>
 <button (click)="import2017b()">Import 2017b</button>
+<button (click)="import2017c()">Import 2017c</button>
+
+<table>
+    <tr>
+        <th>Id</th>
+        <th>Date</th>
+        <th>Account</th>
+        <th>Account To</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Budget</th>
+        <th>Category</th>
+        <th>Place</th>
+        <th>Description</th>
+        <th>Notes</th>
+        <th>Status</th>
+    </tr>
+    <tr *ngFor="let m of viewData.movements">
+        <td>{{m.mov_id}}</td>
+        <td>{{m.mov_date | date: 'yyyy-MM-dd'}}</td>
+        <td>{{m.mov_txt_account}}</td>
+        <td>{{m.mov_txt_account_to}}</td>
+        <td>{{m.mov_txt_type}}</td>
+        <td>{{m.mov_amount | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+        <td>{{m.mov_budget}}</td>
+        <td>{{m.mov_txt_category}}</td>
+        <td>{{m.mov_txt_place}}</td>
+        <td>{{m.mov_desc}}</td>
+        <td>{{m.mov_notes}}</td>
+        <td>{{m.mov_txt_status}}</td>
+    </tr>
+</table>

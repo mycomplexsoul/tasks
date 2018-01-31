@@ -138,7 +138,7 @@ export class TasksComponent implements OnInit {
         this.state.backlogTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.BACKLOG).sort(this.sortByGroup));
         this.state.openTasks = this.createGroupedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) < today : true) && ((this.options.optShowQualifiedTasksOnly ? t.tsk_qualifiers !== '' : true) || t.tsk_ctg_in_process == 2)).sort(this.sortByGroup));
         this.state.closedTasks = this.createGroupedClosedTasks(this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED).sort(sortByClosedDate));
-        this.state.closedTodayTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED && new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) <= today).sort(sortByClosedDate);
+        this.state.closedTodayTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.CLOSED && new Date(t.tsk_date_done) >= today0 && new Date(t.tsk_date_done) <= tomorrow0).sort(sortByClosedDate);
         this.state.postponedTasks = this.tasks.filter((t) => t.tsk_ctg_status == this.taskStatus.OPEN && (t.tsk_date_view_until ? new Date(t.tsk_date_view_until) > today : false)).sort(sortByDateUntilView);
 
         // Estimated Total
@@ -335,7 +335,7 @@ export class TasksComponent implements OnInit {
         this.taskToggleTimeTracking(t,parent);
     }
 
-    taskEdit(t: any, event: KeyboardEvent){
+    taskEdit(t: Task, event: KeyboardEvent){
         let parent = event.target["parentNode"];
         if (event.altKey && event.keyCode==38){ // detect move up
             this.taskMoveUp(parent);
@@ -401,6 +401,7 @@ export class TasksComponent implements OnInit {
                 if (t.tsk_ctg_in_process == 1){
                     let randomFinish = ((t.tsk_estimated_duration - 2) * 60) + Math.floor(Math.random() * 2 * 10 * 6);
                     t.tsk_time_history[t.tsk_time_history.length - 1].tsh_date_end = new Date(tt.getTime() + randomFinish * 1000);
+                    t.tsk_time_history[t.tsk_time_history.length - 1].tsh_time_spent = randomFinish;
                     let total: number = 0;
                     t.tsk_time_history.forEach((tth: any) => {
                         total += tth.tsh_time_spent;
@@ -408,6 +409,8 @@ export class TasksComponent implements OnInit {
                     this.services.tasksCore.updateTask(t,{
                         tsk_total_time_spent: total
                     });
+                    t.tsk_total_time_spent = total;
+                    console.log('task with changes after time tracking setup',t);
                 }
                 //this.updateTaskTimeTracking(t.tsk_id,t.tsk_time_history.length,data);
                 this.services.tasksCore.tasksToStorage(); // TODO: move this sentence to tasksCore
