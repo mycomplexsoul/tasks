@@ -6,6 +6,10 @@
         <select [(ngModel)]="model.iterable" name="fMonth" id="fMonth" (change)="reloadBalance()">
             <option *ngFor="let opt of viewData.monthList" value="{{opt.iterable}}">{{opt.name}}</option>
         </select>
+
+        <br/>
+        <input name="fFilterNonZero" id="fFilterNonZero" type="checkbox" (click)="toggleFilterNonZero()" [(ngModel)]="viewData.filterNonZero" />
+        <label for="fFilterNonZero">Filter Non Zero Balance</label>
     </span>
 
     <table>
@@ -21,7 +25,9 @@
             <td class="currency-cell-right">{{b.bal_initial | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
             <td class="currency-cell-right">{{b.bal_charges | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
             <td class="currency-cell-right">{{b.bal_withdrawals | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
-            <td class="currency-cell-right">{{b.bal_final | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+            <td class="currency-cell-right" [ngClass]="{'balance-zero': b.bal_final == 0, 'balance-positive': b.bal_final > 0, 'balance-negative': b.bal_final < 0}">
+                {{b.bal_final | currency:'MXN':'symbol-narrow':'1.2-2'}}
+            </td>
         </tr>
     </table>
 </div>
