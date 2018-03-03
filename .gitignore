@@ -52,6 +52,7 @@ node_modules/
 typings/
 app/*.js.map
 app/*.js
+server.js
 e2e/*.js.map
 e2e/*.js
 debug.log

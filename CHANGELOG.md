@@ -6,10 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Notes]
 * Use types as unions "string | null | undefined"
-* tsconfig.json -> strictNullChecks: true
 
 ## [Unreleased]
 ### Changed
+
+<a name="1.2.0"></a>
+## 1.2.0 (2018-03-03)
+### Added
+* Node :-D
 
 <a name="1.1.1"></a>
 ## 1.1.1 (2018-03-02)

@@ -1,11 +1,18 @@
-{                                                                                                                                                                                                    
-  "compilerOptions": {                                                                                                                                                                               
-    "outDir": "./",                                                                                                                                                                             
-    "allowJs": true,                                                                                                                                                                                 
-    "target": "es5",                                                                                                                                                                                 
-    "types": ["node"]                                                                                                                                                                                
-  },                                                                                                                                                                                                 
-  "include": [                                                                                                                                                                                       
-    "./src/*"                                                                                                                                                                                          
-  ]                                                                                                                                                                                                  
-} 
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "es5",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "./",
+    "allowJs": true,
+    "strictNullChecks": true,
+    "alwaysStrict": true,
+    "types": ["node"]
+  },
+  "include": [
+    "./src/*"
+  ]
+}
