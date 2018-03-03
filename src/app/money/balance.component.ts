@@ -21,10 +21,12 @@ export class BalanceComponent implements OnInit {
         balance: Array<Balance>
         , monthBalance: Array<Balance>
         , monthList: Array<any>
+        , filterNonZero: boolean
     } = {
         balance: []
         , monthBalance: []
         , monthList: []
+        , filterNonZero: true
     };
     public services = {
         balance: <BalanceService>null
@@ -51,9 +53,7 @@ export class BalanceComponent implements OnInit {
         this.parseIterable();
         
         this.viewData.balance = this.services.balance.list;
-        this.viewData.monthBalance = this.services.balance.list.filter((b: Balance) => {
-            return b.bal_year == this.model.year && b.bal_month == this.model.month;
-        });
+        this.viewData.monthBalance = this.filterMonthBalance();
         //this.viewData.monthBalance = this.services.balance.list;
         // TODO: add list of year/months of balance for combo box
         this.viewData.monthList = this.services.balance.monthList(this.user);
@@ -66,8 +66,20 @@ export class BalanceComponent implements OnInit {
 
     reloadBalance(){
         this.parseIterable();
-        this.viewData.monthBalance = this.services.balance.list.filter((b: Balance) => {
-            return b.bal_year == this.model.year && b.bal_month == this.model.month;
-        });
+        this.viewData.monthBalance = this.filterMonthBalance();
+    }
+
+    filterMonthBalance(){
+        let filter = (b: Balance) => b.bal_year == this.model.year && b.bal_month == this.model.month;
+        if (this.viewData.filterNonZero){
+            filter = (b: Balance) => b.bal_year == this.model.year && b.bal_month == this.model.month && b.bal_final !== 0;
+        }
+        
+        return this.services.balance.list.filter((b: Balance) => filter(b));
+    }
+
+    toggleFilterNonZero(){
+        this.viewData.filterNonZero = !this.viewData.filterNonZero;
+        this.viewData.monthBalance = this.filterMonthBalance();
     }
 }

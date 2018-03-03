@@ -56,9 +56,7 @@
         </span>
         <span class="field" *ngIf="!isTransfer">
             <label for="fBudget" class="label-left">Budget</label>
-            <select name="fBudget" id="fBudget" ngModel>
-                <option *ngFor="let opt of viewData.budgets" value="{{opt}}">{{opt}}</option>
-            </select>
+            <input type="text" name="fBudget" id="fBudget" ngModel>
         </span>
         <span class="field" *ngIf="!isTransfer">
             <label for="fCategory" class="label-left">Category</label>

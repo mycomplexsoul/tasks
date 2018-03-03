@@ -292,3 +292,15 @@ menu {
 input[type="radio"] {
   vertical-align: bottom;
 }
+
+.balance-zero {
+  color: gray;
+}
+
+.balance-positive {
+  color: green;
+}
+
+.balance-negative {
+  color: red;
+}

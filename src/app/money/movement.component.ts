@@ -173,6 +173,10 @@ export class MovementComponent implements OnInit {
         // });
         // console.log('entries for Mosho Cartera Income',mon.filter((e: Entry) => e.ent_id_account === account && e.ent_ctg_type == 2));
         // console.log('entries for Mosho Cartera Expense',mon.filter((e: Entry) => e.ent_id_account === account && e.ent_ctg_type == 1));
+
+        this.viewData.movements = this.viewData.movements
+            .sort((a: Movement, b: Movement) => a.mov_date >= b.mov_date ? -1 : 1)
+            .slice(0,10)
     }
 
     get movementFlowType(){
