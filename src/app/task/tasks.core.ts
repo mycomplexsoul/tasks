@@ -924,7 +924,8 @@ export class TasksCore {
 
     compareTask(t: any, s: any){
         //let fields = ['tsk_id_container','tsk_id_record','tsk_name','tsk_notes', 'tsk_parent', 'tsk_order', 'tsk_date_done', 'tsk_total_time_spent', 'tsk_ctg_in_process', 'tsk_qualifiers', 'tsk_tags', 'tsk_estimated_duration', 'tsk_schedule_date_start', 'tsk_schedule_date_end', 'tsk_date_view_until', 'tsk_id_user_added', 'tsk_id_user_asigned', 'tsk_date_add', 'tsk_date_mod', 'tsk_ctg_status'];
-        let fields = ['tsk_id_container','tsk_id_record','tsk_name','tsk_notes','tsk_parent','tsk_order','tsk_date_done','tsk_total_time_spent','tsk_ctg_in_process','tsk_qualifiers','tsk_tags','tsk_estimated_duration','tsk_schedule_date_start','tsk_schedule_date_end','tsk_date_view_until','tsk_id_user_added','tsk_id_user_asigned','tsk_template','tsk_template_state','tsk_date_due','tsk_id_related','tsk_url','tsk_ctg_repeats','tsk_id_main','tsk_ctg_rep_type','tsk_ctg_rep_after_completion','tsk_ctg_rep_end','tsk_rep_date_end','tsk_rep_end_iteration','tsk_rep_iteration','tsk_rep_frequency','tsk_ctg_rep_frequency_rule','tsk_rep_weekdays','tsk_date_add','tsk_date_mod','tsk_ctg_status'];
+        //let fields = ['tsk_id_container','tsk_id_record','tsk_name','tsk_notes','tsk_parent','tsk_order','tsk_date_done','tsk_total_time_spent','tsk_ctg_in_process','tsk_qualifiers','tsk_tags','tsk_estimated_duration','tsk_schedule_date_start','tsk_schedule_date_end','tsk_date_view_until','tsk_id_user_added','tsk_id_user_asigned','tsk_template','tsk_template_state','tsk_date_due','tsk_id_related','tsk_url','tsk_ctg_repeats','tsk_id_main','tsk_ctg_rep_type','tsk_ctg_rep_after_completion','tsk_ctg_rep_end','tsk_rep_date_end','tsk_rep_end_iteration','tsk_rep_iteration','tsk_rep_frequency','tsk_ctg_rep_frequency_rule','tsk_rep_weekdays','tsk_date_add','tsk_date_mod','tsk_ctg_status'];
+        let fields = ['tsk_id_container','tsk_id_record','tsk_name','tsk_notes','tsk_parent','tsk_order','tsk_date_done','tsk_total_time_spent','tsk_ctg_in_process','tsk_tags','tsk_estimated_duration','tsk_schedule_date_start','tsk_schedule_date_end','tsk_date_view_until','tsk_id_user_added','tsk_id_user_asigned','tsk_template','tsk_template_state','tsk_date_due','tsk_id_related','tsk_url','tsk_id_main','tsk_rep_date_end','tsk_rep_weekdays','tsk_date_add','tsk_date_mod','tsk_ctg_status'];
         //let fields = ['tsk_date_done'];
         let comparison: Array<any> = [];
         let field: any = {};
@@ -936,6 +937,18 @@ export class TasksCore {
             field.client = t[f];
             field.server = s[f];
             field.isEqual = t[f] == s[f];
+            if (field.name === 'tsk_total_time_spent' && !field.isEqual){
+                // let's find out which one is the real one
+                let taskClient: Task = this.data.taskList.find((t: Task) => t.tsk_id === field.id);
+                this.recalculateTotalTimeSpent(taskClient);
+                field.isEqual = taskClient[f] == s[f];
+            }
+            if (field.name === 'tsk_date_mod' && !field.isEqual){
+                // we preserve server date if it defers from browser
+                let taskClient: Task = this.data.taskList.find((t: Task) => t.tsk_id === field.id);
+                taskClient[name] = new Date(s[f]);
+                field.isEqual = taskClient[f] == s[f];
+            }
             if (!field.isEqual){
                 comparison.push(field);
             }

@@ -88,7 +88,7 @@ export class TasksComponent implements OnInit {
         this.notification({
             body: 'Hello there!! you have ' + this.state.openTasksCount + ' tasks open'
         });
-        //this.services.tasksCore.computeComparisonData().then((data: any) => this.comparisonData = data);
+        this.services.tasksCore.computeComparisonData().then((data: any) => this.comparisonData = data);
     }
 
     ngOnInit(){
@@ -1579,5 +1579,14 @@ export class TasksComponent implements OnInit {
             task
             , element: event.target['parentNode']
         };
+    }
+
+    sendFEToBE(taskDiff: Array<any>){
+        let upd = {};
+        taskDiff.forEach((td: any) => {
+            upd[td.name] = td.client;
+        });
+        this.updateTask(taskDiff[0].id, upd);
+        this.services.tasksCore.computeComparisonData().then((data: any) => this.comparisonData = data);
     }
 }
