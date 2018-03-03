@@ -946,7 +946,7 @@ export class TasksCore {
             if (field.name === 'tsk_date_mod' && !field.isEqual){
                 // we preserve server date if it defers from browser
                 let taskClient: Task = this.data.taskList.find((t: Task) => t.tsk_id === field.id);
-                taskClient[name] = new Date(s[f]);
+                taskClient[f] = new Date(s[f]);
                 field.isEqual = taskClient[f] == s[f];
             }
             if (!field.isEqual){
