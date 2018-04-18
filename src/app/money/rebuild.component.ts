@@ -19,9 +19,9 @@ import { Balance } from './balance.type';
     ]
 })
 export class RebuildComponent implements OnInit {
-    public services = {
-        entry: <EntryService>null
-        , balance: <BalanceService>null
+    public services: {
+        entry: EntryService
+        , balance: BalanceService
     };
     public user: string = 'anon';
     public model: {

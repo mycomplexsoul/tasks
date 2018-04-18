@@ -59,6 +59,7 @@ debug.log
 Dockerfile
 .dockerignore
 wallaby.js
+dist/
 
 # quickstart
 .idea

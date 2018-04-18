@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Changed
 
+<a name="1.2.1"></a>
+## 1.2.1 (2018-04-18)
+### Added
+* Basic Webpack bundling configuration, a little quirky but functional
+
 <a name="1.2.0"></a>
 ## 1.2.0 (2018-03-03)
 ### Added

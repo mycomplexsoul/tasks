@@ -70,14 +70,22 @@ export class MovementComponent implements OnInit {
     public isTransfer: boolean = false;
     public isCustom: boolean = true;
     public isPreset: boolean = false;
-    public services = {
-        account: <AccountService>null
-        , category: <CategoryService>null
-        , place: <PlaceService>null
-        , movement: <MovementService>null
-        , entry: <EntryService>null
-        , balance: <BalanceService>null
-        , preset: <PresetService>null
+    public services: {
+        account: AccountService
+        , category: CategoryService
+        , place: PlaceService
+        , movement: MovementService
+        , entry: EntryService
+        , balance: BalanceService
+        , preset: PresetService
+    } = {
+        account: null,
+        category: null,
+        place: null,
+        movement: null,
+        entry: null,
+        balance: null,
+        preset: null
     };
 
     constructor(

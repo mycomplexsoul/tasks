@@ -28,8 +28,8 @@ export class BalanceComponent implements OnInit {
         , monthList: []
         , filterNonZero: true
     };
-    public services = {
-        balance: <BalanceService>null
+    public services: {
+        balance: BalanceService
     };
     public model: {
         iterable: number

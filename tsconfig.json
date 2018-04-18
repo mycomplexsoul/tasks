@@ -10,7 +10,11 @@
     "allowJs": true,
     "strictNullChecks": true,
     "alwaysStrict": true,
-    "types": ["node"]
+    "types": ["node"],
+    "lib": ["es2015", "dom"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "suppressImplicitAnyIndexErrors": true
   },
   "include": [
     "./src/*"

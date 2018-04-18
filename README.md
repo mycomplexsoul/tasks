@@ -1,3 +1,8 @@
+# Tasks
+
+## Dev
+To bundle for dist, use npm run launch.
+
 # Angular QuickStart Source
 [![Build Status][travis-badge]][travis-badge-url]
 
