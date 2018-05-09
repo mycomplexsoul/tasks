@@ -457,10 +457,11 @@
     <table>
         <tr *ngFor="let c of comparisonData.results">
             <td *ngFor="let f of c">
-                id: {{f.id}} |
+                displayName: {{f.displayName}} |
                 name: {{f.name}} | 
                 comparison: {{f.isEqual}} |
-                data: {{f.client}} / {{f.server}}
+                data FE: {{f.client}} |
+                data BE: {{f.server}}
                 <button (click)="sendFEToBE(c)">Send FE data to BE</button>
             </td>
         </tr>

@@ -89,12 +89,12 @@ export class MovementService {
     }
 
     getAll(){
-        let fromStorage = this.storage.get(this.config.storageKey);
+        /*let fromStorage = this.storage.get(this.config.storageKey);
         if (fromStorage){
             this.data = JSON.parse(fromStorage);
         } else {
             this.data = this.initialData();
-        }
+        }*/
         // sort data
         let sort = (a: Movement, b: Movement) => {
             if (a.mov_date < b.mov_date) {
@@ -105,14 +105,17 @@ export class MovementService {
                 return 0;
             }
         };
-        this.data = this.data.sort(sort);
-        return this.data;
+        return this.sync.get(`${this.apiRoot}/movement/list`).then(data => {
+            this.data = data.map((d: any): Movement => new Movement(d));
+            this.data = this.data.sort(sort);
+            return this.data;
+        });
     }
 
     getAllForUser(user: string){
-        const all: Array<Movement> = this.getAll();
-
-        return all.filter((x: Movement) => x.mov_id_user === user);
+        return this.getAll().then((list: Array<Movement>) => {
+            return list.filter((x: Movement) => x.mov_id_user === user);
+        });
     }
 
     saveToStorage(){

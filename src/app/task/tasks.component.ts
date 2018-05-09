@@ -281,6 +281,11 @@ export class TasksComponent implements OnInit {
 
             }
         }
+
+        // Update comparison results
+        setTimeout(() => {
+            this.services.tasksCore.computeComparisonData().then((data: any) => this.comparisonData = data);
+        }, 6000);
     }
 
     showTimersOnLoad(){

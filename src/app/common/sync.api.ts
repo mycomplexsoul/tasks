@@ -258,6 +258,11 @@ export class SyncAPI {
         return this.http.post(url, payload, this.options)
             .toPromise().then((data) => data.json());
     }
+
+    get(url: string): Promise<any>{
+        return this.http.get(url, this.options)
+            .toPromise().then((data) => data.json());
+    }
 }
 
 interface SyncQueue {

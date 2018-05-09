@@ -147,19 +147,24 @@ export class MovementComponent implements OnInit {
         this.accounts = this.services.account.getAll();
         this.services.category.getAllForUser(this.user);
         this.services.place.getAllForUser(this.user);
-        this.services.movement.getAllForUser(this.user);
         this.services.entry.getAllForUser(this.user);
         this.services.preset.getAllForUser(this.user);
         
         this.viewData.accounts = this.accounts;
         this.viewData.categories = this.services.category.list;
         this.viewData.places = this.services.place.list;
-        this.viewData.movements = this.services.movement.list;
         this.viewData.entries = this.services.entry.list;
         this.viewData.presets = this.services.preset.list;
 
         this.addNewCategoryForUser = this.addNewCategoryForUser.bind(this);
         this.addNewPlaceForUser = this.addNewPlaceForUser.bind(this);
+        this.services.movement.getAllForUser(this.user).then((list: Array<Movement>) => {
+            this.viewData.movements = list;
+
+            this.viewData.movements = this.viewData.movements
+            .sort((a: Movement, b: Movement) => a.mov_date >= b.mov_date ? -1 : 1)
+            .slice(0,10);
+        });
         /* analysis */
         // const year = 2017;
         // const month = 6;
@@ -181,10 +186,6 @@ export class MovementComponent implements OnInit {
         // });
         // console.log('entries for Mosho Cartera Income',mon.filter((e: Entry) => e.ent_id_account === account && e.ent_ctg_type == 2));
         // console.log('entries for Mosho Cartera Expense',mon.filter((e: Entry) => e.ent_id_account === account && e.ent_ctg_type == 1));
-
-        this.viewData.movements = this.viewData.movements
-            .sort((a: Movement, b: Movement) => a.mov_date >= b.mov_date ? -1 : 1)
-            .slice(0,10)
     }
 
     get movementFlowType(){

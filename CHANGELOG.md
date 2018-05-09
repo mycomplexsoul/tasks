@@ -7,8 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Notes]
 * Use types as unions "string | null | undefined"
 
+
 ## [Unreleased]
+<hr/>
+## 1.2.2 (2018-05-09)
+### Added
+* [Sync] "get" Method for general get requests.
+
 ### Changed
+* [Money] Movements - Client handler to display data from server (no localStorage saving).
+* [Tasks] Comparison - Fixes for markup and logic.
 
 <a name="1.2.1"></a>
 ## 1.2.1 (2018-04-18)
