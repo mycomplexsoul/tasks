@@ -3,20 +3,26 @@ import { Entry } from './entry.type';
 import { EntryService } from './entry.service';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
+import { SyncAPI } from '../common/sync.api';
 
 @Injectable()
 export class BalanceService {
     private data: Array<Balance> = [];
     private storage: StorageService = null;
+    private sync: SyncAPI = null;
     private entryService: EntryService = null;
     private config = {
         storageKey: 'balance'
         , defaultUser: 'anon'
     }
+    private apiRoot: string = '';
 
-    constructor(storage: StorageService, entryService: EntryService){
+    constructor(storage: StorageService, entryService: EntryService, sync: SyncAPI){
         this.storage = storage;
         this.entryService = entryService;
+        this.sync = sync;
+        // get api root
+        this.apiRoot = storage.getObject('Options')['optServerAddress'];
     }
 
     get list(): Array<Balance> {
@@ -83,26 +89,30 @@ export class BalanceService {
         return list;
     }
 
-    getAll(): Array<Balance>{
-        let fromStorage = this.storage.get(this.config.storageKey);
+    getAll(): Promise<Array<Balance>>{
+        /*let fromStorage = this.storage.get(this.config.storageKey);
         if (fromStorage){
             this.data = JSON.parse(fromStorage);
         } else {
             this.data = this.initialData();
-        }
-        this.data = this.data.sort((a: Balance, b: Balance) => {
+        }*/
+        const sort = ((a: Balance, b: Balance) => {
             if (a.bal_txt_account === 'Capital'){
                 return 1;
             }
             return a.bal_txt_account > b.bal_txt_account ? 1 : -1;
         });
-        return this.data;
+        return this.sync.get(`${this.apiRoot}/balance/list`).then(data => {
+            this.data = data.map((d: any): Balance => new Balance(d));
+            this.data = this.data.sort(sort);
+            return this.data;
+        });
     }
 
     getAllForUser(user: string){
-        const all: Array<Balance> = this.getAll();
-
-        return all.filter((x: Balance) => x.bal_id_user === user);
+        return this.getAll().then((list: Array<Balance>) => {
+            return list.filter((x: Balance) => x.bal_id_user === user);
+        });
     }
 
     saveToStorage(){
@@ -117,7 +127,7 @@ export class BalanceService {
     }
 
     add(entryList: Array<Entry>){
-        let balance: Array<Balance> = this.getAll();
+        let balance: Array<Balance> = this.list;
 
         // add up
         entryList.forEach((e: Entry) => {
@@ -146,7 +156,7 @@ export class BalanceService {
     }
 
     getAllForMonth(year: number, month: number, user: string) : Array<Balance>{
-        return this.getAllForUser(user).filter((b) => b.bal_year === year && b.bal_month === month);
+        return this.list.filter((b) => b.bal_year === year && b.bal_month === month);
     }
 
     rebuild(year: number, month: number, user: string){
@@ -265,7 +275,7 @@ export class BalanceService {
     }
 
     monthList(user: string){
-        let iterable: any = this.getAllForUser(user)
+        let iterable: any = this.list
         .map((b: Balance) => ({
             iterable: b.bal_year * 100 + b.bal_month
             , year: b.bal_year

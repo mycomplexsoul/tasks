@@ -30,6 +30,8 @@ export class BalanceComponent implements OnInit {
     };
     public services: {
         balance: BalanceService
+    } = {
+        balance: null
     };
     public model: {
         iterable: number
@@ -48,15 +50,21 @@ export class BalanceComponent implements OnInit {
     }
 
     ngOnInit(){
-        this.services.balance.getAllForUser(this.user);
         this.model.iterable = (new Date()).getFullYear() * 100 + ((new Date()).getMonth() + 1);
         this.parseIterable();
+
+        this.services.balance.getAllForUser(this.user).then((list: Array<Balance>) => {
+            this.viewData.balance = list;
+
+            /*this.viewData.balance = this.viewData.balance
+            .sort((a: Balance, b: Balance) => a.mov_date >= b.mov_date ? -1 : 1)
+            .slice(0,10);*/
+            this.viewData.monthBalance = this.filterMonthBalance();
+            //this.viewData.monthBalance = this.services.balance.list;
+            // TODO: add list of year/months of balance for combo box
+            this.viewData.monthList = this.services.balance.monthList(this.user);
+        });
         
-        this.viewData.balance = this.services.balance.list;
-        this.viewData.monthBalance = this.filterMonthBalance();
-        //this.viewData.monthBalance = this.services.balance.list;
-        // TODO: add list of year/months of balance for combo box
-        this.viewData.monthList = this.services.balance.monthList(this.user);
     }
 
     parseIterable(){
