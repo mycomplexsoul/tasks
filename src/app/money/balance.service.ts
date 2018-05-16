@@ -160,41 +160,42 @@ export class BalanceService {
     }
 
     rebuild(year: number, month: number, user: string){
-        const entryList: Array<Entry> = this.entryService.getAllForUser(user)
-            .filter((e) => (new Date(e.ent_date)).getFullYear() === year && (new Date(e.ent_date)).getMonth()+1 === month);
-        let balance: Array<Balance> = this.getAllForMonth(year, month, user);
-        
-        balance.forEach((b: Balance) => {
-            b.bal_charges = 0;
-            b.bal_withdrawals = 0;
-            b.bal_final = b.bal_initial;
-        });
-
-        // add up
-        entryList.forEach((e: Entry) => {
-            let b: Balance = balance.find(b => b.bal_id_account === e.ent_id_account);
-
-            if (b) { // exists a balance, add entry amount
-                b.bal_charges += e.ent_ctg_type === 2 ? e.ent_amount : 0;
-                b.bal_withdrawals += e.ent_ctg_type === 1 ? e.ent_amount : 0;
-                b.bal_final += e.ent_ctg_type === 1 ? -1 * e.ent_amount : e.ent_amount;
-            } else { // balance does not exist, create one with amount and add it to list
-                b = new Balance();
-                b.bal_year = year;
-                b.bal_month = month;
-                b.bal_id_account = e.ent_id_account;
-                b.bal_initial = 0;
-                b.bal_charges = e.ent_ctg_type === 2 ? e.ent_amount : 0;
-                b.bal_withdrawals = e.ent_ctg_type === 1 ? e.ent_amount : 0;
-                b.bal_final = b.bal_charges - b.bal_withdrawals;
-                b.bal_id_user = e.ent_id_user;
-                b.bal_txt_account = e.ent_txt_account;
-
-                this.data.push(b);
-                balance.push(b);
-            }
-        });
-        this.saveToStorage();
+        this.entryService.getAllForUser(user).then((entryList: Array<Entry>) => {
+            entryList.filter((e) => (new Date(e.ent_date)).getFullYear() === year && (new Date(e.ent_date)).getMonth()+1 === month);
+            let balance: Array<Balance> = this.getAllForMonth(year, month, user);
+            
+            balance.forEach((b: Balance) => {
+                b.bal_charges = 0;
+                b.bal_withdrawals = 0;
+                b.bal_final = b.bal_initial;
+            });
+    
+            // add up
+            entryList.forEach((e: Entry) => {
+                let b: Balance = balance.find(b => b.bal_id_account === e.ent_id_account);
+    
+                if (b) { // exists a balance, add entry amount
+                    b.bal_charges += e.ent_ctg_type === 2 ? e.ent_amount : 0;
+                    b.bal_withdrawals += e.ent_ctg_type === 1 ? e.ent_amount : 0;
+                    b.bal_final += e.ent_ctg_type === 1 ? -1 * e.ent_amount : e.ent_amount;
+                } else { // balance does not exist, create one with amount and add it to list
+                    b = new Balance();
+                    b.bal_year = year;
+                    b.bal_month = month;
+                    b.bal_id_account = e.ent_id_account;
+                    b.bal_initial = 0;
+                    b.bal_charges = e.ent_ctg_type === 2 ? e.ent_amount : 0;
+                    b.bal_withdrawals = e.ent_ctg_type === 1 ? e.ent_amount : 0;
+                    b.bal_final = b.bal_charges - b.bal_withdrawals;
+                    b.bal_id_user = e.ent_id_user;
+                    b.bal_txt_account = e.ent_txt_account;
+    
+                    this.data.push(b);
+                    balance.push(b);
+                }
+            });
+            this.saveToStorage();
+        })
     }
 
     transfer(year: number, month: number, user: string){

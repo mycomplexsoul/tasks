@@ -1,18 +1,23 @@
 import { Entry } from './entry.type';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
+import { SyncAPI } from '../common/sync.api';
 
 @Injectable()
 export class EntryService {
     private data: Array<Entry> = [];
     private storage: StorageService = null;
+    private sync: SyncAPI = null;
     private config = {
         storageKey: 'entries'
         , defaultUser: 'anon'
     }
+    private apiRoot: string = '';
 
-    constructor(storage: StorageService){
+    constructor(storage: StorageService, sync: SyncAPI){
         this.storage = storage;
+        this.sync = sync;
+        this.apiRoot = storage.getObject('Options')['optServerAddress'];
     }
 
     get list(): Array<Entry> {
@@ -79,20 +84,27 @@ export class EntryService {
         return list;
     }
 
-    getAll(){
-        let fromStorage = this.storage.get(this.config.storageKey);
-        if (fromStorage){
-            this.data = JSON.parse(fromStorage);
-        } else {
-            this.data = this.initialData();
-        }
-        return this.data;
+    getAll(): Promise<Array<Entry>>{
+        const sort = ((a: Entry, b: Entry) => {
+            if (a.ent_date < b.ent_date) {
+                return -1;
+            } else if (a.ent_date > b.ent_date) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        return this.sync.get(`${this.apiRoot}/entry/list`).then(data => {
+            this.data = data.map((d: any): Entry => new Entry(d));
+            this.data = this.data.sort(sort);
+            return this.data;
+        });
     }
 
     getAllForUser(user: string){
-        const all: Array<Entry> = this.getAll();
-
-        return all.filter((x: Entry) => x.ent_id_user === user);
+        return this.getAll().then((list: Array<Entry>) => {
+            return list.filter((x: Entry) => x.ent_id_user === user);
+        });
     }
 
     saveToStorage(){

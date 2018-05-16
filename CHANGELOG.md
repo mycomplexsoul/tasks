@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 <hr/>
+<a name="1.2.4"></a>
+## 1.2.4 (2018-05-16)
+### Added
+* [Money] Entry - Client handler to display data from server (no localStorage saving).
+
 <a name="1.2.3"></a>
 ## 1.2.3 (2018-05-14)
 ### Added
