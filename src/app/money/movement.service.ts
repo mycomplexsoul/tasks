@@ -15,6 +15,9 @@ export class MovementService {
         , defaultUser: 'anon'
     }
     private apiRoot: string = '';
+    private usage: string = 'ALWAYS_ON_LINE';
+    // ALWAYS_ON_LINE = means no local storage layer, always fetch from server and always push to server, just save to storage when an error ocurrs
+    // LOCAL_FIRST = means use local storage layer, fetch from server to local storage then push to server
 
     constructor(storage: StorageService, sync: SyncAPI, utils: UtilsCommon){
         this.storage = storage;
@@ -88,6 +91,21 @@ export class MovementService {
         return list;
     }
 
+    /**
+     * Guidance for this method objective:
+     * - Read sync data from storage
+     * - Read from storage to memory
+     * - If server is available
+     *   - Push sync data to server, server decides changes to keep, returns sync results (merge if needed)
+     *   - Fetch from server to memory, then save to local
+     * - Return data
+     * 
+     * When new data comes (new, update, delete):
+     * - Create sync data in memory and push it to local (to be available if push to server fails)
+     * - Update local with changes
+     * - If server is available
+     *   - Push sync data to server, server decides changes to keep, returns sync results (straightforward in this case)
+     */
     getAll(){
         /*let fromStorage = this.storage.get(this.config.storageKey);
         if (fromStorage){
@@ -119,7 +137,7 @@ export class MovementService {
     }
 
     saveToStorage(){
-        this.storage.set(this.config.storageKey,JSON.stringify(this.data));
+        //this.storage.set(this.config.storageKey,JSON.stringify(this.data));
     }
 
     newId(date: Date){

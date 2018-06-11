@@ -9,7 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 ## [Unreleased]
+
 <hr/>
+<a name="1.2.5"></a>
+## 1.2.5 (2018-06-10)
+### Added
+* [Server.ts] Server, connection and config for node-typescript.
+
 <a name="1.2.4"></a>
 ## 1.2.4 (2018-05-16)
 ### Added
