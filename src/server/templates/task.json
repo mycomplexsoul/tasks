@@ -1,0 +1,301 @@
+{
+    "name": "Task"
+    , "namespace": "common"
+    , "removeMeans": "CANCELATION"
+    , "authNeeded": false
+    , "displayOnMenu": false
+    , "prefix": "tsk"
+    , "permissionsTemplate": "permissions_all"
+    , "specialFeatures": [
+        "AUTONUMERIC"
+        , "HEADERS(Task,Tasks)"
+        , "TABLE_NAME(TASK)"
+        , "VIEW_NAME(VITASK)"
+    ]
+    , "fields": [
+        {
+            "templateId": "string"
+            , "dbName": "tsk_id"
+            , "isPK": true
+            , "size": 32
+            , "minLength": 32
+            , "dbComment": "Id for the task"
+            , "entName": "TaskId"
+            , "captureRequired": true
+            , "specialRules": [
+                "DUPLICITY_ADD"
+            ]
+            , "displayName": "Task Id"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_id_container"
+            , "size": 50
+            , "minLength": 1
+            , "dbComment": "Container group id for multiple tasks"
+            , "entName": "ContainerId"
+            , "displayName": "Container Id"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_id_record"
+            , "size": 20
+            , "minLength": 1
+            , "dbComment": "Record id for multiple tasks grouping"
+            , "entName": "RecordId"
+            , "displayName": "Record Id"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_name"
+            , "size": 500
+            , "minLength": 1
+            , "dbComment": "Name of the task, meaning the task itself"
+            , "entName": "Name"
+            , "displayName": "Name"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_notes"
+            , "size": 4000
+            , "minLength": 0
+            , "allowNull": true
+            , "dbComment": "Notes for the task, details"
+            , "entName": "Notes"
+            , "displayName": "Notes"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_parent"
+            , "size": 32
+            , "minLength": 32
+            , "allowNull": true
+            , "dbComment": "Parent task of this subtask"
+            , "entName": "Parent"
+            , "displayName": "Parent"
+        },{
+            "templateId": "integer"
+            , "dbName": "tsk_order"
+            , "dbComment": "Order used to be displayed in list"
+            , "entName": "Order"
+            , "displayName": "Order"
+        },{
+            "templateId": "datetime"
+            , "dbName": "tsk_date_done"
+            , "dbComment": "Date when the task is marked as done"
+            , "entName": "DoneDate"
+            , "captureRequired": true
+            , "displayName": "Date of Termination"
+        },{
+            "templateId": "long"
+            , "dbName": "tsk_total_time_spent"
+            , "dbComment": "Total time spent attending this task"
+            , "entName": "TotalTimeSpent"
+            , "displayName": "Total Time Spent"
+        },{
+            "templateId": "integer"
+            , "dbName": "tsk_ctg_in_process"
+            , "dbComment": "Indicates if this task is currently being attended or not"
+            , "entName": "InProgress"
+            , "displayName": "In Progress"
+            , "catalogId": "BOOLEAN"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_qualifiers"
+            , "size": 100
+            , "allowNull": true
+            , "dbComment": "Qualifiers used to enhance this task"
+            , "entName": "Qualifiers"
+            , "displayName": "Qualifiers"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_tags"
+            , "size": 200
+            , "allowNull": true
+            , "dbComment": "Tags used to group tasks"
+            , "entName": "Tags"
+            , "displayName": "Tags"
+        },{
+            "templateId": "long"
+            , "dbName": "tsk_estimated_duration"
+            , "dbComment": "Total time estimated to be taken attending this task"
+            , "entName": "EstimatedDuration"
+            , "displayName": "Estimated Duration"
+        },{
+            "templateId": "datetime"
+            , "dbName": "tsk_schedule_date_start"
+            , "dbComment": "Schedule date and time for the task to be attended"
+            , "entName": "ScheduleDateStart"
+            , "displayName": "Schedule Date Start"
+        },{
+            "templateId": "datetime"
+            , "dbName": "tsk_schedule_date_end"
+            , "dbComment": "Schedule date and time for the task to be finished"
+            , "entName": "ScheduleDateEnd"
+            , "displayName": "Schedule Date End"
+        },{
+            "templateId": "datetime"
+            , "dbName": "tsk_date_view_until"
+            , "dbComment": "Date and time until this task must be shown, until then it should be hidden"
+            , "entName": "DateUntilView"
+            , "displayName": "Date Until View"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_id_user_added"
+            , "size": 50
+            , "dbComment": "User who created this task"
+            , "entName": "User"
+            , "displayName": "User"
+        },{
+            "templateId": "string"
+            , "size": 50
+            , "dbName": "tsk_id_user_asigned"
+            , "dbComment": "User who has been asigned to attend this task"
+            , "entName": "UserAsigned"
+            , "displayName": "User Asigned"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_template"
+            , "size": 500
+            , "minLength": 1
+            , "allowNull": true
+            , "dbComment": "Template of the task, used for variable substitution on task creation"
+            , "entName": "Template"
+            , "displayName": "Template"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_template_state"
+            , "size": 4000
+            , "allowNull": true
+            , "dbComment": "State of variables used to substitute values in the template"
+            , "entName": "TemplateState"
+            , "displayName": "Template State"
+        },{
+            "templateId": "datetime"
+            , "dbName": "tsk_date_due"
+            , "allowNull": true
+            , "dbComment": "Date when the task should be completed"
+            , "entName": "DueDate"
+            , "displayName": "Due Date"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_id_related"
+            , "size": 32
+            , "minLength": 32
+            , "allowNull": true
+            , "dbComment": "Id of a related task"
+            , "entName": "RelatedTaskId"
+            , "displayName": "Related Task Id"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_url"
+            , "size": 4000
+            , "allowNull": true
+            , "dbComment": "Url related to the task"
+            , "entName": "Url"
+            , "displayName": "Url"
+        },{
+            "templateId": "integer"
+            , "dbName": "tsk_ctg_repeats"
+            , "dbComment": "Indicates if this task repeats itself as a new undone task when finished"
+            , "entName": "Repeats"
+            , "displayName": "Repeats"
+            , "catalogId": "BOOLEAN"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_id_main"
+            , "size": 32
+            , "minLength": 32
+            , "allowNull": true
+            , "dbComment": "Id of the main task that configured the repetition rules"
+            , "entName": "RepetitionMainTaskId"
+            , "displayName": "Repetition Main Task Id"
+        },{
+            "templateId": "integer"
+            , "dbName": "tsk_ctg_rep_type"
+            , "dbComment": "Indicates the repetition rule that applies to the task when finished"
+            , "entName": "RepetitionType"
+            , "displayName": "Repetition Type"
+            , "catalogId": "TASK_REPETITION_TYPE"
+        },{
+            "templateId": "integer"
+            , "dbName": "tsk_ctg_rep_after_completion"
+            , "dbComment": "Indicates the repetition projection should be calculated after the repetition or not"
+            , "entName": "RepeatAfterCompletion"
+            , "displayName": "Repeat After Completion"
+            , "catalogId": "BOOLEAN"
+        },{
+            "templateId": "integer"
+            , "dbName": "tsk_ctg_rep_end"
+            , "dbComment": "Indicates the repetition end rule"
+            , "entName": "RepetitionEnd"
+            , "displayName": "Repetition Ends At"
+            , "catalogId": "TASK_REPETITION_END_AT"
+        },{
+            "templateId": "datetime"
+            , "dbName": "tsk_rep_date_end"
+            , "allowNull": true
+            , "dbComment": "Date when the repetitions end"
+            , "entName": "RepetitionEndDate"
+            , "displayName": "Repetition End Date"
+        },{
+            "templateId": "integer"
+            , "dbName": "tsk_rep_end_iteration"
+            , "dbComment": "Total number of iterations that the task should be done to end repetition"
+            , "entName": "RepetitionEndIterations"
+            , "displayName": "Repetition End Iterations"
+        },{
+            "templateId": "integer"
+            , "dbName": "tsk_rep_iteration"
+            , "dbComment": "Number of iteration of this task"
+            , "entName": "RepetitionIteration"
+            , "displayName": "Repetition Iteration"
+        },{
+            "templateId": "integer"
+            , "dbName": "tsk_rep_frequency"
+            , "dbComment": "Frequency of repetition"
+            , "entName": "RepetitionFrequency"
+            , "displayName": "Repetition Frequency"
+        },{
+            "templateId": "integer"
+            , "dbName": "tsk_ctg_rep_frequency_rule"
+            , "dbComment": "Indicates the repetition frequency rule"
+            , "entName": "RepetitionFrequencyRule"
+            , "displayName": "Repetition Frequency Rule"
+            , "catalogId": "TASK_REPETITION_FREQUENCY"
+        },{
+            "templateId": "string"
+            , "dbName": "tsk_rep_weekdays"
+            , "size": 7
+            , "allowNull": true
+            , "dbComment": "Selected days of the week on task repetition"
+            , "entName": "RepetitionWeekdays"
+            , "displayName": "Repetition Days of the Week"
+        },{
+            "templateId": "creationDate"
+        },{
+            "templateId": "modificationDate"
+        },{
+            "templateId": "status"
+            , "catalogId": "RECORD_STATUS"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_in_process"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_repeats"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_rep_type"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_rep_after_completion"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_rep_end"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_rep_frequency_rule"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_status"
+        }
+    ]
+    , "view": [
+    ]
+}

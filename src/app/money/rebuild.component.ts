@@ -48,7 +48,9 @@ export class RebuildComponent implements OnInit {
     }
 
     ngOnInit(){
-        this.viewData.monthList = this.months();
+        this.months().then((response: any[]) => {
+            this.viewData.monthList = response;
+        });
     }
 
     parseMonthName(iterable: number){
@@ -62,23 +64,25 @@ export class RebuildComponent implements OnInit {
         let currentDate: Date = new Date();
         let max: number = currentDate.getFullYear() * 100 + (currentDate.getMonth() + 1)
         this.model.month = max;
-        let min: number = this.services.balance.getAll()
-            .map((b: Balance) => b.bal_year * 100 + b.bal_month)
-            .reduce((previous, current) => previous <= current ? previous : current, 999999);
-        let month: any;
-        let list: Array<any> = [];
-        if (min === 999999) {
-            min = 201602;
-        }
-        while (min <= max){
-            console.log('calculated',min);
-            list.push({
-                iterable: min
-                , name: this.parseMonthName(min)
-            });
-            min = this.services.balance.getNextMonth(Math.floor(min / 100), min % 100).iterable;
-        }
-        return list.reverse();
+        return this.services.balance.getAll().then((response: Balance[]) => {
+            let min: number = response.map((b: Balance) => b.bal_year * 100 + b.bal_month)
+                .reduce((previous, current) => previous <= current ? previous : current, 999999);
+            
+            let month: any;
+            let list: Array<any> = [];
+            if (min === 999999) {
+                min = 201602;
+            }
+            while (min <= max){
+                console.log('calculated',min);
+                list.push({
+                    iterable: min
+                    , name: this.parseMonthName(min)
+                });
+                min = this.services.balance.getNextMonth(Math.floor(min / 100), min % 100).iterable;
+            }
+            return list.reverse();
+        });
     }
 
     parseModel(){
