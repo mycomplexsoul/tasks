@@ -5,12 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Notes]
-* Use types as unions "string | null | undefined"
-
+* TODO: Test runner for node.
 
 ## [Unreleased]
 
 <hr/>
+<a name="1.2.7"></a>
+## 1.2.7 (2018-06-28)
+### Added
+* [Generator] Interfaces and classes for generator.
+
 <a name="1.2.6"></a>
 ## 1.2.6 (2018-06-27)
 ### Added

@@ -1,6 +1,6 @@
 {
   "name": "tasks",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "Task manager and money manager web application",
   "scripts": {
     "build": "tsc -p src/",
@@ -25,8 +25,8 @@
     "launch": "npm run build && npm run bundleapp && npm run servedist",
     "launch2": "webpack-dev-server --inline --progress --port 8080"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["tasks", "to do", "to do list", "money", "money manager"],
+  "author": "mycomplexsoul",
   "license": "MIT",
   "dependencies": {
     "@angular/common": "~4.3.4",
