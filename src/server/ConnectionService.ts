@@ -1,21 +1,23 @@
 "use strict";
 import iConnection from "./iConnection";
 import { Promise } from 'es6-promise';
+import * as mysql from 'mysql';
+
 let ConnectionService = (function(){
-    function loadJSON(file){
+    function loadJSON(file: string){
         let fs = require('fs');
         let obj = JSON.parse(fs.readFileSync(file + '.json', 'utf8'));
         return obj;
     }
-    let getConnection = (mysql): iConnection => {
-        let config = loadJSON('cfg');
-        let connection;// = mysql.createConnection(config[0]);
+    let getConnection = (): iConnection => {
+        let config = loadJSON(__dirname + '/../../cfg');
+        let connection: any;// = mysql.createConnection(config[0]);
 
         function handleDisconnect() {
             connection = mysql.createConnection(config[0]); // Recreate the connection, since
                                                             // the old one cannot be reused.
             
-            connection.connect(function(err) {              // The server is either down
+            connection.connect(function(err: any) {              // The server is either down
                 if(err) {                                     // or restarting (takes a while sometimes).
                     console.log('error when connecting to db:', err);
                     setTimeout(handleDisconnect, 2000); // We introduce a delay before attempting to reconnect,
@@ -23,7 +25,7 @@ let ConnectionService = (function(){
                 console.log('connected as id ' + connection.threadId);
             });                                     // process asynchronous requests in the meantime.
                                                     // If you're also serving http, display a 503 error.
-            connection.on('error', function(err) {
+            connection.on('error', function(err: any) {
                 console.log((new Date()).toISOString() + ' - db error', err);
                 if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
                     handleDisconnect();                         // lost due to either server restart, or a
@@ -42,7 +44,7 @@ let ConnectionService = (function(){
         };
         let runSql = (sql: string): Promise<any> => {
             return new Promise<any>((resolve,reject) => {
-                connection.query(sql,(err,rows,fields) => {
+                connection.query(sql,(err: any, rows: any, fields: any[]) => {
                     if (err){
                         console.log('There was an error with this sql: ' + sql + ', the error is: ' + err);
                         reject(err);
@@ -57,7 +59,7 @@ let ConnectionService = (function(){
             });
         };
         let runSqlArray = (sqlArray: Array<string>): Array<Promise<any>> => {
-            let responseArray = sqlArray.map((sql: string) => this.runSql(sql));
+            let responseArray = sqlArray.map((sql: string) => runSql(sql));
             return responseArray;
         };
         return {
