@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 <hr/>
+<a name="1.2.9"></a>
+## 1.2.9 (2018-06-30)
+### Added
+* [Generator] Generated entities with metadata.
+
 <a name="1.2.8"></a>
 ## 1.2.8 (2018-06-29)
 ### Added
