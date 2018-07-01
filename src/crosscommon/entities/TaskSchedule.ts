@@ -252,4 +252,10 @@ export class TaskSchedule implements iEntity {
 			this.tss_date_mod = base.tss_date_mod;
 		}
 	}
+
+	recordName = () => {
+		return this.metadata.fields.filter(f => f.isRecordName).map(f => {
+			return `${f.dbName} = ${this[f.dbName]}`;
+		}).join(', ');
+	};
 }

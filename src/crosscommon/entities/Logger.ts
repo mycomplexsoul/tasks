@@ -248,4 +248,10 @@ export class Logger implements iEntity {
 			this.log_id_user = base.log_id_user;
 		}
 	}
+
+	recordName = () => {
+		return this.metadata.fields.filter(f => f.isRecordName).map(f => {
+			return `${f.dbName} = ${this[f.dbName]}`;
+		}).join(', ');
+	};
 }

@@ -15,4 +15,6 @@ export interface iEntity {
 		, specialFeatures: string[]
 		, fields: FieldDefinition[]
 	}
+
+	recordName: () => string;
 }

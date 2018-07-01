@@ -16,8 +16,8 @@
             "templateId": "string"
             , "dbName": "mpl_id"
             , "isPK": true
-            , "size": 16
-            , "minLength": 16
+            , "size": 32
+            , "minLength": 32
             , "dbComment": "Id for the place"
             , "entName": "PlaceId"
             , "captureRequired": true

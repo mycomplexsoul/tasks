@@ -55,9 +55,9 @@ export class Place implements iEntity {
 				, dbType: 'string'
 				, isTableField: true
 				, isPK: true
-				, size: 16
+				, size: 32
 				, decimal: 0
-				, minLength: 16
+				, minLength: 32
 				, allowNull: false
 				, default: ''
 				, dbComment: 'Id for the place'
@@ -286,4 +286,10 @@ export class Place implements iEntity {
 			this.mpl_txt_status = base.mpl_txt_status;
 		}
 	}
+
+	recordName = () => {
+		return this.metadata.fields.filter(f => f.isRecordName).map(f => {
+			return `${f.dbName} = ${this[f.dbName]}`;
+		}).join(', ');
+	};
 }

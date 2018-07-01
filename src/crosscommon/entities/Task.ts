@@ -1508,4 +1508,10 @@ export class Task implements iEntity {
 			this.tsk_txt_status = base.tsk_txt_status;
 		}
 	}
+
+	recordName = () => {
+		return this.metadata.fields.filter(f => f.isRecordName).map(f => {
+			return `${f.dbName} = ${this[f.dbName]}`;
+		}).join(', ');
+	};
 }

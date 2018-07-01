@@ -552,4 +552,10 @@ export class Balance implements iEntity {
 			this.bal_txt_status = base.bal_txt_status;
 		}
 	}
+
+	recordName = () => {
+		return this.metadata.fields.filter(f => f.isRecordName).map(f => {
+			return `${f.dbName} = ${this[f.dbName]}`;
+		}).join(', ');
+	};
 }

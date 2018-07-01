@@ -782,4 +782,10 @@ export class User implements iEntity {
 			this.usr_txt_status = base.usr_txt_status;
 		}
 	}
+
+	recordName = () => {
+		return this.metadata.fields.filter(f => f.isRecordName).map(f => {
+			return `${f.dbName} = ${this[f.dbName]}`;
+		}).join(', ');
+	};
 }

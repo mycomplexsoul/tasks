@@ -385,4 +385,10 @@ export class LastTime implements iEntity {
 			this.lst_txt_status = base.lst_txt_status;
 		}
 	}
+
+	recordName = () => {
+		return this.metadata.fields.filter(f => f.isRecordName).map(f => {
+			return `${f.dbName} = ${this[f.dbName]}`;
+		}).join(', ');
+	};
 }
