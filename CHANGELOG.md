@@ -10,6 +10,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 <hr/>
+
+<a name="1.2.11"></a>
+## 1.2.11 (2018-07-02)
+### Added
+* [Generator] Added `MoBasicGenerator.ts`, `MoSQL.ts`, `MoGen.ts`, `MoInstallSQL.ts` and `Utility.ts` classes.
+
+<a name="1.2.10"></a>
+## 1.2.10 (2018-07-01)
+### Added
+* [Generator] Added method `recordName()` to iEntity and updated entities.
+
 <a name="1.2.9"></a>
 ## 1.2.9 (2018-06-30)
 ### Added

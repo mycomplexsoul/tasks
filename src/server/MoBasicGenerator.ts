@@ -135,6 +135,14 @@ export class MoBasicGenerator {
         });
         str += line + tab + tab + `}`;
         str += line + tab + `}`;
+        str += line;
+        str += line + tab + `recordName = () => {`;
+        str += line + tab + tab + `return this.metadata.fields.filter(f => f.isRecordName).map(f => {`;
+        str += line + tab + tab + tab + `return \`\${f.dbName} = \${this[f.dbName]}\`;`;
+        str += line + tab + tab + `}).join(', ');`;
+        str += line + tab + `};`;
+        
+        // last bracket
         str += line + `}`;
 
         // write file
