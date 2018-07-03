@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+<a name="1.2.12"></a>
+## 1.2.12 (2018-07-03)
+### Added
+* [AppMoney] Routing and server handlers for movements import, entry generation and balance generation.
+
 <a name="1.2.11"></a>
 ## 1.2.11 (2018-07-02)
 ### Added
