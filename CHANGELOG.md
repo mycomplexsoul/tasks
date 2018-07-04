@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+<a name="1.2.13"></a>
+## 1.2.13 (2018-07-04)
+### Added
+* [Generator] ApiModule and DateUtility base classes.
+
 <a name="1.2.12"></a>
 ## 1.2.12 (2018-07-03)
 ### Added
