@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+<a name="1.2.14"></a>
+## 1.2.14 (2018-07-05)
+### Added
+* [AppMoney] Movement import, entry and balance generation routes and methods.
+
 <a name="1.2.13"></a>
 ## 1.2.13 (2018-07-04)
 ### Added
