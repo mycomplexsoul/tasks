@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+<a name="1.2.16"></a>
+## 1.2.16 (2018-07-07)
+### Modified
+* [AppMoney] Fixed promise compilation for UI components.
+
+<a name="1.2.15"></a>
+## 1.2.15 (2018-07-06)
+### Added
+* [AppMoney] Balance grid now has a new column with an option to show movements for an account/month/year in a table below.
+
 <a name="1.2.14"></a>
 ## 1.2.14 (2018-07-05)
 ### Added

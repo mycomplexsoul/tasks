@@ -151,10 +151,10 @@ export class MovementComponent implements OnInit {
         this.services.preset.getAllForUser(this.user);
         
         this.viewData.accounts = this.accounts;
-        this.viewData.categories = this.services.category.list;
-        this.viewData.places = this.services.place.list;
-        this.viewData.entries = this.services.entry.list;
-        this.viewData.presets = this.services.preset.list;
+        this.viewData.categories = this.services.category.list();
+        this.viewData.places = this.services.place.list();
+        this.viewData.entries = this.services.entry.list();
+        this.viewData.presets = this.services.preset.list();
 
         this.addNewCategoryForUser = this.addNewCategoryForUser.bind(this);
         this.addNewPlaceForUser = this.addNewPlaceForUser.bind(this);
@@ -188,11 +188,10 @@ export class MovementComponent implements OnInit {
         // console.log('entries for Mosho Cartera Expense',mon.filter((e: Entry) => e.ent_id_account === account && e.ent_ctg_type == 1));
     }
 
-    get movementFlowType(){
-        return this._movementFlowType;
-    }
-
-    set movementFlowType(value: string){
+    movementFlowType(value: string){
+        if (!value) {
+            return this._movementFlowType;
+        }
         this._movementFlowType = value;
         this.isTransfer = false;
         this.isCustom = false;
@@ -3169,15 +3168,15 @@ export class MovementComponent implements OnInit {
         // categories and places
         data.forEach((d: string, index: number, arr: string[]) => {
             let values: Array<string> = d.split('|');
-            if (!this.findIn(this.services.category.list,(e: Category) => e.mct_name === values[5],'mct_id')){
+            if (!this.findIn(this.services.category.list(),(e: Category) => e.mct_name === values[5],'mct_id')){
                 this.services.category.newItem(values[5],this.user);
             }
-            if (!this.findIn(this.services.place.list,(e: Place) => e.mpl_name === values[6],'mpl_id')){
+            if (!this.findIn(this.services.place.list(),(e: Place) => e.mpl_name === values[6],'mpl_id')){
                 this.services.place.newItem(values[6],this.user);
             }
         });
-        this.viewData.categories = this.services.category.list;
-        this.viewData.places = this.services.place.list;
+        this.viewData.categories = this.services.category.list();
+        this.viewData.places = this.services.place.list();
 
         data.forEach((d: string, index: number, arr: string[]) => {
             try {

@@ -27,7 +27,7 @@ export class MovementService {
         this.apiRoot = storage.getObject('Options')['optServerAddress'];
     }
 
-    get list(): Array<Movement> {
+    list(): Array<Movement> {
         return this.data;
     }
 

@@ -22,6 +22,9 @@ export class RebuildComponent implements OnInit {
     public services: {
         entry: EntryService
         , balance: BalanceService
+    } = {
+        entry: null
+        , balance: null
     };
     public user: string = 'anon';
     public model: {
