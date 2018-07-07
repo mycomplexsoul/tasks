@@ -19,6 +19,7 @@
             <th>Charges</th>
             <th>Withdrawals</th>
             <th>Final</th>
+            <th>Actions</th>
         </tr>
         <tr *ngFor="let b of viewData.monthBalance" class="balance-row">
             <td>{{b.bal_txt_account}}</td>
@@ -28,6 +29,38 @@
             <td class="currency-cell-right" [ngClass]="{'balance-zero': b.bal_final == 0, 'balance-positive': b.bal_final > 0, 'balance-negative': b.bal_final < 0}">
                 {{b.bal_final | currency:'MXN':'symbol-narrow':'1.2-2'}}
             </td>
+            <td><a href="#" (click)="renderMovements(b, $event)">View Movements</a></td>
+        </tr>
+    </table>
+
+    <table *ngIf="viewData.movements.length">
+        <tr>
+            <th>Id</th>
+            <th>Date</th>
+            <th>Account</th>
+            <th>Account To</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Budget</th>
+            <th>Category</th>
+            <th>Place</th>
+            <th>Description</th>
+            <th>Notes</th>
+            <th>Status</th>
+        </tr>
+        <tr *ngFor="let m of viewData.movements">
+            <td>{{m.mov_id}}</td>
+            <td>{{m.mov_date | date: 'yyyy-MM-dd'}}</td>
+            <td>{{m.mov_txt_account}}</td>
+            <td>{{m.mov_txt_account_to}}</td>
+            <td>{{m.mov_txt_type}}</td>
+            <td>{{m.mov_amount | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+            <td>{{m.mov_budget}}</td>
+            <td>{{m.mov_txt_category}}</td>
+            <td>{{m.mov_txt_place}}</td>
+            <td>{{m.mov_desc}}</td>
+            <td>{{m.mov_notes}}</td>
+            <td>{{m.mov_txt_status}}</td>
         </tr>
     </table>
 </div>

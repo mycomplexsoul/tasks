@@ -20,7 +20,7 @@ export class EntryService {
         this.apiRoot = storage.getObject('Options')['optServerAddress'];
     }
 
-    get list(): Array<Entry> {
+    list(): Array<Entry> {
         return this.data;
     }
 

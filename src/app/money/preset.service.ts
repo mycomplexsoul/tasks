@@ -15,7 +15,7 @@ export class PresetService {
         this.storage = storage;
     }
 
-    get list(): Array<Preset> {
+    list(): Array<Preset> {
         return this.data;
     }
 

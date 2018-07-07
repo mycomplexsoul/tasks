@@ -2,10 +2,12 @@ import { Component, OnInit, Renderer } from '@angular/core';
 import { NgForm } from '@angular/forms';
 // types
 import { Balance } from './balance.type';
+import { Movement } from './movement.type';
 
 // services
 import { StorageService }  from '../common/storage.service';
 import { BalanceService } from './balance.service';
+import { MovementService } from './movement.service';
 
 @Component({
     selector: 'balance',
@@ -13,25 +15,30 @@ import { BalanceService } from './balance.service';
     styleUrls: ['./balance.css'],
     providers: [
         BalanceService
+        , MovementService
     ]
 })
 export class BalanceComponent implements OnInit {
     private user: string = 'anon';
     public viewData: {
         balance: Array<Balance>
+        , movements: Array<Movement>
         , monthBalance: Array<Balance>
         , monthList: Array<any>
         , filterNonZero: boolean
     } = {
         balance: []
+        , movements: []
         , monthBalance: []
         , monthList: []
         , filterNonZero: true
     };
     public services: {
         balance: BalanceService
+        , movement: MovementService
     } = {
         balance: null
+        , movement: null
     };
     public model: {
         iterable: number
@@ -45,8 +52,10 @@ export class BalanceComponent implements OnInit {
 
     constructor(
         balanceService: BalanceService
+        , movementService: MovementService
     ){
         this.services.balance = balanceService;
+        this.services.movement = movementService;
     }
 
     ngOnInit(){
@@ -83,11 +92,23 @@ export class BalanceComponent implements OnInit {
             filter = (b: Balance) => b.bal_year == this.model.year && b.bal_month == this.model.month && b.bal_final !== 0;
         }
         
-        return this.services.balance.list.filter((b: Balance) => filter(b));
+        return this.services.balance.list().filter((b: Balance) => filter(b));
     }
 
     toggleFilterNonZero(){
         this.viewData.filterNonZero = !this.viewData.filterNonZero;
         this.viewData.monthBalance = this.filterMonthBalance();
+    }
+
+    renderMovements(balance: Balance, event: Event){
+        event.preventDefault();
+        this.services.movement.getAllForUser(this.user).then((list: Array<Movement>) => {
+            let ref = balance.bal_year * 100 + balance.bal_month;
+            this.viewData.movements = list.filter(m => {
+                let movRef = (new Date(m.mov_date)).getFullYear() * 100 + ((new Date(m.mov_date)).getMonth() + 1);
+                return ref === movRef && (balance.bal_id_account === m.mov_id_account || balance.bal_id_account === m.mov_id_account_to);
+            });
+            console.log(`movements fetched for balance`, balance, this.viewData.movements);
+        });
     }
 }

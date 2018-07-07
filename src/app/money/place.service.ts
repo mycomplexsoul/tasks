@@ -15,7 +15,7 @@ export class PlaceService {
         this.storage = storage;
     }
 
-    get list(): Array<Place> {
+    list(): Array<Place> {
         return this.data;
     }
 

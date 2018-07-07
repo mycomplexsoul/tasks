@@ -15,7 +15,7 @@ export class CategoryService {
         this.storage = storage;
     }
 
-    get list(): Array<Category> {
+    list(): Array<Category> {
         return this.data;
     }
 

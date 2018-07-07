@@ -25,7 +25,7 @@ export class BalanceService {
         this.apiRoot = storage.getObject('Options')['optServerAddress'];
     }
 
-    get list(): Array<Balance> {
+    list(): Array<Balance> {
         return this.data;
     }
 
@@ -127,7 +127,7 @@ export class BalanceService {
     }
 
     add(entryList: Array<Entry>){
-        let balance: Array<Balance> = this.list;
+        let balance: Array<Balance> = this.list();
 
         // add up
         entryList.forEach((e: Entry) => {
@@ -156,7 +156,7 @@ export class BalanceService {
     }
 
     getAllForMonth(year: number, month: number, user: string) : Array<Balance>{
-        return this.list.filter((b) => b.bal_year === year && b.bal_month === month);
+        return this.list().filter((b) => b.bal_year === year && b.bal_month === month);
     }
 
     rebuild(year: number, month: number, user: string){
@@ -276,7 +276,7 @@ export class BalanceService {
     }
 
     monthList(user: string){
-        let iterable: any = this.list
+        let iterable: any = this.list()
         .map((b: Balance) => ({
             iterable: b.bal_year * 100 + b.bal_month
             , year: b.bal_year
