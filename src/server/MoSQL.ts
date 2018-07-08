@@ -177,7 +177,7 @@ export class MoSQL {
         const c = { ...this.constants };
 
         this.getPK(m).forEach(f =>  {
-            sql = this.concatAnd(sql, this.formatValueForSQL(f.dbType, f.value));
+            sql = this.concatAnd(sql, this.formatValueForSQL(f.dbType, m[f.dbName]));
         });
 
         sql = `delete from ${m.metadata.tableName} where (${sql})`;
@@ -189,9 +189,10 @@ export class MoSQL {
         let sql: string = '';
         
         this.getPK(m).forEach(field => {
-            sql = this.concatAnd(sql, this.formatValueForSQL(field.dbType, field.value, field.dbName));
+            sql = this.concatAnd(sql, this.formatValueForSQL(field.dbType, m[field.dbName], field.dbName));
         });
-
+        
+        sql = `select * from ${m.metadata.viewName}${sql ? ` where ${sql}` : ''}`;
         return sql;
     }
 

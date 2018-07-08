@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+<a name="1.2.17"></a>
+## 1.2.17 (2018-07-08)
+### Added
+* [AppMoney] Balance Module for rebuild and transfer balance.
+
 <a name="1.2.16"></a>
 ## 1.2.16 (2018-07-07)
 ### Modified

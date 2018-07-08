@@ -238,155 +238,157 @@ export class MovementCustom {
         return true;
     }
 
-    generateEntries = (): Promise<any> => {
+    generateEntries = (movementList: Movement[]): Promise<any> => {
         const connection: iConnection = ConnectionService.getConnection();
-        const movementModel: Movement = new Movement();
-        const sqlMotor: MoSQL = new MoSQL(movementModel);
-        return connection.runSql(sqlMotor.toSelectSQL()).then(response => {
-            if (response.err){ // TODO: move this code to a catch or use await/try-catch
-                console.log("err: can't read movements", response.err);
-                return {operationOk: false, message: response.err};
-            }
-            // iterate movements
-            let entryList: Array<Entry> = [];
-            console.log('movements to process', response.rows.length);
-            response.rows.forEach((m: any, index: number, arr: any[]) => {
-                // generate entry 1
-                entryList.push(new Entry({
-                    ent_id: m.mov_id
-                    , ent_sequential: 1
-                    , ent_date: m.mov_date
-                    , ent_desc: m.mov_desc
-                    , ent_ctg_currency: 1 // static until Multi-currency
-                    , ent_amount: m.mov_amount
-                    , ent_id_account: m.mov_id_account
-                    , ent_ctg_type: m.mov_ctg_type === 3 ? 1 : m.mov_ctg_type
-                    , ent_budget: m.mov_budget
-                    , ent_id_category: m.mov_id_category
-                    , ent_id_place: m.mov_id_place
-                    , ent_notes: m.mov_notes
-                    , ent_id_user: m.mov_id_user
-                    , ent_date_add: m.mov_date_add
-                    , ent_date_mod: m.mov_date_mod
-                    , ent_ctg_status: m.mov_ctg_status
-                }));
-                // generate entry 2
-                entryList.push(new Entry({
-                    ent_id: m.mov_id
-                    , ent_sequential: 2
-                    , ent_date: m.mov_date
-                    , ent_desc: m.mov_desc
-                    , ent_ctg_currency: 1
-                    , ent_amount: m.mov_amount
-                    , ent_id_account: m.mov_ctg_type === 3 ? m.mov_id_account_to : '1' // TODO: Fix capital account per user
-                    , ent_ctg_type: m.mov_ctg_type === 3 ? 2 : m.mov_ctg_type
-                    , ent_budget: m.mov_budget
-                    , ent_id_category: m.mov_id_category
-                    , ent_id_place: m.mov_id_place
-                    , ent_notes: m.mov_notes
-                    , ent_id_user: m.mov_id_user
-                    , ent_date_add: m.mov_date_add
-                    , ent_date_mod: m.mov_date_mod
-                    , ent_ctg_status: m.mov_ctg_status
-                }));
-            });
-            // insert entries
-            const responsesPromises = entryList.map(e => sqlMotor.toInsertSQL(e));
-            return Promise.all(connection.runSqlArray(responsesPromises)).then(values => {
-                // all inserted ok
-                connection.close();
-                console.log(`Batch finished, inserted ok: ${entryList.length}`);
-                return {operationOk: true, message: `Batch finished, inserted ok: ${entryList.length}`};
-            }).catch(reason => {
-                // some failed
-                console.log('err on inserting entries',reason);
-                return {operationOk: false, message: `error ${reason}`};
-            });
+        const sqlMotor: MoSQL = new MoSQL();
+        console.log('movements to process', movementList.length);
+        
+        // iterate movements
+        let entryList: Array<Entry> = [];
+        movementList.forEach((m: Movement, index: number, arr: any[]) => {
+            // generate entry 1
+            entryList.push(new Entry({
+                ent_id: m.mov_id
+                , ent_sequential: 1
+                , ent_date: m.mov_date
+                , ent_desc: m.mov_desc
+                , ent_ctg_currency: 1 // static until Multi-currency
+                , ent_amount: m.mov_amount
+                , ent_id_account: m.mov_id_account
+                , ent_ctg_type: m.mov_ctg_type === 3 ? 1 : m.mov_ctg_type
+                , ent_budget: m.mov_budget
+                , ent_id_category: m.mov_id_category
+                , ent_id_place: m.mov_id_place
+                , ent_notes: m.mov_notes
+                , ent_id_user: m.mov_id_user
+                , ent_date_add: m.mov_date_add
+                , ent_date_mod: m.mov_date_mod
+                , ent_ctg_status: m.mov_ctg_status
+            }));
+            // generate entry 2
+            entryList.push(new Entry({
+                ent_id: m.mov_id
+                , ent_sequential: 2
+                , ent_date: m.mov_date
+                , ent_desc: m.mov_desc
+                , ent_ctg_currency: 1
+                , ent_amount: m.mov_amount
+                , ent_id_account: m.mov_ctg_type === 3 ? m.mov_id_account_to : '1' // TODO: Fix capital account per user
+                , ent_ctg_type: m.mov_ctg_type === 3 ? 2 : m.mov_ctg_type
+                , ent_budget: m.mov_budget
+                , ent_id_category: m.mov_id_category
+                , ent_id_place: m.mov_id_place
+                , ent_notes: m.mov_notes
+                , ent_id_user: m.mov_id_user
+                , ent_date_add: m.mov_date_add
+                , ent_date_mod: m.mov_date_mod
+                , ent_ctg_status: m.mov_ctg_status
+            }));
+        });
+        // insert entries
+        const responsesPromises = entryList.map(e => sqlMotor.toInsertSQL(e));
+        return Promise.all(connection.runSqlArray(responsesPromises)).then(values => {
+            // all inserted ok
+            connection.close();
+            console.log(`Batch finished, inserted ok: ${entryList.length}`);
+            return {operationOk: true, message: `Batch finished, inserted ok: ${entryList.length}`, data: entryList};
+        }).catch(reason => {
+            // some failed
+            console.log('err on inserting entries',reason);
+            return {operationOk: false, message: `error ${reason}`};
         });
     };
     
-    _generateEntries = async (node: iNode) => {
-        let result = await this.generateEntries();
-        node.response.end(JSON.stringify(result));
+    _generateEntries = (node: iNode) => {
+        const connection: iConnection = ConnectionService.getConnection();
+        const movementModel: Movement = new Movement();
+        const sqlMotor: MoSQL = new MoSQL(movementModel);
+
+        connection.runSql(sqlMotor.toSelectSQL()).then(response => {
+            const list: Movement[] = response.rows.map(r => new Movement(r));
+            this.generateEntries(list).then(result => {
+                node.response.end(JSON.stringify(result));
+            });
+        });
     };
 
-    generateBalance = (): Promise<any> => {
+    generateBalance = (entryList: Entry[]): Promise<any> => {
+        const connection: iConnection = ConnectionService.getConnection();
+        const sqlMotor: MoSQL = new MoSQL();
+        let balanceList: Balance[] = [];
+            
+        entryList.forEach(e => {
+            let b: Balance = balanceList.find(b => b.bal_year === e.ent_date.getFullYear() && b.bal_month === e.ent_date.getMonth()+1 && b.bal_id_account === e.ent_id_account && b.bal_id_user === e.ent_id_user);
+
+            if (b) { // exists a balance, add entry amount
+                b.bal_charges += e.ent_ctg_type === 2 ? e.ent_amount : 0;
+                b.bal_withdrawals += e.ent_ctg_type === 1 ? e.ent_amount : 0;
+                b.bal_final += e.ent_ctg_type === 1 ? -1 * e.ent_amount : e.ent_amount;
+            } else { // balance does not exist, create one with amount and add it to list
+                b = new Balance();
+                b.bal_year = e.ent_date.getFullYear();
+                b.bal_month = e.ent_date.getMonth() + 1;
+                b.bal_ctg_currency = 1;
+                b.bal_id_account = e.ent_id_account;
+                b.bal_initial = 0;
+                b.bal_charges = e.ent_ctg_type === 2 ? e.ent_amount : 0;
+                b.bal_withdrawals = e.ent_ctg_type === 1 ? e.ent_amount : 0;
+                b.bal_final = b.bal_charges - b.bal_withdrawals;
+                b.bal_id_user = e.ent_id_user;
+                b.bal_date_add = e.ent_date_add;
+                b.bal_date_mod = e.ent_date_mod;
+                b.bal_ctg_status = 1;
+                
+                balanceList.push(b);
+            }
+        });
+        // insert balance
+        let responsesPromises = balanceList.map(b => sqlMotor.toInsertSQL(b));
+        return Promise.all(connection.runSqlArray(responsesPromises)).then(values => {
+            // all inserted ok
+            connection.close();
+            return {operationOk: true, message: `Batch finished, inserted ok: ${balanceList.length}`};
+        }).catch(reason => {
+            // some failed
+            console.log('err on inserting balance',reason);
+            return {operationOk: false, message: `error ${reason}`};
+        });
+    };
+
+    _generateBalance = (node: iNode) => {
         const connection: iConnection = ConnectionService.getConnection();
         const entryModel: Entry = new Entry();
         const sqlMotor: MoSQL = new MoSQL(entryModel);
 
-        return connection.runSql(sqlMotor.toSelectSQL()).then(response => {
-            if (response.err){ // TODO: move this code to a catch or use await/try-catch
-                console.log("err: can't read entries",response.err);
-                return {operationOk: false, message: response.err};
-            }
-            let entryList: Entry[] = [];
-            let balanceList: Balance[] = [];
+        connection.runSql(sqlMotor.toSelectSQL()).then(response => {
+            let entryList: Entry[] = response.rows.map(r => new Entry(r));
             console.log('entries to process', response.rows.length);
-            response.rows.forEach((m: any) => {
-                entryList.push(new Entry(m));
-            });
-            entryList.forEach(e => {
-                let b: Balance = balanceList.find(b => b.bal_year === e.ent_date.getFullYear() && b.bal_month === e.ent_date.getMonth()+1 && b.bal_id_account === e.ent_id_account && b.bal_id_user === e.ent_id_user);
-    
-                if (b) { // exists a balance, add entry amount
-                    b.bal_charges += e.ent_ctg_type === 2 ? e.ent_amount : 0;
-                    b.bal_withdrawals += e.ent_ctg_type === 1 ? e.ent_amount : 0;
-                    b.bal_final += e.ent_ctg_type === 1 ? -1 * e.ent_amount : e.ent_amount;
-                } else { // balance does not exist, create one with amount and add it to list
-                    b = new Balance();
-                    b.bal_year = e.ent_date.getFullYear();
-                    b.bal_month = e.ent_date.getMonth() + 1;
-                    b.bal_ctg_currency = 1;
-                    b.bal_id_account = e.ent_id_account;
-                    b.bal_initial = 0;
-                    b.bal_charges = e.ent_ctg_type === 2 ? e.ent_amount : 0;
-                    b.bal_withdrawals = e.ent_ctg_type === 1 ? e.ent_amount : 0;
-                    b.bal_final = b.bal_charges - b.bal_withdrawals;
-                    b.bal_id_user = e.ent_id_user;
-                    b.bal_date_add = e.ent_date_add;
-                    b.bal_date_mod = e.ent_date_mod;
-                    b.bal_ctg_status = 1;
-                    
-                    balanceList.push(b);
-                }
-            });
-            // insert balance
-            let responsesPromises = balanceList.map(b => sqlMotor.toInsertSQL(b));
-            return Promise.all(connection.runSqlArray(responsesPromises)).then(values => {
-                // all inserted ok
-                connection.close();
-                return {operationOk: true, message: `Batch finished, inserted ok: ${balanceList.length}`};
-            }).catch(reason => {
-                // some failed
-                console.log('err on inserting balance',reason);
-                return {operationOk: false, message: `error ${reason}`};
+
+            this.generateBalance(entryList).then(result => {
+                node.response.end(JSON.stringify(result));
             });
         });
     };
 
-    _generateBalance = async (node: iNode) => {
-        let result = await this.generateBalance();
-        node.response.end(JSON.stringify(result));
-    };
-
-    async rebuildAndTransfer(){
+    rebuildAndTransfer(): Promise<any>{
         // get first month
         let balanceMotor: BalanceModule = new BalanceModule();
         const user: string = 'anon';
 
         let sql: string = `select min(ent_date) as min, max(ent_date) as max from entry where ent_id_user = '${user}'`;
         const connection: iConnection = ConnectionService.getConnection();
-        let response = await connection.runSql(sql);
-        if (response) {
-            let yearInitial = (new Date(response.rows[0].min)).getFullYear();
-            let monthInitial = (new Date(response.rows[0].min)).getMonth() + 1;
-            let yearFinal = (new Date(response.rows[0].max)).getFullYear();
-            let monthFinal = (new Date(response.rows[0].max)).getMonth() + 1;
-
-            await balanceMotor.rebuildAndTransferRange(yearInitial, monthInitial, yearFinal, monthFinal, user);
-            return true;
-        }
+        return connection.runSql(sql).then(response => {
+            if (response) {
+                let yearInitial = (new Date(response.rows[0].min)).getFullYear();
+                let monthInitial = (new Date(response.rows[0].min)).getMonth() + 1;
+                let yearFinal = (new Date(response.rows[0].max)).getFullYear();
+                let monthFinal = (new Date(response.rows[0].max)).getMonth() + 1;
+    
+                return balanceMotor.rebuildAndTransferRange(yearInitial, monthInitial, yearFinal, monthFinal, user).then(resp => {
+                    return resp;
+                });
+            }
+        });
     };
 
     list = (node: iNode) => {
@@ -399,15 +401,19 @@ export class MovementCustom {
 
     create = (node: iNode) => {
         const api: ApiModule = new ApiModule(new Movement());
+        const balanceModule: BalanceModule = new BalanceModule();
+
         const hooks: any = {
-            afterInsertOK: async (response: any, model: iEntity) => {
+            afterInsertOK: (response: any, model: Movement) => {
                 // generate entities
-                const result = await this.generateEntries();
-                if (result.operationOk) {
-                    // generate balance
-                    const res = await this.generateBalance();
-                    return {message: `entries: ${result.message}, balance: ${res.message}`};
-                }
+                return this.generateEntries([model]).then(result => {
+                    if (result.operationOk) {
+                        // generate balance
+                        balanceModule.rebuildAndTransferRange(model.mov_date.getFullYear(), model.mov_date.getMonth() + 1, (new Date()).getFullYear(), (new Date()).getMonth() + 1, 'anon').then(response => {
+                            return {message: `entries: ${result.message}`};
+                        });
+                    }
+                });
             }
         };
 
