@@ -759,7 +759,7 @@ export class Entry implements iEntity {
 		if (base !== undefined){
 			this.ent_id = base.ent_id;
 			this.ent_sequential = base.ent_sequential;
-			this.ent_date = base.ent_date;
+			this.ent_date = new Date(base.ent_date);
 			this.ent_ctg_currency = base.ent_ctg_currency;
 			this.ent_amount = base.ent_amount;
 			this.ent_id_account = base.ent_id_account;
@@ -770,8 +770,8 @@ export class Entry implements iEntity {
 			this.ent_desc = base.ent_desc;
 			this.ent_notes = base.ent_notes;
 			this.ent_id_user = base.ent_id_user;
-			this.ent_date_add = base.ent_date_add;
-			this.ent_date_mod = base.ent_date_mod;
+			this.ent_date_add = new Date(base.ent_date_add);
+			this.ent_date_mod = new Date(base.ent_date_mod);
 			this.ent_ctg_status = base.ent_ctg_status;
 
 			this.ent_txt_type = base.ent_txt_type;

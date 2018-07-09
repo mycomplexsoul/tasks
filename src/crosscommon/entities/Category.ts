@@ -279,8 +279,8 @@ export class Category implements iEntity {
 			this.mct_id = base.mct_id;
 			this.mct_name = base.mct_name;
 			this.mct_id_user = base.mct_id_user;
-			this.mct_date_add = base.mct_date_add;
-			this.mct_date_mod = base.mct_date_mod;
+			this.mct_date_add = new Date(base.mct_date_add);
+			this.mct_date_mod = new Date(base.mct_date_mod);
 			this.mct_ctg_status = base.mct_ctg_status;
 
 			this.mct_txt_status = base.mct_txt_status;

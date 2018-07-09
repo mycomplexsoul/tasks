@@ -244,7 +244,7 @@ export class Logger implements iEntity {
 			this.log_id_screen = base.log_id_screen;
 			this.log_id_feature = base.log_id_feature;
 			this.log_text = base.log_text;
-			this.log_date = base.log_date;
+			this.log_date = new Date(base.log_date);
 			this.log_id_user = base.log_id_user;
 		}
 	}

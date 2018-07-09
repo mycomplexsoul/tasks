@@ -379,8 +379,8 @@ export class LastTimeHistory implements iEntity {
 			this.lth_value = base.lth_value;
 			this.lth_notes = base.lth_notes;
 			this.lth_id_user = base.lth_id_user;
-			this.lth_date_add = base.lth_date_add;
-			this.lth_date_mod = base.lth_date_mod;
+			this.lth_date_add = new Date(base.lth_date_add);
+			this.lth_date_mod = new Date(base.lth_date_mod);
 			this.lth_ctg_status = base.lth_ctg_status;
 
 			this.lth_txt_status = base.lth_txt_status;

@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+<a name="1.2.18"></a>
+## 1.2.18 (2018-07-09)
+### Added
+* [AppGenerator] Generator now creates Date objects for date fields on constructor.
+
 <a name="1.2.17"></a>
 ## 1.2.17 (2018-07-08)
 ### Added

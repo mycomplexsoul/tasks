@@ -131,7 +131,11 @@ export class MoBasicGenerator {
                 flagForViewFields = false;
                 str += line;
             }
-            str += line + tab + tab + tab + `this.${f.dbName} = base.${f.dbName};`;
+            if (['date', 'datetime'].indexOf(f.dbType) !== -1){
+                str += line + tab + tab + tab + `this.${f.dbName} = new Date(base.${f.dbName});`;
+            } else {
+                str += line + tab + tab + tab + `this.${f.dbName} = base.${f.dbName};`;
+            }
         });
         str += line + tab + tab + `}`;
         str += line + tab + `}`;

@@ -279,8 +279,8 @@ export class Place implements iEntity {
 			this.mpl_id = base.mpl_id;
 			this.mpl_name = base.mpl_name;
 			this.mpl_id_user = base.mpl_id_user;
-			this.mpl_date_add = base.mpl_date_add;
-			this.mpl_date_mod = base.mpl_date_mod;
+			this.mpl_date_add = new Date(base.mpl_date_add);
+			this.mpl_date_mod = new Date(base.mpl_date_mod);
 			this.mpl_ctg_status = base.mpl_ctg_status;
 
 			this.mpl_txt_status = base.mpl_txt_status;

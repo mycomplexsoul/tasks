@@ -246,10 +246,10 @@ export class TaskSchedule implements iEntity {
 		if (base !== undefined){
 			this.tss_id = base.tss_id;
 			this.tss_num_secuential = base.tss_num_secuential;
-			this.tss_date_start = base.tss_date_start;
-			this.tss_date_end = base.tss_date_end;
-			this.tss_date_add = base.tss_date_add;
-			this.tss_date_mod = base.tss_date_mod;
+			this.tss_date_start = new Date(base.tss_date_start);
+			this.tss_date_end = new Date(base.tss_date_end);
+			this.tss_date_add = new Date(base.tss_date_add);
+			this.tss_date_mod = new Date(base.tss_date_mod);
 		}
 	}
 

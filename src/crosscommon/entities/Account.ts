@@ -476,8 +476,8 @@ export class Account implements iEntity {
 			this.acc_average_min_balance = base.acc_average_min_balance;
 			this.acc_payment_day = base.acc_payment_day;
 			this.acc_id_user = base.acc_id_user;
-			this.acc_date_add = base.acc_date_add;
-			this.acc_date_mod = base.acc_date_mod;
+			this.acc_date_add = new Date(base.acc_date_add);
+			this.acc_date_mod = new Date(base.acc_date_mod);
 			this.acc_ctg_status = base.acc_ctg_status;
 
 			this.acc_txt_type = base.acc_txt_type;
