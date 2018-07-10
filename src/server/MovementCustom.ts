@@ -407,9 +407,11 @@ export class MovementCustom {
             afterInsertOK: (response: any, model: Movement) => {
                 // generate entities
                 return this.generateEntries([model]).then(result => {
+                    console.log(`entry generation for movement result`, result);
                     if (result.operationOk) {
                         // generate balance
-                        balanceModule.rebuildAndTransferRange(model.mov_date.getFullYear(), model.mov_date.getMonth() + 1, (new Date()).getFullYear(), (new Date()).getMonth() + 1, 'anon').then(response => {
+                        return balanceModule.applyEntriesToBalance(result.data, 'anon').then(res => {
+                            console.log(`balance generation for movement result`, res);
                             return {message: `entries: ${result.message}`};
                         });
                     }

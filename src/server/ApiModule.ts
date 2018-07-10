@@ -67,9 +67,11 @@ export class ApiModule {
                     } else {
                         let resultAfterInsertOK: any;
                         if (hooks && hooks.afterInsertOK){
-                            resultAfterInsertOK = hooks.afterInsertOK(responseCreate, this.model);
+                            return hooks.afterInsertOK(responseCreate, this.model).then(resultAfterInsertOk => {
+                                return {operationOk: true, message: `${this.model.metadata.tableName} created correctly. id: ${recordName}${resultAfterInsertOK ? `, afterInsertOk: ${resultAfterInsertOK.message}` : ''}`};
+                            });
                         }
-                        return {operationOk: true, message: `${this.model.metadata.tableName} created correctly. id: ${recordName}${resultAfterInsertOK ? `, afterInsertOk: ${resultAfterInsertOK.message}` : ''}`};
+                        return {operationOk: true, message: `${this.model.metadata.tableName} created correctly. id: ${recordName}`};
                     }
                 });
             });

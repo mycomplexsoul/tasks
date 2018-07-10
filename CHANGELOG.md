@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+<a name="1.2.19"></a>
+## 1.2.19 (2018-07-10)
+### Fixed
+* [AppMoney] Fixed flow for applying entries to balance on movement creation via hooks.
+
 <a name="1.2.18"></a>
 ## 1.2.18 (2018-07-09)
 ### Added
@@ -23,7 +28,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <a name="1.2.16"></a>
 ## 1.2.16 (2018-07-07)
-### Modified
+### Fixed
 * [AppMoney] Fixed promise compilation for UI components.
 
 <a name="1.2.15"></a>

@@ -252,31 +252,44 @@ export class BalanceModule {
             let updateBalanceList: Balance[] = [];
             let found: number;
             let isNew: number;
+            const round = (obj: any, fieldName: string) => {
+                obj[fieldName] = Math.round(obj[fieldName] * 100) / 100;
+            }
             
             while (iterable.iterable <= finalIterable){
+                console.log(`-- Applying entries to balance, iteration: ${iterable.iterable}, limit: ${finalIterable}`);
                 let monthEntryList: Entry[] = entryList.filter((e) => e.ent_date.getFullYear() === year && e.ent_date.getMonth()+1 === month);
                 let balance: Array<Balance> = [...this.getAllForMonth(balanceList, year, month)];
 
+                console.log(`Entries to be processed in this iteration`, monthEntryList.length);
                 // add up
                 monthEntryList.forEach((e: Entry) => {
+                    console.log(`Entry to be processed`, e);
                     let b: Balance = balance.find(b => b.bal_id_account === e.ent_id_account);
         
                     if (b) { // exists a balance, add entry amount
+                        console.log(`Balance found for entry`, b);
                         b.bal_charges += e.ent_ctg_type === 2 ? e.ent_amount : 0;
                         b.bal_withdrawals += e.ent_ctg_type === 1 ? e.ent_amount : 0;
                         b.bal_final += e.ent_ctg_type === 1 ? -1 * e.ent_amount : e.ent_amount;
                         b.bal_date_mod = new Date();
+                        round(b, 'bal_charges');
+                        round(b, 'bal_withdrawals');
+                        round(b, 'bal_final');
     
                         found = updateBalanceList.findIndex(balance => balance.bal_id_account === b.bal_id_account);
                         isNew = newBalanceList.findIndex(nb => nb.bal_year === b.bal_year && nb.bal_month === b.bal_month && nb.bal_id_account === b.bal_id_account);
                         // if a record in newBalance exists in updateBalance, move the one in updateBalance to newBalance
                         if (isNew === -1){
                             if (found === -1){
+                                console.log(`Balance pushed for update with new values`, b);
                                 updateBalanceList.push(b);
                             } else {
+                                console.log(`Balance updated in updateArray for update with new values`, b);
                                 updateBalanceList[found] = b;
                             }
                         } else {
+                            console.log(`Balance pushed as new for update flow with new values`, b);
                             newBalanceList[isNew] = b;
                         }
                     } else { // balance does not exist, create one with amount and add it to list
@@ -348,6 +361,7 @@ export class BalanceModule {
                     return b.bal_year === bal.bal_year && b.bal_month === bal.bal_month && b.bal_id_account === bal.bal_id_account;
                 })))
             ];
+            console.log(`this is all sql to update`, all_sql);
             return Promise.all(connection.runSqlArray(all_sql)).then(response => {
                 console.log(`inserted ${newBalanceList.length}, updated ${updateBalanceList.length}`);
                 return true;
