@@ -1,3 +1,4 @@
+import * as path  from 'path';
 import * as express from "express";
 import * as mysql from "mysql";
 import iConnection from "./iConnection";
@@ -7,12 +8,13 @@ import { MoInstallSQL } from "./MoInstallSQL";
 import { Catalog } from "../crosscommon/entities/Catalog";
 import { MovementCustom } from "./MovementCustom";
 import { iNode } from "./iNode";
+import * as BalanceRoute from './BalanceRoute';
 //import * as bodyParser from 'body-parser';
 const app = express();
 app.use(express.json());
 
-app.use(express.static(__dirname + '/src'));
-app.use('/node_modules', express.static(__dirname + '/node_modules'));
+app.use(express.static(path.join(__dirname, '../../src')));
+app.use('/node_modules', express.static(path.join(__dirname, '../../node_modules')));
 
 app.use(function(req, res, next) {
     console.log(`incoming request: ${req.url}`);
@@ -167,9 +169,13 @@ app.get('/movement/generate-balance', (req, res) => {
     res.end(JSON.stringify({operationOk: true, message: `Batch finished, inserted ok`}));
 });
 
+BalanceRoute.register(app);
+
 app.use(function(req, res) {
     // Use res.sendfile, as it streams instead of reading the file into memory.
-    res.sendFile(__dirname + '/src/index.html');
+    const index = path.join(__dirname, '../index.html');
+    console.log(`${index}`);
+    res.sendFile(index);
 });
 
 const server = app.listen(8081, () => {

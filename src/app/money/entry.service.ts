@@ -17,7 +17,7 @@ export class EntryService {
     constructor(storage: StorageService, sync: SyncAPI){
         this.storage = storage;
         this.sync = sync;
-        this.apiRoot = storage.getObject('Options')['optServerAddress'];
+        this.apiRoot = storage.getObject('Options')['optServerAddress'] || '';
     }
 
     list(): Array<Entry> {

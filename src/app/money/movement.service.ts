@@ -24,7 +24,7 @@ export class MovementService {
         this.sync = sync;
         this.utils = utils;
         // get api root
-        this.apiRoot = storage.getObject('Options')['optServerAddress'];
+        this.apiRoot = storage.getObject('Options')['optServerAddress'] || '';
     }
 
     list(): Array<Movement> {

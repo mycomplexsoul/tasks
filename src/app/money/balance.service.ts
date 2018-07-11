@@ -22,7 +22,7 @@ export class BalanceService {
         this.entryService = entryService;
         this.sync = sync;
         // get api root
-        this.apiRoot = storage.getObject('Options')['optServerAddress'];
+        this.apiRoot = storage.getObject('Options')['optServerAddress'] || '';
     }
 
     list(): Array<Balance> {
