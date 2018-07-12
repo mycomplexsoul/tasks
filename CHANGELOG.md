@@ -9,7 +9,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+* [Breaking -> 1.3] [AppCommon] All routing for node endpoints moved to /api.
+* [Breaking -> 1.x] [AppCommon] iNode reduced to just `{req, res}` to clean up the interface.
+
 <hr/>
+
+<a name="1.2.21"></a>
+## 1.2.21 (2018-07-12)
+### Added
+* [Common] Route structure separated from server file and inside /api route.
+* [AppMoney] /categories REST get endpoint for category listing.
+
+<a name="1.2.20"></a>
+## 1.2.20 (2018-07-11)
+### Added
+* [AppMoney] Routes to support Moevements and Balance pages data listing (movement, entry and balance).
 
 <a name="1.2.19"></a>
 ## 1.2.19 (2018-07-10)

@@ -9,6 +9,7 @@ import { Catalog } from "../crosscommon/entities/Catalog";
 import { MovementCustom } from "./MovementCustom";
 import { iNode } from "./iNode";
 import * as BalanceRoute from './BalanceRoute';
+import * as Routes from './Routes';
 //import * as bodyParser from 'body-parser';
 const app = express();
 app.use(express.json());
@@ -170,6 +171,8 @@ app.get('/movement/generate-balance', (req, res) => {
 });
 
 BalanceRoute.register(app);
+
+app.use('/api', Routes.router);
 
 app.use(function(req, res) {
     // Use res.sendfile, as it streams instead of reading the file into memory.
