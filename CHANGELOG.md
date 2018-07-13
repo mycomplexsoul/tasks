@@ -14,10 +14,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+<a name="1.2.22"></a>
+## 1.2.22 (2018-07-13)
+### Added
+* [AppCommon] Generic Validation Class structure.
+* [AppCommon] Change Balance FE class and use Balance Crosscommon class in FE.
+
 <a name="1.2.21"></a>
 ## 1.2.21 (2018-07-12)
 ### Added
-* [Common] Route structure separated from server file and inside /api route.
+* [AppCommon] Route structure separated from server file and inside /api route.
 * [AppMoney] /categories REST get endpoint for category listing.
 
 <a name="1.2.20"></a>

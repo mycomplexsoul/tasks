@@ -1,4 +1,4 @@
-import { Balance } from './balance.type';
+import { Balance } from '../../crosscommon/entities/Balance';
 import { Entry } from './entry.type';
 import { EntryService } from './entry.service';
 import { StorageService } from '../common/storage.service';
