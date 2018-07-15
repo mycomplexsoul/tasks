@@ -3,6 +3,7 @@ import { iNode } from "./iNode";
 import iConnection from "./iConnection";
 import { Promise } from "es6-promise";
 import { MoSQL } from "./MoSQL";
+import ConnectionService from './ConnectionService';
 
 export class ApiModule {
     model: iEntity;
@@ -13,7 +14,7 @@ export class ApiModule {
     }
     
     list = (node: iNode): Promise<iEntity[]> => {
-        let connection: iConnection = node.connection.getConnection(node.mysql);
+        let connection: iConnection = ConnectionService.getConnection();
         let params: string = node.request['query'];
         let sqlMotor: MoSQL = new MoSQL(this.model);
         let sql: string = sqlMotor.toSelectSQL(params);
@@ -30,12 +31,12 @@ export class ApiModule {
     };
 
     create = (node: iNode, hooks: any): Promise<any> => {
-        if (node.data){
+        if (node.request.body){
             let sql: string = "";
-            const connection: iConnection = node.connection.getConnection(node.mysql);
+            const connection: iConnection = ConnectionService.getConnection();
             // Assign data from request
             this.model.metadata.fields.filter(f => f.isTableField).forEach(f => {
-                this.model[f.dbName] = node.data[f.dbName];
+                this.model[f.dbName] = node.request.body[f.dbName];
             });
             const sqlMotor: MoSQL = new MoSQL(this.model);
             const recordName: string = this.model.recordName();
@@ -67,7 +68,7 @@ export class ApiModule {
                     } else {
                         let resultAfterInsertOK: any;
                         if (hooks && hooks.afterInsertOK){
-                            return hooks.afterInsertOK(responseCreate, this.model).then(resultAfterInsertOk => {
+                            return hooks.afterInsertOK(responseCreate, this.model).then((resultAfterInsertOk: any) => {
                                 return {operationOk: true, message: `${this.model.metadata.tableName} created correctly. id: ${recordName}${resultAfterInsertOK ? `, afterInsertOk: ${resultAfterInsertOK.message}` : ''}`};
                             });
                         }

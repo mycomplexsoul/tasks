@@ -37,7 +37,7 @@ export class MovementCustom {
     }
 
     import = (node: iNode) => {
-        let connection: iConnection = node.connection.getConnection();
+        let connection: iConnection = ConnectionService.getConnection();
         const user: string = 'anon';
 
         let categoryModel: Category = new Category();
@@ -305,7 +305,7 @@ export class MovementCustom {
         const sqlMotor: MoSQL = new MoSQL(movementModel);
 
         connection.runSql(sqlMotor.toSelectSQL()).then(response => {
-            const list: Movement[] = response.rows.map(r => new Movement(r));
+            const list: Movement[] = response.rows.map((r: any) => new Movement(r));
             this.generateEntries(list).then(result => {
                 node.response.end(JSON.stringify(result));
             });
@@ -361,7 +361,7 @@ export class MovementCustom {
         const sqlMotor: MoSQL = new MoSQL(entryModel);
 
         connection.runSql(sqlMotor.toSelectSQL()).then(response => {
-            let entryList: Entry[] = response.rows.map(r => new Entry(r));
+            let entryList: Entry[] = response.rows.map((r: any) => new Entry(r));
             console.log('entries to process', response.rows.length);
 
             this.generateBalance(entryList).then(result => {

@@ -1,13 +1,11 @@
 import * as express from 'express';
 import { iNode } from "../iNode";
-import { CategoryServer } from './CategoryServer';
+import { BalanceServer } from './BalanceServer';
 
 const router = express.Router();
-/*
 
- */
 router.get('/', (req, res) => {
-    let server: CategoryServer = new CategoryServer();
+    let server: BalanceServer = new BalanceServer();
     let node: iNode = {
         request: req
         , response: res

@@ -1,6 +1,5 @@
 import * as path  from 'path';
 import * as express from "express";
-import * as mysql from "mysql";
 import iConnection from "./iConnection";
 import ConnectionService from './ConnectionService';
 import * as Generator from './MoBasicGenerator';
@@ -8,7 +7,6 @@ import { MoInstallSQL } from "./MoInstallSQL";
 import { Catalog } from "../crosscommon/entities/Catalog";
 import { MovementCustom } from "./MovementCustom";
 import { iNode } from "./iNode";
-import * as BalanceRoute from './BalanceRoute';
 import * as Routes from './Routes';
 //import * as bodyParser from 'body-parser';
 const app = express();
@@ -113,9 +111,6 @@ app.get('/movement/import', (req, res) => {
     let node: iNode = {
         request: req
         , response: res
-        , mysql: mysql
-        , connection: ConnectionService
-        , data: null
     };
     mov.import(node);
 });
@@ -125,9 +120,6 @@ app.get('/movement/list', (req, res) => {
     let node: iNode = {
         request: req
         , response: res
-        , mysql: mysql
-        , connection: ConnectionService
-        , data: null
     };
     mov.list(node);
 });
@@ -137,9 +129,6 @@ app.post('/movement/create', (req, res) => {
     let node: iNode = {
         request: req
         , response: res
-        , mysql: mysql
-        , connection: ConnectionService
-        , data: req.body
     };
     mov.create(node);
 });
@@ -149,9 +138,6 @@ app.get('/movement/generate-entries', (req, res) => {
     let node: iNode = {
         request: req
         , response: res
-        , mysql: mysql
-        , connection: ConnectionService
-        , data: null
     };
     mov._generateEntries(node);
 });
@@ -161,16 +147,11 @@ app.get('/movement/generate-balance', (req, res) => {
     let node: iNode = {
         request: req
         , response: res
-        , mysql: mysql
-        , connection: ConnectionService
-        , data: null
     };
     //mov.generateBalance(node);
     mov.rebuildAndTransfer();
     res.end(JSON.stringify({operationOk: true, message: `Batch finished, inserted ok`}));
 });
-
-BalanceRoute.register(app);
 
 app.use('/api', Routes.router);
 

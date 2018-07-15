@@ -1,8 +1,8 @@
-import { ApiModule } from "./ApiModule";
-import { iNode } from "./iNode";
-import { Balance } from "../crosscommon/entities/Balance";
+import { ApiModule } from "../ApiModule";
+import { iNode } from "../iNode";
+import { Balance } from "../../crosscommon/entities/Balance";
 
-export class BalanceCustom {
+export class BalanceServer {
     list = (node: iNode) => {
         let api: ApiModule = new ApiModule(new Balance());
 

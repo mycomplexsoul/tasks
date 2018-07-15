@@ -1,9 +1,7 @@
-import { IncomingMessage, ServerResponse } from "http";
+// import { IncomingMessage, ServerResponse } from "http";
+import { Request, Response } from "../../node_modules/@types/express";
 
 export interface iNode {
-    request: IncomingMessage
-    , response: ServerResponse
-    , mysql: any
-    , connection: any
-    , data: any
-}
+    request: Request
+    , response: Response
+ }
