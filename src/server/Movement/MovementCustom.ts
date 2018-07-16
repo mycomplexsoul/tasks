@@ -1,20 +1,20 @@
 import { IncomingMessage, ServerResponse } from "http";
-import { Category } from "../crosscommon/entities/Category";
-import { Place } from "../crosscommon/entities/Place";
-import { Account } from "../crosscommon/entities/Account";
-import { Movement } from "../crosscommon/entities/Movement";
-import { Catalog } from "../crosscommon/entities/Catalog";
-import * as movementsImport from './movements-import';
-import { MoSQL } from "./MoSQL";
-import iConnection from "./iConnection";
-import { iEntity } from "../crosscommon/iEntity";
-import { Utils } from "../crosscommon/Utility";
-import { Entry } from "../crosscommon/entities/Entry";
-import { Balance } from "../crosscommon/entities/Balance";
-import { iNode } from "./iNode";
-import { BalanceModule } from "./BalanceModule";
-import ConnectionService from "./ConnectionService";
-import { ApiModule } from "./ApiModule";
+import { Category } from "../../crosscommon/entities/Category";
+import { Place } from "../../crosscommon/entities/Place";
+import { Account } from "../../crosscommon/entities/Account";
+import { Movement } from "../../crosscommon/entities/Movement";
+import { Catalog } from "../../crosscommon/entities/Catalog";
+import * as movementsImport from '../movements-import';
+import { MoSQL } from "../MoSQL";
+import iConnection from "../iConnection";
+import { iEntity } from "../../crosscommon/iEntity";
+import { Utils } from "../../crosscommon/Utility";
+import { Entry } from "../../crosscommon/entities/Entry";
+import { Balance } from "../../crosscommon/entities/Balance";
+import { iNode } from "../iNode";
+import { BalanceModule } from "../BalanceModule";
+import ConnectionService from "../ConnectionService";
+import { ApiModule } from "../ApiModule";
 import { Promise } from "es6-promise";
 
 export class MovementCustom {

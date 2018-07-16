@@ -1,5 +1,5 @@
 // import { IncomingMessage, ServerResponse } from "http";
-import { Request, Response } from "../../node_modules/@types/express";
+import { Request, Response } from "express";
 
 export interface iNode {
     request: Request

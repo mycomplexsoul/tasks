@@ -9,16 +9,33 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-* [AppMoney] Movement endpoints moved under /api/movements.
+* [AppMoney] Filter accounts with status ACTIVE.
+* [AppMoney] New Category, Place from UI.
+
+* [AppMoney] Movements UI now fetches Accounts, Categories and Places from server.
 
 <hr/>
 
+
+<a name="1.3.1"></a>
+
+## 1.3.1 (2018-07-16)
+
+### Added
+* [AppMoney] Added routes for Entry, Place and Account.
+
+### Modified
+* [AppCommon] iNode now uses express types for request and response instead of node's native ones.
+* [AppMoney] Movement routes moved under /api/movements.
+
 <a name="1.3.0"></a>
+
 ## 1.3.0 (2018-07-15)
+
 ### Modified
 * [Breaking][AppCommon] All routing for node endpoints moved to /api.
 * [Breaking][AppCommon] `iNode` reduced to just `{req, res}` to clean up the interface.
-* [AppMoney] Balance endpoints moved under /api/balance.
+* [Breaking][AppMoney] Balance endpoints moved under /api/balance.
 
 <a name="1.2.22"></a>
 ## 1.2.22 (2018-07-13)

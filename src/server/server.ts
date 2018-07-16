@@ -5,7 +5,6 @@ import ConnectionService from './ConnectionService';
 import * as Generator from './MoBasicGenerator';
 import { MoInstallSQL } from "./MoInstallSQL";
 import { Catalog } from "../crosscommon/entities/Catalog";
-import { MovementCustom } from "./MovementCustom";
 import { iNode } from "./iNode";
 import * as Routes from './Routes';
 //import * as bodyParser from 'body-parser';
@@ -14,6 +13,7 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, '../../src')));
 app.use('/node_modules', express.static(path.join(__dirname, '../../node_modules')));
+app.use('/crosscommon', express.static(path.join(__dirname, '../crosscommon')));
 
 app.use(function(req, res, next) {
     console.log(`incoming request: ${req.url}`);
@@ -106,60 +106,19 @@ app.get('/generator/database', (req, res) => {
     res.end(JSON.stringify({ operationOK: true, message: `success!` }));
 });
 
-app.get('/movement/import', (req, res) => {
-    let mov: MovementCustom = new MovementCustom();
-    let node: iNode = {
-        request: req
-        , response: res
-    };
-    mov.import(node);
-});
-
-app.get('/movement/list', (req, res) => {
-    let mov: MovementCustom = new MovementCustom();
-    let node: iNode = {
-        request: req
-        , response: res
-    };
-    mov.list(node);
-});
-
-app.post('/movement/create', (req, res) => {
-    let mov: MovementCustom = new MovementCustom();
-    let node: iNode = {
-        request: req
-        , response: res
-    };
-    mov.create(node);
-});
-
-app.get('/movement/generate-entries', (req, res) => {
-    let mov: MovementCustom = new MovementCustom();
-    let node: iNode = {
-        request: req
-        , response: res
-    };
-    mov._generateEntries(node);
-});
-
-app.get('/movement/generate-balance', (req, res) => {
-    let mov: MovementCustom = new MovementCustom();
-    let node: iNode = {
-        request: req
-        , response: res
-    };
-    //mov.generateBalance(node);
-    mov.rebuildAndTransfer();
-    res.end(JSON.stringify({operationOk: true, message: `Batch finished, inserted ok`}));
-});
-
 app.use('/api', Routes.router);
 
 app.use(function(req, res) {
     // Use res.sendfile, as it streams instead of reading the file into memory.
     const index = path.join(__dirname, '../index.html');
-    console.log(`${index}`);
-    res.sendFile(index);
+    if (req.url.indexOf('crosscommon') !== -1) { // TODO: move this to FE build
+        const file = path.join(__dirname, `../${req.url}.js`);
+        console.log(`Answering request with: ${file}`);
+        res.sendFile(file);
+    } else {
+        console.log(`Answering request with: ${index}`);
+        res.sendFile(index);
+    }
 });
 
 const server = app.listen(8081, () => {
