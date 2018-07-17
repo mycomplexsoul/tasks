@@ -16,10 +16,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.3.2 (2018-07-17)
+
+### Added
+* [AppCommon] Added `web.config` for node deploy with IIS.
+* [AppCommon] Added `/status` route for verifying server status once deployed.
 
 <a name="1.3.1"></a>
 
-## 1.3.1 (2018-07-16)
+## v1.3.1 (2018-07-16)
 
 ### Added
 * [AppMoney] Added routes for Entry, Place and Account.
@@ -30,7 +35,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <a name="1.3.0"></a>
 
-## 1.3.0 (2018-07-15)
+## v1.3.0 (2018-07-15)
 
 ### Modified
 * [Breaking][AppCommon] All routing for node endpoints moved to /api.

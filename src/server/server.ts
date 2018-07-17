@@ -62,6 +62,10 @@ function validateQueryString(qs: any, rules: Array<validationRule>): iError[]{
     return errors;
 }
 
+app.get('/status', (req, res) => {
+    res.end(JSON.stringify({ operationOK: true, message: `Hi! server time is ${new Date()}` }));
+});
+
 app.get('/task/list', (req, res) => {
     let user = req.query['u'];
     // Query string validation on params
