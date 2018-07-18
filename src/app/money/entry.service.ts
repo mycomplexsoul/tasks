@@ -94,7 +94,7 @@ export class EntryService {
                 return 0;
             }
         });
-        return this.sync.get(`${this.apiRoot}/entry/list`).then(data => {
+        return this.sync.get(`${this.apiRoot}/api/entries`).then(data => {
             this.data = data.map((d: any): Entry => new Entry(d));
             this.data = this.data.sort(sort);
             return this.data;

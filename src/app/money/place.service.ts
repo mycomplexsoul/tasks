@@ -1,18 +1,24 @@
-import { Place } from './place.type';
+import { Place } from '../../crosscommon/entities/Place';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
+import { SyncAPI } from '../common/sync.api';
 
 @Injectable()
 export class PlaceService {
     private data: Array<Place> = [];
     private storage: StorageService = null;
+    private sync: SyncAPI = null;
     private config = {
         storageKey: 'places'
         , defaultUser: 'anon'
+        , api: {
+            list: '/api/places'
+        }
     }
 
-    constructor(storage: StorageService){
+    constructor(storage: StorageService, sync: SyncAPI){
         this.storage = storage;
+        this.sync = sync;
     }
 
     list(): Array<Place> {
@@ -40,20 +46,23 @@ export class PlaceService {
         return list;
     }
 
-    getAll(){
-        let fromStorage = this.storage.get(this.config.storageKey);
-        if (fromStorage){
-            this.data = JSON.parse(fromStorage);
-        } else {
-            this.data = this.initialData();
-        }
-        return this.data;
+    async getAll(){
+        const sort = ((a: Place, b: Place) => {
+            return a.mpl_name > b.mpl_name ? 1 : -1;
+        });
+        return this.sync.get(`${this.config.api.list}`).then(data => {
+            this.data = data.map((d: any): Place => new Place(d));
+            this.data = this.data.sort(sort);
+            return this.data;
+        }).catch(err => {
+            return [];
+        });
     }
 
-    getAllForUser(user: string){
-        const all: Array<Place> = this.getAll();
-
-        return all.filter((x: Place) => x.mpl_id_user === user);
+    async getAllForUser(user: string){
+        return this.getAll().then((all: Place[]) => {
+            return all.filter((x: Place) => x.mpl_id_user === user);
+        });
     }
 
     saveToStorage(){

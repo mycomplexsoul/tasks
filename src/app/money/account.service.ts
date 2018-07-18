@@ -1,17 +1,23 @@
-import { Account } from './account.type';
+import { Account } from '../../crosscommon/entities/Account';
 import { StorageService } from '../common/storage.service';
 import {Injectable} from '@angular/core';
+import { SyncAPI } from '../common/sync.api';
 
 @Injectable()
 export class AccountService {
     private data: Array<Account> = [];
     private storage: StorageService = null;
+    private sync: SyncAPI = null;
     private config = {
-        storageKey: 'accounts'
+        storageKey: 'accounts',
+        api: {
+            list: '/api/accounts'
+        }
     }
 
-    constructor(storage: StorageService){
+    constructor(storage: StorageService, sync: SyncAPI){
         this.storage = storage;
+        this.sync = sync;
     }
 
     initialData(){
@@ -108,13 +114,23 @@ export class AccountService {
         return list;
     }
 
-    getAll(){
-        let fromStorage = this.storage.get(this.config.storageKey);
+    async getAll(){
+        /*let fromStorage = this.storage.get(this.config.storageKey);
         if (fromStorage){
             this.data = JSON.parse(fromStorage);
         } else {
             this.data = this.initialData();
-        }
-        return this.data;
+        }*/
+        const sort = ((a: Account, b: Account) => {
+            return a.acc_name > b.acc_name ? 1 : -1;
+        });
+        const query = '?acc_ctg_status=1';
+        return this.sync.get(`${this.config.api.list}${query}`).then(data => {
+            this.data = data.map((d: any): Account => new Account(d));
+            this.data = this.data.sort(sort);
+            return this.data;
+        }).catch(err => {
+            return [];
+        });
     }
 }

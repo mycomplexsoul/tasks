@@ -13,6 +13,11 @@ export class MovementService {
     private config = {
         storageKey: 'movements'
         , defaultUser: 'anon'
+        , api: {
+            list: '/api/movements'
+            , create: '/api/movements'
+            , batch: '/movement/batch' // not supported in NodeTS
+        }
     }
     private apiRoot: string = '';
     private usage: string = 'ALWAYS_ON_LINE';
@@ -123,7 +128,7 @@ export class MovementService {
                 return 0;
             }
         };
-        return this.sync.get(`${this.apiRoot}/movement/list`).then(data => {
+        return this.sync.get(`${this.apiRoot}${this.config.api.list}`).then(data => {
             this.data = data.map((d: any): Movement => new Movement(d));
             this.data = this.data.sort(sort);
             return this.data;
@@ -164,7 +169,7 @@ export class MovementService {
     }
 
     sendBatchToServer(list: Array<Movement>){
-        this.sync.post(`${this.apiRoot}/movement/batch`, list).then((response: any) => {
+        this.sync.post(`${this.apiRoot}${this.config.api.batch}`, list).then((response: any) => {
             // response: { processOk: true, details: {  } }
             console.log('response movements batch',response);
         });

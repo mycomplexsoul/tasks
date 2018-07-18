@@ -14,6 +14,9 @@ export class BalanceService {
     private config = {
         storageKey: 'balance'
         , defaultUser: 'anon'
+        , api: {
+            list: '/api/balance'
+        }
     }
     private apiRoot: string = '';
 
@@ -102,7 +105,8 @@ export class BalanceService {
             }
             return a.bal_txt_account > b.bal_txt_account ? 1 : -1;
         });
-        return this.sync.get(`${this.apiRoot}/balance/list`).then(data => {
+        
+        return this.sync.get(`${this.apiRoot}${this.config.api.list}`).then(data => {
             this.data = data.map((d: any): Balance => new Balance(d));
             this.data = this.data.sort(sort);
             return this.data;

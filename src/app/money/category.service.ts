@@ -1,18 +1,24 @@
-import { Category } from './category.type';
+import { Category } from '../../crosscommon/entities/Category';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
+import { SyncAPI } from '../common/sync.api';
 
 @Injectable()
 export class CategoryService {
     private data: Array<Category> = [];
     private storage: StorageService = null;
+    private sync: SyncAPI = null;
     private config = {
         storageKey: 'categories'
         , defaultUser: 'anon'
+        , api: {
+            list: '/api/categories'
+        }
     }
 
-    constructor(storage: StorageService){
+    constructor(storage: StorageService, sync: SyncAPI){
         this.storage = storage;
+        this.sync = sync;
     }
 
     list(): Array<Category> {
@@ -37,20 +43,29 @@ export class CategoryService {
         return list;
     }
 
-    getAll(){
-        let fromStorage = this.storage.get(this.config.storageKey);
+    async getAll(){
+        /*let fromStorage = this.storage.get(this.config.storageKey);
         if (fromStorage){
             this.data = JSON.parse(fromStorage);
         } else {
             this.data = this.initialData();
-        }
-        return this.data;
+        }*/
+        const sort = ((a: Category, b: Category) => {
+            return a.mct_name > b.mct_name ? 1 : -1;
+        });
+        return this.sync.get(`${this.config.api.list}`).then(data => {
+            this.data = data.map((d: any): Category => new Category(d));
+            this.data = this.data.sort(sort);
+            return this.data;
+        }).catch(err => {
+            return [];
+        });
     }
 
-    getAllForUser(user: string){
-        const all: Array<Category> = this.getAll();
-
-        return all.filter((x: Category) => x.mct_id_user === user);
+    async getAllForUser(user: string){
+        return this.getAll().then((all: Category[]) => {
+            return all.filter((x: Category) => x.mct_id_user === user);
+        });
     }
 
     saveToStorage(){
