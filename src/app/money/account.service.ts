@@ -124,7 +124,19 @@ export class AccountService {
         const sort = ((a: Account, b: Account) => {
             return a.acc_name > b.acc_name ? 1 : -1;
         });
-        const query = '?acc_ctg_status=1';
+        const filter = {
+            gc: 'AND'
+            , cont: [{
+                f: 'acc_ctg_status'
+                , op: 'eq'
+                , val: '1'
+            }, {
+                f: 'acc_ctg_type'
+                , op: 'ne'
+                , val: '4'
+            }]
+        };
+        const query = `?q=${JSON.stringify(filter)}`;
         return this.sync.get(`${this.config.api.list}${query}`).then(data => {
             this.data = data.map((d: any): Account => new Account(d));
             this.data = this.data.sort(sort);

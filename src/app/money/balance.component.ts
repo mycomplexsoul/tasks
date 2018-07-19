@@ -1,8 +1,8 @@
 import { Component, OnInit, Renderer } from '@angular/core';
 import { NgForm } from '@angular/forms';
 // types
-import { Balance } from './balance.type';
-import { Movement } from './movement.type';
+import { Balance } from '../../crosscommon/entities/Balance';
+import { Movement } from '../../crosscommon/entities/Movement';
 
 // services
 import { StorageService }  from '../common/storage.service';

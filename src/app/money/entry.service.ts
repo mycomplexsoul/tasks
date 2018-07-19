@@ -1,4 +1,4 @@
-import { Entry } from './entry.type';
+import { Entry } from '../../crosscommon/entities/Entry';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
 import { SyncAPI } from '../common/sync.api';

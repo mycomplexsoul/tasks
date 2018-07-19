@@ -18,6 +18,10 @@ export class MoSQL {
         , _s: ', '
         , _and: ' and '
     };
+    OPERATORS: any = {
+        eq: '='
+        , ne: '!='
+    };
     
     constructor(model?: iEntity){
         this.model = model;
@@ -51,10 +55,10 @@ export class MoSQL {
         });
     };
 
-    formatValueForSQL(dbType: string, value: string | number | Date | null, dbName: string = ''): string {
+    formatValueForSQL(dbType: string, value: string | number | Date | null, dbName: string = '', operator: string = '='): string {
         let sql: string = '';
         const c = { ...this.constants };
-        const prefix = dbName ? `${dbName} = ` : '';
+        const prefix = dbName ? `${dbName} ${operator} ` : '';
 
         if (value === null){
             sql = `${prefix}null`;
@@ -210,25 +214,45 @@ export class MoSQL {
     toSelectSQL = (criteria?: any, model?: iEntity): string => {
         const m: iEntity = this.decideModel(model);
         let sql: string = '';
-        let completeFieldName: string = '';
 
+        console.log('raw criteria', criteria);
         if (criteria){
-            Object.keys(criteria).forEach((fieldName: string) => {
-                if (fieldName[0] === '_') { // field name starts with an underscore, append prefix
-                    completeFieldName = m.metadata.prefix + fieldName;
-                } else {
-                    completeFieldName = fieldName;
-                }
-                if (this.isValidFieldName(m, completeFieldName)){
-                    let dbType: string = m.metadata.fields.filter(f => f.dbName === completeFieldName)[0].dbType;
-                    sql = this.concatAnd(sql, this.formatValueForSQL(dbType, criteria[fieldName], completeFieldName));
-                } else {
-                    // field not found inside this Entity, skip it
-                }
-            });
+            console.log('parse criteria', this.parseSQLCriteria(criteria));
+            sql = this.criteriaToSQL(this.parseSQLCriteria(criteria), m);
+            console.log('sql criteria', sql);
         }
 
         sql = `select * from ${m.metadata.viewName}${sql ? ` where ${sql}` : ''}`;
         return sql;
+    }
+
+    parseSQLCriteria = (criteria: any): string => {
+        const jsonCriteria: any = JSON.parse(decodeURIComponent(criteria));
+        return jsonCriteria;
+    }
+
+    criteriaToSQL = (criteria: any, model: iEntity): string => {
+        let sql: string = '';
+
+        criteria.cont.forEach((crit) => {
+            if (Array.isArray(crit.cont)) {
+                sql = this.criteriaToSQL(crit, model);
+            } else {
+                let completeFieldName: string = '';
+                if (crit.f[0] === '_') { // field name starts with an underscore, append prefix
+                    completeFieldName = model.metadata.prefix + crit.f;
+                } else {
+                    completeFieldName = crit.f;
+                }
+                if (model.metadata.fields.find(f => f.dbName === completeFieldName)){
+                    let dbType: string = model.metadata.fields.find(f => f.dbName === completeFieldName).dbType;
+                    sql = this.concatAnd(sql, this.formatValueForSQL(dbType, crit.val, completeFieldName, this.OPERATORS[crit.op]));
+                } else {
+                    // field not found inside this Entity, skip it
+                }
+            }
+        });
+
+        return sql ? `(${sql})` : '';
     }
 }

@@ -57,7 +57,7 @@ export class MovementCustom {
 
         Promise.all(connection.runSqlArray(models.map((model: iEntity) => {
             sqlMotor = new MoSQL(model);
-            return sqlMotor.toSelectSQL({ '_id_user': user }); // TODO: criteria with underscore should add prefix, if field is not in entity ignore criteria
+            return sqlMotor.toSelectSQL(JSON.stringify({ cont:[{f: '_id_user', op: 'eq', val: user }]})); // TODO: criteria with underscore should add prefix, if field is not in entity ignore criteria
         }))).then(response => {
             // We have all data from database now
             categoryList = response[0].rows;

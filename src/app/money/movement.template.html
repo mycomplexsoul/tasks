@@ -4,11 +4,11 @@
 
 <form #newMovementForm="ngForm" (ngSubmit)="newMovement(newMovementForm)">
     <input type="radio" name="fMovementFlowType" id="fMovementFlowTypeCustom"
-        [(ngModel)]="movementFlowType"
+        [(ngModel)]="_movementFlowType" (click)="movementFlowType('custom')"
         value="custom">
     <label for="fMovementFlowTypeCustom">Custom</label>
     <input type="radio" name="fMovementFlowType" id="fMovementFlowTypeTransfer"
-        [(ngModel)]="movementFlowType"
+        [(ngModel)]="_movementFlowType" (click)="movementFlowType('transfer')"
         value="transfer">
     <label for="fMovementFlowTypeTransfer">Transfer</label>
 

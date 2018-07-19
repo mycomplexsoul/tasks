@@ -1,5 +1,5 @@
 import { Balance } from '../../crosscommon/entities/Balance';
-import { Entry } from './entry.type';
+import { Entry } from '../../crosscommon/entities/Entry';
 import { EntryService } from './entry.service';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';

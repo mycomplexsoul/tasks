@@ -2,12 +2,12 @@ import { Component, OnInit, Renderer, transition } from '@angular/core';
 import { NgForm } from '@angular/forms';
 //import { CurrencyPipe } from '@angular/common';
 // types
-import { Movement } from './movement.type';
+import { Movement } from '../../crosscommon/entities/Movement';
 import { Account } from '../../crosscommon/entities/Account';
 import { Catalog } from '../common/catalog.type';
 import { Category } from './category.type';
 import { Place } from './place.type';
-import { Entry } from './entry.type';
+import { Entry } from '../../crosscommon/entities/Entry';
 import { Preset } from './preset.type';
 
 // services
@@ -268,8 +268,8 @@ export class MovementComponent implements OnInit {
                 m.mov_id_place = form.value.fPlace;
             } else {
                 m.mov_budget = null;
-                m.mov_id_category = 0;
-                m.mov_id_place = 0;
+                m.mov_id_category = '0';
+                m.mov_id_place = '0';
             }
             m.mov_notes = form.value.fNotes;
             m.mov_id_user = this.user;
@@ -280,7 +280,7 @@ export class MovementComponent implements OnInit {
                 m.mov_txt_account_to = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == m.mov_id_account_to,'acc_name');
             }
             m.mov_txt_type = this.findIn(this.viewData.types,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_type,'ctg_desc');
-            m.mov_txt_budget = m.mov_budget;
+            //m.mov_txt_budget = m.mov_budget;
             m.mov_txt_category = this.findIn(this.viewData.categories,(e: any) => e.mct_id === m.mov_id_category,'mct_name');
             m.mov_txt_place = this.findIn(this.viewData.places,(e: any) => e.mpl_id === m.mov_id_place,'mpl_name');
             m.mov_txt_status = this.findIn(this.viewData.statuses,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_status,'ctg_desc');
@@ -322,7 +322,7 @@ export class MovementComponent implements OnInit {
 
         e.ent_txt_account = m.mov_txt_account;
         e.ent_txt_type = m.mov_txt_type;
-        e.ent_txt_budget = m.mov_txt_budget;
+        //e.ent_txt_budget = m.mov_txt_budget;
         e.ent_txt_category = m.mov_txt_category;
         e.ent_txt_place = m.mov_txt_place;
         e.ent_txt_status = m.mov_txt_status;
@@ -346,7 +346,7 @@ export class MovementComponent implements OnInit {
         
         e.ent_txt_account = this.findIn(this.viewData.accounts,(i: any) => i.acc_id == e.ent_id_account,'acc_name');
         e.ent_txt_type = this.findIn(this.viewData.types,(i: any) => i.ctg_ctg_value == e.ent_ctg_type,'ctg_desc');
-        e.ent_txt_budget = m.mov_txt_budget;
+        //e.ent_txt_budget = m.mov_txt_budget;
         e.ent_txt_category = m.mov_txt_category;
         e.ent_txt_place = m.mov_txt_place;
         e.ent_txt_status = m.mov_txt_status;
@@ -504,8 +504,8 @@ export class MovementComponent implements OnInit {
                         m.mov_id_account = m.mov_id_account_to;
                         m.mov_id_account_to = temp;
                     }
-                    m.mov_id_category = 0;
-                    m.mov_id_place = 0;
+                    m.mov_id_category = '0';
+                    m.mov_id_place = '0';
                 } else {
                     m.mov_ctg_type = values[2] === 'ABONO' ? 1 : 2;
                     m.mov_budget = '' + ((m.mov_date.getFullYear() * 100) + (m.mov_date.getMonth() + 1));
@@ -523,7 +523,7 @@ export class MovementComponent implements OnInit {
                     m.mov_txt_account_to = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == m.mov_id_account_to,'acc_name');
                 }
                 m.mov_txt_type = this.findIn(this.viewData.types,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_type,'ctg_desc');
-                m.mov_txt_budget = m.mov_budget;
+                //m.mov_txt_budget = m.mov_budget;
                 m.mov_txt_category = this.findIn(this.viewData.categories,(e: any) => e.mct_id === m.mov_id_category,'mct_name');
                 m.mov_txt_place = this.findIn(this.viewData.places,(e: any) => e.mpl_id === m.mov_id_place,'mpl_name');
                 m.mov_txt_status = this.findIn(this.viewData.statuses,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_status,'ctg_desc');

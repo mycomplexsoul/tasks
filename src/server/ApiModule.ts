@@ -15,7 +15,7 @@ export class ApiModule {
     
     list = (node: iNode): Promise<iEntity[]> => {
         let connection: iConnection = ConnectionService.getConnection();
-        let params: string = node.request['query'];
+        let params: string = node.request.query['q'];
         let sqlMotor: MoSQL = new MoSQL(this.model);
         let sql: string = sqlMotor.toSelectSQL(params);
         let data: iEntity[] = [];

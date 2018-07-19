@@ -1,15 +1,14 @@
-import { Movement } from './movement.type';
+import { Movement } from '../../crosscommon/entities/Movement';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
 import { SyncAPI } from '../common/sync.api';
-import { UtilsCommon } from '../common/utils.common';
+import { Utils } from '../../crosscommon/Utility';
 
 @Injectable()
 export class MovementService {
     private data: Array<Movement> = [];
     private storage: StorageService = null;
     private sync: SyncAPI = null;
-    private utils: UtilsCommon = null;
     private config = {
         storageKey: 'movements'
         , defaultUser: 'anon'
@@ -24,10 +23,9 @@ export class MovementService {
     // ALWAYS_ON_LINE = means no local storage layer, always fetch from server and always push to server, just save to storage when an error ocurrs
     // LOCAL_FIRST = means use local storage layer, fetch from server to local storage then push to server
 
-    constructor(storage: StorageService, sync: SyncAPI, utils: UtilsCommon){
+    constructor(storage: StorageService, sync: SyncAPI){
         this.storage = storage;
         this.sync = sync;
-        this.utils = utils;
         // get api root
         this.apiRoot = storage.getObject('Options')['optServerAddress'] || '';
     }
@@ -146,15 +144,32 @@ export class MovementService {
     }
 
     newId(date: Date){
-        return this.utils.hashId('M',32,date);
+        return Utils.hashId('mov', 32, date);
     }
 
     newItem(movement: Movement): Movement{
-        let newId: string = this.newId(movement.mov_date);
+        const newId: string = this.newId(new Date(movement.mov_date));
+        //const newId: string = Utils.hashId('mov', 32, new Date(movement.mov_date));
         movement.mov_id = newId;
-        let newItem = new Movement(movement);
-        this.data.push(newItem);
-        this.saveToStorage();
+        movement.mov_ctg_currency = 1;
+        movement.mov_date_add = new Date();
+        movement.mov_date_mod = new Date();
+        const newItem = new Movement(movement);
+        //this.data.push(newItem);
+        //this.saveToStorage();
+        this.sync.post('/api/movements', newItem).then(response => {
+            if (response.processOk) {
+                this.data.push(newItem);
+            } else {
+                newItem['sync'] = false;
+                this.data.push(newItem);
+            }
+        }).catch(err => {
+            // Append it to the listing but flag it as non-synced yet
+            newItem['sync'] = false;
+            this.data.push(newItem);
+        });
+
         return newItem;
     }
 

@@ -19,7 +19,7 @@ export class BalanceModule {
         console.log(`--rebuild balance for ${year}-${month}`);
         
         return Promise.all(connection.runSqlArray(models.map((model: iEntity) => {
-            return sqlMotor.toSelectSQL({ '_id_user': user }, model);
+            return sqlMotor.toSelectSQL(JSON.stringify({ cont:[{f: '_id_user', op: 'eq', val: user }]}), model);
         }))).then((response) => {
             let entryList: Entry[] = response[0].rows;
             let balanceList: Balance[] = response[1].rows.map((r: any) => new Balance(r));
@@ -113,7 +113,7 @@ export class BalanceModule {
         console.log(`--transfer balance for ${year}-${month}`);
         
         return Promise.all(connection.runSqlArray(models.map((model: iEntity) => {
-            return sqlMotor.toSelectSQL({ '_id_user': user }, model);
+            return sqlMotor.toSelectSQL(JSON.stringify({ cont:[{f: '_id_user', op: 'eq', val: user }]}), model);
         }))).then((response) => {
             let balanceList: Balance[] = response[0].rows.map((r: any) => new Balance(r));;
 
@@ -242,7 +242,7 @@ export class BalanceModule {
         const finalIterable: number = finalYear * 100 + finalMonth;
         
         return Promise.all(connection.runSqlArray(models.map((model: iEntity) => {
-            return sqlMotor.toSelectSQL({ '_id_user': user }, model);
+            return sqlMotor.toSelectSQL(JSON.stringify({ cont:[{f: '_id_user', op: 'eq', val: user }]}), model);
         }))).then((response) => {
             let balanceList: Balance[] = response[0].rows.map((r: any) => new Balance(r));
             let originalBalanceList: Balance[] = response[0].rows.map((r: any) => new Balance(r));
