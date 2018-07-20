@@ -10,4 +10,12 @@ export class CategoryServer {
             node.response.end(JSON.stringify(response));
         });
     };
+
+    create = (node: iNode) => {
+        const api: ApiModule = new ApiModule(new Category());
+
+        api.create(node, {}).then((response) => {
+            node.response.end(JSON.stringify(response));
+        });
+    };
 }

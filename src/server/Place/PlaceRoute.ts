@@ -13,4 +13,13 @@ router.get('/', (req, res) => {
     server.list(node);
 });
 
+router.post('/', (req, res) => {
+    let server: PlaceServer = new PlaceServer();
+    let node: iNode = {
+        request: req
+        , response: res
+    };
+    server.create(node);
+});
+
 export { router };

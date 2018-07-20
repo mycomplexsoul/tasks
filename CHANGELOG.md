@@ -6,13 +6,41 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Notes / To Do / Roadmap]
 * [AppCommon] Test runner for node.
-* [AppMoney] New Category, Place from UI.
+* [AppMoney] Edit Movement REST endpoint, including updating Entries and Balance rebuild.
+* [AppMoney] Edit Movement UI, without endpoint integration.
 
 ## [Unreleased / Work In Progress]
-* [AppGeneral] Query params for filtering list REST methods use groups and expression structures. query = {groupConnector:"AND", content: [{field: "acc_id_status", op: "eq", value: "1"}]}
-
+* [AppCommon] Node build into `/dist` folder.
+* [AppCommon] Angular build into `/dist` folder.
+* [AppCommon] Deploy BE + FE in `/dist` folder.
 
 <hr/>
+
+## v1.3.5 (2018-07-20)
+
+### Added
+* [AppMoney] Category create and Place create REST endpoints.
+* [AppMoney] New Category, Place from UI and integration with REST endpoint.
+
+## v1.3.4 (2018-07-19)
+
+### Added
+* [AppMoney] Movements UI new movement integration with REST API create method.
+* [AppGeneral] Query params for filtering list REST methods use groups and expression structures.
+Example:
+```javascript
+{
+    gc: "AND",
+    cont: [{
+        f: "acc_ctg_status",
+        op: "eq",
+        val: "1"
+    }]
+}
+```
+
+### Modified
+* [AppCommon] Changed all filtering done through `MoSQL.toSelect()` that received a filtering object to use the new filter expressions.
 
 ## v1.3.3 (2018-07-18)
 

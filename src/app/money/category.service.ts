@@ -2,6 +2,7 @@ import { Category } from '../../crosscommon/entities/Category';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
 import { SyncAPI } from '../common/sync.api';
+import { Utils } from '../../crosscommon/Utility';
 
 @Injectable()
 export class CategoryService {
@@ -13,6 +14,7 @@ export class CategoryService {
         , defaultUser: 'anon'
         , api: {
             list: '/api/categories'
+            , create: '/api/categories'
         }
     }
 
@@ -73,18 +75,36 @@ export class CategoryService {
     }
 
     newId(){
-        return this.data.length + 1 + '';
+        const m: Category = new Category();
+        const length: number = m.metadata.fields.find(f => f.dbName === 'mct_id').size;
+        return Utils.hashId(m.metadata.prefix, length);
     }
 
-    newItem(category: string, user: string): Category{
+    newItem(category: string, user: string): Promise<Category>{
         let newId: string = this.newId();
         let newItem = new Category({
             mct_id: newId
             , mct_name: category
             , mct_id_user: user
+            , mct_date_add: new Date()
+            , mct_date_mod: new Date()
+            , mct_ctg_status: 1
         });
-        this.data.push(newItem);
-        this.saveToStorage();
-        return newItem;
+        //this.data.push(newItem);
+        //this.saveToStorage();
+        return this.sync.post(this.config.api.create, newItem).then(response => {
+            if (response.processOk) {
+                this.data.push(newItem);
+            } else {
+                newItem['sync'] = false;
+                this.data.push(newItem);
+            }
+            return newItem;
+        }).catch(err => {
+            // Append it to the listing but flag it as non-synced yet
+            newItem['sync'] = false;
+            this.data.push(newItem);
+            return newItem;
+        });
     }
 }

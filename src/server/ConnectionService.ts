@@ -1,6 +1,6 @@
 "use strict";
 import iConnection from "./iConnection";
-import { Promise } from 'es6-promise';
+//import { Promise } from 'es6-promise';
 import * as mysql from 'mysql';
 
 let ConnectionService = (function(){

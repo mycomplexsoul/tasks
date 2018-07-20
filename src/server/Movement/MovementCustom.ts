@@ -15,7 +15,7 @@ import { iNode } from "../iNode";
 import { BalanceModule } from "../BalanceModule";
 import ConnectionService from "../ConnectionService";
 import { ApiModule } from "../ApiModule";
-import { Promise } from "es6-promise";
+//import { Promise } from "es6-promise";
 
 export class MovementCustom {
 

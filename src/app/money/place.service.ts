@@ -2,6 +2,7 @@ import { Place } from '../../crosscommon/entities/Place';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
 import { SyncAPI } from '../common/sync.api';
+import { Utils } from '../../crosscommon/Utility';
 
 @Injectable()
 export class PlaceService {
@@ -13,6 +14,7 @@ export class PlaceService {
         , defaultUser: 'anon'
         , api: {
             list: '/api/places'
+            , create: '/api/places'
         }
     }
 
@@ -70,18 +72,36 @@ export class PlaceService {
     }
 
     newId(){
-        return this.data.length + 1 + '';
+        const m: Place = new Place();
+        const length: number = m.metadata.fields.find(f => f.dbName === 'mpl_id').size;
+        return Utils.hashId(m.metadata.prefix, length);
     }
 
-    newItem(place: string, user: string): Place{
+    newItem(place: string, user: string): Promise<Place>{
         let newId: string = this.newId();
         let newItem = new Place({
             mpl_id: newId
             , mpl_name: place
             , mpl_id_user: user
+            , mpl_date_add: new Date()
+            , mpl_date_mod: new Date()
+            , mpl_ctg_status: 1
         });
-        this.data.push(newItem);
-        this.saveToStorage();
-        return newItem;
+        //this.data.push(newItem);
+        //this.saveToStorage();
+        return this.sync.post(this.config.api.create, newItem).then(response => {
+            if (response.processOk) {
+                this.data.push(newItem);
+            } else {
+                newItem['sync'] = false;
+                this.data.push(newItem);
+            }
+            return newItem;
+        }).catch(err => {
+            // Append it to the listing but flag it as non-synced yet
+            newItem['sync'] = false;
+            this.data.push(newItem);
+            return newItem;
+        });
     }
 }

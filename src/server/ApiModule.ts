@@ -1,7 +1,7 @@
 import { iEntity } from "../crosscommon/iEntity";
 import { iNode } from "./iNode";
 import iConnection from "./iConnection";
-import { Promise } from "es6-promise";
+//import { Promise } from "es6-promise";
 import { MoSQL } from "./MoSQL";
 import ConnectionService from './ConnectionService';
 
@@ -10,7 +10,6 @@ export class ApiModule {
 
     constructor(model: iEntity){
         this.model = model;
-
     }
     
     list = (node: iNode): Promise<iEntity[]> => {

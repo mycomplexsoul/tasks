@@ -157,7 +157,7 @@ export class MovementService {
         const newItem = new Movement(movement);
         //this.data.push(newItem);
         //this.saveToStorage();
-        this.sync.post('/api/movements', newItem).then(response => {
+        this.sync.post(this.config.api.create, newItem).then(response => {
             if (response.processOk) {
                 this.data.push(newItem);
             } else {

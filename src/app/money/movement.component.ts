@@ -385,13 +385,17 @@ export class MovementComponent implements OnInit {
     }
 
     addNewCategoryForUser(category: string){
-        let id = this.services.category.newItem(category, this.user).mct_id;
-        this.model.category = id;
+        this.services.category.newItem(category, this.user).then((item: Category) => {
+            this.viewData.categories = this.services.category.list();
+            this.model.category = item.mct_id;
+        });
     }
     
     addNewPlaceForUser(place: string){
-        let id = this.services.place.newItem(place, this.user).mpl_id;
-        this.model.place = id;
+        this.services.place.newItem(place, this.user).then((item: Place) => {
+            this.viewData.places = this.services.place.list();
+            this.model.place = item.mpl_id;
+        });
     }
 
     selectPreset(presetId: string, form: any){

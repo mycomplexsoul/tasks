@@ -1,5 +1,3 @@
-import { Promise } from 'es6-promise';
-
 interface iConnection {
     close: () => void
     , runSql: (sql: string) => Promise<any>
