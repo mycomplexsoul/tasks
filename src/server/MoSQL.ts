@@ -21,6 +21,7 @@ export class MoSQL {
     OPERATORS: any = {
         eq: '='
         , ne: '!='
+        , in: 'in'
     };
     
     constructor(model?: iEntity){
@@ -60,6 +61,11 @@ export class MoSQL {
         const c = { ...this.constants };
         const prefix = dbName ? `${dbName} ${operator} ` : '';
 
+        if (operator === 'in'){
+            sql = `${prefix}(${value})`;
+            return sql;
+        }
+
         if (value === null){
             sql = `${prefix}null`;
         } else if ([c._integer, c._long, c._double].indexOf(dbType) !== -1){
@@ -74,9 +80,14 @@ export class MoSQL {
         return sql;
     }
 
-    isValidFieldName(model: iEntity, dbName: string): boolean {
-        let filtered = model.metadata.fields.filter(f => f.dbName === dbName)
-        return filtered.length > 0;
+    isValidFieldName(model: iEntity, dbName: string, tableFieldsOnly: boolean): boolean {
+        let found: boolean;
+        if (tableFieldsOnly) {
+            found = !!model.metadata.fields.find(f => f.dbName === dbName && f.isTableField);
+        } else {
+            found = !!model.metadata.fields.find(f => f.dbName === dbName);
+        }
+        return found;
     }
 
     datesAreEqual(date1: string | Date, date2: string | Date): boolean {
@@ -107,6 +118,7 @@ export class MoSQL {
         let changesArray: any[] = [];
         let previousValue: any;
         let newValue: any;
+        const recordName: string = m.recordName();
         
         const handlePossibleChange = (dbName: string, dbType: string, previousValue: any, value: any) => {
             let areDifferent: boolean;
@@ -116,13 +128,13 @@ export class MoSQL {
                 areDifferent = previousValue !== newValue;
             }
             if (areDifferent){ // change value diff from current
-                changesArray.push({ dbName, dbType, previousValue, value });
+                changesArray.push({ dbName, dbType, previousValue, value, recordName });
             }
         };
 
         if (Array.isArray(changes)){
             changes.forEach((ch) => { // { dbName: string, value: any }
-                if (this.isValidFieldName(m, ch.dbName)){
+                if (this.isValidFieldName(m, ch.dbName, true)){
                     field = m.metadata.fields.filter(e => {
                         return e.dbName === ch.dbName;
                     })[0];
@@ -138,7 +150,7 @@ export class MoSQL {
         if (changes !== null && !Array.isArray(changes)){
             // other object with different values on some members
             changes.metadata.fields.forEach(field => {
-                if (!field.isPK/* && changes.db[dbName]()*/){ // only members that are not PKs can receive changes in this way
+                if (!field.isPK && field.isTableField/* && changes.db[dbName]()*/){ // only members that are not PKs can receive changes in this way
                     previousValue = m[field.dbName];
                     newValue = changes[field.dbName];
                     
@@ -163,7 +175,10 @@ export class MoSQL {
         
         let changesArray: any[] = this.toChangesObject(m, changes);
         changesArray.forEach((change: any) => { // { dbName, dbType, previousValue, value }
+            // as a special case, if a change is detected on _date_add field, skip that field for sql
+            //if (change.dbName !== `${model.metadata.prefix}_date_add`){
             sqlChanges = this.concatSemicolon(sqlChanges, this.formatValueForSQL(change.dbType, change.value, change.dbName));
+            //}
         });
 
         // iterate PKs

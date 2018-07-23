@@ -6,15 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Notes / To Do / Roadmap]
 * [AppCommon] Test runner for node.
-* [AppMoney] Edit Movement REST endpoint, including updating Entries and Balance rebuild.
-* [AppMoney] Edit Movement UI, without endpoint integration.
 
 ## [Unreleased / Work In Progress]
+* [AppMoney] Edit Movement UI, without endpoint integration.
 * [AppCommon] Node build into `/dist` folder.
 * [AppCommon] Angular build into `/dist` folder.
 * [AppCommon] Deploy BE + FE in `/dist` folder.
 
 <hr/>
+
+## v1.3.6 (2018-07-23)
+
+### Added
+* [AppMoney] Edit Movement REST endpoint, including updating Entries and Balance rebuild.
 
 ## v1.3.5 (2018-07-20)
 

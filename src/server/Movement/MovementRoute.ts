@@ -31,6 +31,15 @@ router.post('/', (req, res) => {
     mov.create(node);
 });
 
+router.post('/:mov_id', (req, res) => {
+    let mov: MovementCustom = new MovementCustom();
+    let node: iNode = {
+        request: req
+        , response: res
+    };
+    mov.update(node);
+});
+
 router.get('/generate-entries', (req, res) => {
     let mov: MovementCustom = new MovementCustom();
     let node: iNode = {

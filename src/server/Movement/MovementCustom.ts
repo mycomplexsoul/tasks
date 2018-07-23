@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse } from "http";
+// import { IncomingMessage, ServerResponse } from "http";
 import { Category } from "../../crosscommon/entities/Category";
 import { Place } from "../../crosscommon/entities/Place";
 import { Account } from "../../crosscommon/entities/Account";
@@ -15,10 +15,8 @@ import { iNode } from "../iNode";
 import { BalanceModule } from "../BalanceModule";
 import ConnectionService from "../ConnectionService";
 import { ApiModule } from "../ApiModule";
-//import { Promise } from "es6-promise";
 
 export class MovementCustom {
-
     findIn = <T>(arr: T[], findCriteria: (e: T) => boolean, returnField: string) => {
         const f = arr.filter((e) => findCriteria(e));
         if (f.length) {
@@ -421,6 +419,109 @@ export class MovementCustom {
 
         api.create(node, hooks).then((response) => {
             node.response.end(JSON.stringify(response));
+        });
+    };
+
+    update = (node: iNode) => {
+        let api: ApiModule = new ApiModule(new Movement());
+        const balanceModule: BalanceModule = new BalanceModule();
+
+        const hooks: any = {
+            afterUpdateOK: (response: any, model: Movement) => {
+                // generate entities
+                return this.updateEntries([model]).then(result => {
+                    console.log(`entries updated for movement result`, result);
+                    if (result.operationOk) {
+                        // generate balance
+                        const date: Date = new Date(model.mov_date);
+                        const initialYear = date.getFullYear();
+                        const initialMonth = date.getMonth() + 1;
+                        const finalYear = (new Date()).getFullYear();
+                        const finalMonth = (new Date()).getMonth() + 1;
+                        return balanceModule.rebuildAndTransferRange(initialYear, initialMonth, finalYear, finalMonth, 'anon').then(res => {
+                            return {message: `entries: ${result.message}`};
+                        });
+                    }
+                });
+            }
+        };
+
+        api.update(node, hooks).then((response) => {
+            node.response.end(JSON.stringify(response));
+        });
+    };
+
+    updateEntries = (movementList: Movement[]): Promise<any> => {
+        const connection: iConnection = ConnectionService.getConnection();
+        const sqlMotor: MoSQL = new MoSQL();
+        console.log('movements to update', movementList.length);
+        
+        const entryModel: Entry = new Entry();
+        let entryOriginList: Entry[] = [];
+        return connection.runSql(sqlMotor.toSelectSQL(JSON.stringify({
+            gc: 'AND'
+            , cont: [{
+                f: 'ent_id'
+                , op: 'in'
+                , val: movementList.map(m => `'${m.mov_id}'`).join(', ')
+            }]
+        }), entryModel)).then(entryResponse => {
+            entryOriginList = entryResponse.rows.map((r: any) => new Entry(r));
+
+            // iterate movements
+            let entryList: Array<Entry> = [];
+            movementList.forEach((m: Movement, index: number, arr: any[]) => {
+                // generate entry 1
+                entryList.push(new Entry({
+                    ent_id: m.mov_id
+                    , ent_sequential: 1
+                    , ent_date: m.mov_date
+                    , ent_desc: m.mov_desc
+                    , ent_ctg_currency: 1 // static until Multi-currency
+                    , ent_amount: m.mov_amount
+                    , ent_id_account: m.mov_id_account
+                    , ent_ctg_type: m.mov_ctg_type === 3 ? 1 : m.mov_ctg_type
+                    , ent_budget: m.mov_budget
+                    , ent_id_category: m.mov_id_category
+                    , ent_id_place: m.mov_id_place
+                    , ent_notes: m.mov_notes
+                    , ent_id_user: m.mov_id_user
+                    , ent_date_add: m.mov_date_add
+                    , ent_date_mod: m.mov_date_mod
+                    , ent_ctg_status: m.mov_ctg_status
+                }));
+                // generate entry 2
+                entryList.push(new Entry({
+                    ent_id: m.mov_id
+                    , ent_sequential: 2
+                    , ent_date: m.mov_date
+                    , ent_desc: m.mov_desc
+                    , ent_ctg_currency: 1
+                    , ent_amount: m.mov_amount
+                    , ent_id_account: m.mov_ctg_type === 3 ? m.mov_id_account_to : '1' // TODO: Fix capital account per user
+                    , ent_ctg_type: m.mov_ctg_type === 3 ? 2 : m.mov_ctg_type
+                    , ent_budget: m.mov_budget
+                    , ent_id_category: m.mov_id_category
+                    , ent_id_place: m.mov_id_place
+                    , ent_notes: m.mov_notes
+                    , ent_id_user: m.mov_id_user
+                    , ent_date_add: m.mov_date_add
+                    , ent_date_mod: m.mov_date_mod
+                    , ent_ctg_status: m.mov_ctg_status
+                }));
+            });
+            // update entries
+            const responsesPromises = entryList.map(e => sqlMotor.toUpdateSQL(e, entryOriginList.find(o => o.ent_id === e.ent_id && o.ent_sequential === e.ent_sequential)));
+            return Promise.all(connection.runSqlArray(responsesPromises)).then(values => {
+                // all updated ok
+                connection.close();
+                console.log(`Batch finished, updated ok: ${entryList.length}`);
+                return {operationOk: true, message: `Batch finished, updated ok: ${entryList.length}`, data: entryList};
+            }).catch(reason => {
+                // some failed
+                console.log('err on updating entries',reason);
+                return {operationOk: false, message: `error ${reason}`};
+            });
         });
     };
 }
