@@ -392,7 +392,7 @@ export class MovementCustom {
     list = (node: iNode) => {
         let api: ApiModule = new ApiModule(new Movement());
 
-        api.list(node).then((response) => {
+        api.list({ q: node.request.query['q'] }).then((response) => {
             node.response.end(JSON.stringify(response));
         });
     };
@@ -417,7 +417,7 @@ export class MovementCustom {
             }
         };
 
-        api.create(node, hooks).then((response) => {
+        api.create({ body: node.request.body }, hooks).then((response) => {
             node.response.end(JSON.stringify(response));
         });
     };
@@ -446,7 +446,7 @@ export class MovementCustom {
             }
         };
 
-        api.update(node, hooks).then((response) => {
+        api.update({ body: node.request.body, pk: node.request.params }, hooks).then((response) => {
             node.response.end(JSON.stringify(response));
         });
     };

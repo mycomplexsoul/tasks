@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.4.0 (2018-07-24)
+
+### Added
+* [AppCommon] ApiModule Sync method.
+
+### Modified
+* [Breaking][AppCommon] Refactor to support sync method on ApiModule.
+
 ## v1.3.6 (2018-07-23)
 
 ### Added

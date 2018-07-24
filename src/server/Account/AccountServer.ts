@@ -6,7 +6,7 @@ export class AccountServer {
     list = (node: iNode) => {
         let api: ApiModule = new ApiModule(new Account());
 
-        api.list(node).then((response) => {
+        api.list({ q: node.request.query['q'] }).then((response) => {
             node.response.end(JSON.stringify(response));
         });
     };

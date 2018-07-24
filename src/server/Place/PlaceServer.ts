@@ -6,7 +6,7 @@ export class PlaceServer {
     list = (node: iNode) => {
         let api: ApiModule = new ApiModule(new Place());
 
-        api.list(node).then((response) => {
+        api.list({ q: node.request.query['q'] }).then((response) => {
             node.response.end(JSON.stringify(response));
         });
     };
@@ -14,7 +14,7 @@ export class PlaceServer {
     create = (node: iNode) => {
         const api: ApiModule = new ApiModule(new Place());
 
-        api.create(node, {}).then((response) => {
+        api.create({ body: node.request.body }, {}).then((response) => {
             node.response.end(JSON.stringify(response));
         });
     };

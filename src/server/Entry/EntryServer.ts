@@ -6,7 +6,7 @@ export class EntryServer {
     list = (node: iNode) => {
         let api: ApiModule = new ApiModule(new Entry());
 
-        api.list(node).then((response) => {
+        api.list({ q: node.request.query['q'] }).then((response) => {
             node.response.end(JSON.stringify(response));
         });
     };

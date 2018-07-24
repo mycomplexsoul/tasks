@@ -6,7 +6,7 @@ export class CategoryServer {
     list = (node: iNode) => {
         let api: ApiModule = new ApiModule(new Category());
 
-        api.list(node).then((response) => {
+        api.list({ q: node.request.query['q'] }).then((response) => {
             node.response.end(JSON.stringify(response));
         });
     };
@@ -14,7 +14,7 @@ export class CategoryServer {
     create = (node: iNode) => {
         const api: ApiModule = new ApiModule(new Category());
 
-        api.create(node, {}).then((response) => {
+        api.create({ body: node.request.body }, {}).then((response) => {
             node.response.end(JSON.stringify(response));
         });
     };
