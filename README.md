@@ -3,6 +3,24 @@
 ## Dev
 To bundle for dist, use npm run launch.
 
+## Database connection
+
+Create a file named `cfg.json` in the root of the project and add the proper configuration:
+
+```javascript
+[
+    {
+        "name"     : "default",
+        "host"     : "localhost",
+        "user"     : "some_user",
+        "password" : "some_password",
+        "database" : "some_db"
+    }
+]
+```
+
+With this, you can connnect to a MySQL database.
+
 # Angular QuickStart Source
 [![Build Status][travis-badge]][travis-badge-url]
 

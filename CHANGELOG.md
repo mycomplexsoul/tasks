@@ -15,6 +15,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.4.1 (2018-07-25)
+
+### Added
+* [AppCommon] Added `cfg.json` setup to README.md.
+* [AppCommon] Add `cfg.json` to gitignore. Structure for cfg is:
+```javascript
+[
+    {
+        "name"     : "default",
+        "host"     : "localhost",
+        "user"     : "some_user",
+        "password" : "some_password",
+        "database" : "some_db"
+    }
+]
+```
+
 ## v1.4.0 (2018-07-24)
 
 ### Added

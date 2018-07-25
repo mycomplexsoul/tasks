@@ -78,3 +78,5 @@ _test-output
 _temp
 build/
 deploy/
+
+cfg.json
