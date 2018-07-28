@@ -74,6 +74,7 @@ export class EntityParser {
                 (<any>Object).assign(f, templateCollection.getTemplate("status"));*/
                 f = {
                     f
+                    , ...templateCollection.getTemplate('base')
                     , ...templateCollection.getTemplate('integer')
                     , ...templateCollection.getTemplate('status')
                 };

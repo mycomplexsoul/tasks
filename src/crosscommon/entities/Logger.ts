@@ -1,5 +1,6 @@
 import { iEntity } from "../iEntity";
 import { FieldDefinition } from "../FieldDefinition";
+import { ViewJoinDefinition } from "../ViewJoinDefinition";
 
 export class Logger implements iEntity {
 	public log_id: number;
@@ -22,6 +23,7 @@ export class Logger implements iEntity {
 		, permissions: string[]
 		, specialFeatures: string[]
 		, fields: FieldDefinition[]
+		, view: ViewJoinDefinition[]
 	} = {
 		name: 'Logger'
 		, namespace: 'common'
@@ -235,6 +237,8 @@ export class Logger implements iEntity {
 				, globalOrder: 0
 				, value: null
 			}
+		]
+		, view: [
 		]
 	};
 

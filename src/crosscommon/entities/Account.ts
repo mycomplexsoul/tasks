@@ -1,5 +1,6 @@
 import { iEntity } from "../iEntity";
 import { FieldDefinition } from "../FieldDefinition";
+import { ViewJoinDefinition } from "../ViewJoinDefinition";
 
 export class Account implements iEntity {
 	public acc_id: string;
@@ -30,6 +31,7 @@ export class Account implements iEntity {
 		, permissions: string[]
 		, specialFeatures: string[]
 		, fields: FieldDefinition[]
+		, view: ViewJoinDefinition[]
 	} = {
 		name: 'Account'
 		, namespace: 'Money'
@@ -374,25 +376,25 @@ export class Account implements iEntity {
 				, dbName: 'acc_ctg_status'
 				, dbType: 'integer'
 				, isTableField: true
-				, isPK: undefined
+				, isPK: false
 				, size: 4
-				, decimal: undefined
+				, decimal: 0
 				, minLength: 1
-				, allowNull: undefined
-				, default: 'undefined'
+				, allowNull: false
+				, default: ''
 				, dbComment: 'Record status in table'
 				, catalogId: 'RECORD_STATUS'
 				, originTable: 'CATALOG'
-				, linkedField: 'undefined'
+				, linkedField: ''
 				, entName: 'Status'
 				, formControl: 'Combobox'
-				, captureRequired: undefined
-				, appearsByDefaultOnGrid: undefined
+				, captureRequired: false
+				, appearsByDefaultOnGrid: true
 				, specialRules: [
 				]
 				, displayName: 'Status'
-				, tooltip: 'undefined'
-				, isRecordName: undefined
+				, tooltip: ''
+				, isRecordName: false
 				, gridOrder: 10
 				, orderOnNew: 10
 				, orderOnDetails: 10
@@ -463,6 +465,8 @@ export class Account implements iEntity {
 				, globalOrder: 0
 				, value: null
 			}
+		]
+		, view: [
 		]
 	};
 

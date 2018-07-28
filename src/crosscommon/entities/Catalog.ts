@@ -1,5 +1,6 @@
 import { iEntity } from "../iEntity";
 import { FieldDefinition } from "../FieldDefinition";
+import { ViewJoinDefinition } from "../ViewJoinDefinition";
 
 export class Catalog implements iEntity {
 	public ctg_id: string;
@@ -29,6 +30,7 @@ export class Catalog implements iEntity {
 		, permissions: string[]
 		, specialFeatures: string[]
 		, fields: FieldDefinition[]
+		, view: ViewJoinDefinition[]
 	} = {
 		name: 'Catalog'
 		, namespace: 'common'
@@ -346,25 +348,25 @@ export class Catalog implements iEntity {
 				, dbName: 'ctg_ctg_status'
 				, dbType: 'integer'
 				, isTableField: true
-				, isPK: undefined
+				, isPK: false
 				, size: 4
-				, decimal: undefined
+				, decimal: 0
 				, minLength: 1
-				, allowNull: undefined
-				, default: 'undefined'
+				, allowNull: false
+				, default: ''
 				, dbComment: 'Record status in table'
 				, catalogId: 'RECORD_STATUS'
 				, originTable: 'CATALOG'
-				, linkedField: 'undefined'
+				, linkedField: ''
 				, entName: 'Status'
 				, formControl: 'Combobox'
-				, captureRequired: undefined
-				, appearsByDefaultOnGrid: undefined
+				, captureRequired: false
+				, appearsByDefaultOnGrid: true
 				, specialRules: [
 				]
 				, displayName: 'Status'
-				, tooltip: 'undefined'
-				, isRecordName: undefined
+				, tooltip: ''
+				, isRecordName: false
 				, gridOrder: 9
 				, orderOnNew: 9
 				, orderOnDetails: 9
@@ -434,6 +436,13 @@ export class Catalog implements iEntity {
 				, orderOnImport: 11
 				, globalOrder: 0
 				, value: null
+			}
+		]
+		, view: [
+			{
+				joinType: 'INNER'
+				, joinTable: 'CATALOG CATALOG2'
+				, joinStatement: 'CATALOG.CTG_ID = CATALOG2.CTG_ID AND CATALOG.CTG_SEQUENTIAL = CATALOG2.CTG_SEQUENTIAL'
 			}
 		]
 	};

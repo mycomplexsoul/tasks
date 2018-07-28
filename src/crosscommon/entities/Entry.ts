@@ -1,5 +1,6 @@
 import { iEntity } from "../iEntity";
 import { FieldDefinition } from "../FieldDefinition";
+import { ViewJoinDefinition } from "../ViewJoinDefinition";
 
 export class Entry implements iEntity {
 	public ent_id: string;
@@ -39,6 +40,7 @@ export class Entry implements iEntity {
 		, permissions: string[]
 		, specialFeatures: string[]
 		, fields: FieldDefinition[]
+		, view: ViewJoinDefinition[]
 	} = {
 		name: 'Entry'
 		, namespace: 'Money'
@@ -539,25 +541,25 @@ export class Entry implements iEntity {
 				, dbName: 'ent_ctg_status'
 				, dbType: 'integer'
 				, isTableField: true
-				, isPK: undefined
+				, isPK: false
 				, size: 4
-				, decimal: undefined
+				, decimal: 0
 				, minLength: 1
-				, allowNull: undefined
-				, default: 'undefined'
+				, allowNull: false
+				, default: ''
 				, dbComment: 'Record status in table'
 				, catalogId: 'RECORD_STATUS'
 				, originTable: 'CATALOG'
-				, linkedField: 'undefined'
+				, linkedField: ''
 				, entName: 'Status'
 				, formControl: 'Combobox'
-				, captureRequired: undefined
-				, appearsByDefaultOnGrid: undefined
+				, captureRequired: false
+				, appearsByDefaultOnGrid: true
 				, specialRules: [
 				]
 				, displayName: 'Status'
-				, tooltip: 'undefined'
-				, isRecordName: undefined
+				, tooltip: ''
+				, isRecordName: false
 				, gridOrder: 15
 				, orderOnNew: 15
 				, orderOnDetails: 15
@@ -751,6 +753,21 @@ export class Entry implements iEntity {
 				, orderOnImport: 21
 				, globalOrder: 0
 				, value: null
+			}
+		]
+		, view: [
+			{
+				joinType: 'INNER'
+				, joinTable: 'ACCOUNT ACCOUNT1'
+				, joinStatement: 'ent_id_account = ACCOUNT1.acc_id and ent_id_user = ACCOUNT1.acc_id_user'
+			}, {
+				joinType: 'LEFT'
+				, joinTable: 'CATEGORY'
+				, joinStatement: 'ent_id_category = mct_id and ent_id_user = mct_id_user'
+			}, {
+				joinType: 'LEFT'
+				, joinTable: 'PLACE'
+				, joinStatement: 'ent_id_place = mpl_id and ent_id_user = mpl_id_user'
 			}
 		]
 	};

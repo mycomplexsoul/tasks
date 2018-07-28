@@ -1,4 +1,5 @@
 import { FieldDefinition } from "./FieldDefinition";
+import { ViewJoinDefinition } from "./ViewJoinDefinition";
 
 export interface iEntity {
     metadata: {
@@ -14,6 +15,7 @@ export interface iEntity {
 		, permissions: string[]
 		, specialFeatures: string[]
 		, fields: FieldDefinition[]
+		, view: ViewJoinDefinition[]
 	}
 
 	recordName: () => string;

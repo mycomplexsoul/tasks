@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import { EntityParser } from './EntityParser';
 import { EntityDefinition } from '../crosscommon/EntityDefinition';
 import { FieldDefinition } from '../crosscommon/FieldDefinition';
+import { ViewJoinDefinition } from '../crosscommon/ViewJoinDefinition';
 
 export class MoBasicGenerator {
     entity: EntityDefinition;
@@ -40,6 +41,7 @@ export class MoBasicGenerator {
 
         str += `import { iEntity } from "../iEntity";`;
         str += line + `import { FieldDefinition } from "../FieldDefinition";`;
+        str += line + `import { ViewJoinDefinition } from "../ViewJoinDefinition";`;
         str += line + line;
         str += `export class ${entityName} implements iEntity {`;
         let flagForViewFields = true;
@@ -71,6 +73,7 @@ export class MoBasicGenerator {
         str += line + tab + tab + `, permissions: string[]`;
         str += line + tab + tab + `, specialFeatures: string[]`;
         str += line + tab + tab + `, fields: FieldDefinition[]`;
+        str += line + tab + tab + `, view: ViewJoinDefinition[]`;
         str += line + tab + `} = {`;
         props.forEach((prop: string, index: number) => {
             str += line + tab + tab + (index === 0 ? '' : ', ') + `${prop}: ${typeof this.entity[prop] === 'string' ? "'" + this.entity[prop] + "'" : this.entity[prop] }`;
@@ -119,6 +122,17 @@ export class MoBasicGenerator {
             str += line + tab + tab + tab + `}`;
         });
         str += line + tab + tab + `]`;
+        
+        str += line + tab + tab + `, view: [`;
+        this.entity.view.forEach((v: ViewJoinDefinition, index: number) => {
+            str += (index === 0 ? line + tab + tab + tab : ', ') + `{`;
+            str += line + tab + tab + tab + tab + `joinType: '${v.joinType}'`;
+            str += line + tab + tab + tab + tab + `, joinTable: '${v.joinTable}'`;
+            str += line + tab + tab + tab + tab + `, joinStatement: '${v.joinStatement}'`;
+            str += line + tab + tab + tab + `}`;
+        });
+        str += line + tab + tab + `]`;
+
         str += line + tab + `};`;
         
         // constructor

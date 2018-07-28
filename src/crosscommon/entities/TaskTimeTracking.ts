@@ -1,5 +1,6 @@
 import { iEntity } from "../iEntity";
 import { FieldDefinition } from "../FieldDefinition";
+import { ViewJoinDefinition } from "../ViewJoinDefinition";
 
 export class TaskTimeTracking implements iEntity {
 	public tsh_id: string;
@@ -25,6 +26,7 @@ export class TaskTimeTracking implements iEntity {
 		, permissions: string[]
 		, specialFeatures: string[]
 		, fields: FieldDefinition[]
+		, view: ViewJoinDefinition[]
 	} = {
 		name: 'TaskTimeTracking'
 		, namespace: 'common'
@@ -335,6 +337,8 @@ export class TaskTimeTracking implements iEntity {
 				, globalOrder: 0
 				, value: null
 			}
+		]
+		, view: [
 		]
 	};
 

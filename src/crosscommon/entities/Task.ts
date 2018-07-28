@@ -1,5 +1,6 @@
 import { iEntity } from "../iEntity";
 import { FieldDefinition } from "../FieldDefinition";
+import { ViewJoinDefinition } from "../ViewJoinDefinition";
 
 export class Task implements iEntity {
 	public tsk_id: string;
@@ -61,6 +62,7 @@ export class Task implements iEntity {
 		, permissions: string[]
 		, specialFeatures: string[]
 		, fields: FieldDefinition[]
+		, view: ViewJoinDefinition[]
 	} = {
 		name: 'Task'
 		, namespace: 'common'
@@ -1212,25 +1214,25 @@ export class Task implements iEntity {
 				, dbName: 'tsk_ctg_status'
 				, dbType: 'integer'
 				, isTableField: true
-				, isPK: undefined
+				, isPK: false
 				, size: 4
-				, decimal: undefined
+				, decimal: 0
 				, minLength: 1
-				, allowNull: undefined
-				, default: 'undefined'
+				, allowNull: false
+				, default: ''
 				, dbComment: 'Record status in table'
 				, catalogId: 'RECORD_STATUS'
 				, originTable: 'CATALOG'
-				, linkedField: 'undefined'
+				, linkedField: ''
 				, entName: 'Status'
 				, formControl: 'Combobox'
-				, captureRequired: undefined
-				, appearsByDefaultOnGrid: undefined
+				, captureRequired: false
+				, appearsByDefaultOnGrid: true
 				, specialRules: [
 				]
 				, displayName: 'Status'
-				, tooltip: 'undefined'
-				, isRecordName: undefined
+				, tooltip: ''
+				, isRecordName: false
 				, gridOrder: 36
 				, orderOnNew: 36
 				, orderOnDetails: 36
@@ -1456,6 +1458,8 @@ export class Task implements iEntity {
 				, globalOrder: 0
 				, value: null
 			}
+		]
+		, view: [
 		]
 	};
 

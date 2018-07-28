@@ -1,5 +1,6 @@
 import { iEntity } from "../iEntity";
 import { FieldDefinition } from "../FieldDefinition";
+import { ViewJoinDefinition } from "../ViewJoinDefinition";
 
 export class LastTimeHistory implements iEntity {
 	public lth_id: string;
@@ -27,6 +28,7 @@ export class LastTimeHistory implements iEntity {
 		, permissions: string[]
 		, specialFeatures: string[]
 		, fields: FieldDefinition[]
+		, view: ViewJoinDefinition[]
 	} = {
 		name: 'LastTimeHistory'
 		, namespace: 'LastTimeHistoryApp'
@@ -310,25 +312,25 @@ export class LastTimeHistory implements iEntity {
 				, dbName: 'lth_ctg_status'
 				, dbType: 'integer'
 				, isTableField: true
-				, isPK: undefined
+				, isPK: false
 				, size: 4
-				, decimal: undefined
+				, decimal: 0
 				, minLength: 1
-				, allowNull: undefined
-				, default: 'undefined'
+				, allowNull: false
+				, default: ''
 				, dbComment: 'Record status in table'
 				, catalogId: 'RECORD_STATUS'
 				, originTable: 'CATALOG'
-				, linkedField: 'undefined'
+				, linkedField: ''
 				, entName: 'Status'
 				, formControl: 'Combobox'
-				, captureRequired: undefined
-				, appearsByDefaultOnGrid: undefined
+				, captureRequired: false
+				, appearsByDefaultOnGrid: true
 				, specialRules: [
 				]
 				, displayName: 'Status'
-				, tooltip: 'undefined'
-				, isRecordName: undefined
+				, tooltip: ''
+				, isRecordName: false
 				, gridOrder: 8
 				, orderOnNew: 8
 				, orderOnDetails: 8
@@ -368,6 +370,8 @@ export class LastTimeHistory implements iEntity {
 				, globalOrder: 0
 				, value: null
 			}
+		]
+		, view: [
 		]
 	};
 

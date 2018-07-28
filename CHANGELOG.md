@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Notes / To Do / Roadmap]
 * [AppCommon] Test runner for node.
+* [AppCommon] Display version in main page footer.
+* [AppCommon] Login UI.
 
 ## [Unreleased / Work In Progress]
 * [AppMoney] Edit Movement UI, without endpoint integration.
@@ -14,6 +16,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * [AppCommon] Deploy BE + FE in `/dist` folder.
 
 <hr/>
+
+## v1.4.2 (2018-07-26)
+
+### Added
+* [AppCommon] View information added to entity generation.
+
+### Modified
+* [AppCommon] Status fields now uses base template, this populates correctly the entity field.
 
 ## v1.4.1 (2018-07-25)
 

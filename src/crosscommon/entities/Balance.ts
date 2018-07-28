@@ -1,5 +1,6 @@
 import { iEntity } from "../iEntity";
 import { FieldDefinition } from "../FieldDefinition";
+import { ViewJoinDefinition } from "../ViewJoinDefinition";
 
 export class Balance implements iEntity {
 	public bal_year: number;
@@ -32,6 +33,7 @@ export class Balance implements iEntity {
 		, permissions: string[]
 		, specialFeatures: string[]
 		, fields: FieldDefinition[]
+		, view: ViewJoinDefinition[]
 	} = {
 		name: 'Balance'
 		, namespace: 'Money'
@@ -409,25 +411,25 @@ export class Balance implements iEntity {
 				, dbName: 'bal_ctg_status'
 				, dbType: 'integer'
 				, isTableField: true
-				, isPK: undefined
+				, isPK: false
 				, size: 4
-				, decimal: undefined
+				, decimal: 0
 				, minLength: 1
-				, allowNull: undefined
-				, default: 'undefined'
+				, allowNull: false
+				, default: ''
 				, dbComment: 'Record status in table'
 				, catalogId: 'RECORD_STATUS'
 				, originTable: 'CATALOG'
-				, linkedField: 'undefined'
+				, linkedField: ''
 				, entName: 'Status'
 				, formControl: 'Combobox'
-				, captureRequired: undefined
-				, appearsByDefaultOnGrid: undefined
+				, captureRequired: false
+				, appearsByDefaultOnGrid: true
 				, specialRules: [
 				]
 				, displayName: 'Status'
-				, tooltip: 'undefined'
-				, isRecordName: undefined
+				, tooltip: ''
+				, isRecordName: false
 				, gridOrder: 11
 				, orderOnNew: 11
 				, orderOnDetails: 11
@@ -528,6 +530,13 @@ export class Balance implements iEntity {
 				, orderOnImport: 14
 				, globalOrder: 0
 				, value: null
+			}
+		]
+		, view: [
+			{
+				joinType: 'INNER'
+				, joinTable: 'ACCOUNT ACCOUNT1'
+				, joinStatement: 'bal_id_account = ACCOUNT1.acc_id and bal_id_user = ACCOUNT1.acc_id_user'
 			}
 		]
 	};
