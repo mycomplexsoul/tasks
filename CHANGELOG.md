@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.4.4 (2018-07-28)
+
+### Modified
+* [AppCommon] Fixed compilation issues.
+
 ## v1.4.3 (2018-07-27)
 
 ### Added

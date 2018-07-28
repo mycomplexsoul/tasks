@@ -29,8 +29,8 @@ export class InstallModule {
             , new Account(), new Category(), new Place(), new Movement(), new Entry(), new Balance()
             , new LastTime(), new LastTimeHistory()
         ];
-        const method = (msgOk) => {
-            return (err) => {
+        const method = (msgOk: string) => {
+            return (err: any) => {
                 if (err){
                     console.log(err);
                 } else {
@@ -57,7 +57,7 @@ export class InstallModule {
 
     populateInitialData = () => {
         const connection: iConnection = ConnectionService.getConnection();
-        let inserts = [];
+        let inserts: string[] = [];
         let t: iEntity;
         let sqlMotor: MoSQL = new MoSQL();
 
@@ -66,7 +66,14 @@ export class InstallModule {
         // Catalog
         t = new Catalog();
         let addCatalog = (
-            ctg_id,ctg_sequential,ctg_name,ctg_description,ctg_ctg_permissions,ctg_date_add,ctg_date_mod,ctg_ctg_status
+            ctg_id: string,
+            ctg_sequential: number,
+            ctg_name: string,
+            ctg_description: string,
+            ctg_ctg_permissions: number,
+            ctg_date_add: Date,
+            ctg_date_mod: Date,
+            ctg_ctg_status: number
         ) => {
             t = new Catalog({
                 ctg_id,
@@ -149,7 +156,23 @@ export class InstallModule {
         // User
         inserts = [];
         let addUser = (
-            usr_id,usr_pwd,usr_first_name,usr_middle_name,usr_last_name,usr_ctg_user_type,usr_email,usr_ctg_connected,usr_login_attempts,usr_date_last_login_attempt,usr_date_pwd_change,usr_ctg_pwd_temporal,usr_ctg_blocked,usr_config,usr_date_add,usr_date_mod,usr_ctg_status
+            usr_id: string,
+	        usr_pwd: string,
+	        usr_first_name: string,
+	        usr_middle_name: string,
+	        usr_last_name: string,
+	        usr_ctg_user_type: number,
+	        usr_email: string,
+	        usr_ctg_connected: number,
+	        usr_login_attempts: number,
+	        usr_date_last_login_attempt: Date,
+	        usr_date_pwd_change: Date,
+	        usr_ctg_pwd_temporal: number,
+	        usr_ctg_blocked: number,
+	        usr_config: string,
+	        usr_date_add: Date,
+	        usr_date_mod: Date,
+	        usr_ctg_status: number
         ) => {
             t = new User({
                 usr_id,usr_pwd,usr_first_name,usr_middle_name,usr_last_name,usr_ctg_user_type,usr_email,usr_ctg_connected,usr_login_attempts,usr_date_last_login_attempt,usr_date_pwd_change,usr_ctg_pwd_temporal,usr_ctg_blocked,usr_config,usr_date_add,usr_date_mod,usr_ctg_status

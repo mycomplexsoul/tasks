@@ -249,7 +249,7 @@ export class MoSQL {
     criteriaToSQL = (criteria: any, model: iEntity): string => {
         let sql: string = '';
 
-        criteria.cont.forEach((crit) => {
+        criteria.cont.forEach((crit: any) => {
             if (Array.isArray(crit.cont)) {
                 sql = this.criteriaToSQL(crit, model);
             } else {
