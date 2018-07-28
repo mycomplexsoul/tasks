@@ -84,7 +84,7 @@ export class ApiModule {
     update = (data: any, hooks: any, model?: iEntity): Promise<any> => {
         let m: iEntity = model ? model : this.model;
         const arePKProvided = (pk: string[], values: string[]): boolean => {
-            return pk.every((f => values.includes(f)));
+            return pk.every((f => values.indexOf(f) !== -1));
         };
         const pkInRequest = arePKProvided(m.metadata.fields.filter(f => f.isPK).map(f => f.dbName), Object.keys(data.pk));
         if (data.body && pkInRequest) {

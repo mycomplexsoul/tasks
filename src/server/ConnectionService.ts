@@ -11,7 +11,7 @@ let ConnectionService = (function(){
     }
     let getConnection = (): iConnection => {
         let config = loadJSON(__dirname + '/../../cfg');
-        let connection: any;// = mysql.createConnection(config[0]);
+        let connection: mysql.Connection;// = mysql.createConnection(config[0]);
 
         function handleDisconnect() {
             connection = mysql.createConnection(config[0]); // Recreate the connection, since
@@ -62,10 +62,17 @@ let ConnectionService = (function(){
             let responseArray = sqlArray.map((sql: string) => runSql(sql));
             return responseArray;
         };
+        const runSyncSql = (sql: string, callback: (err: any, rows: any, fields: any[]) => void): void => {
+            connection.query(sql, (err: any, rows: any, fields: any[]) => {
+                console.log('sync execution ok for query',sql);
+                callback(err, rows, fields);
+            });
+        };
         return {
             close
             , runSql
             , runSqlArray
+            , runSyncSql
         } as iConnection;
     };
 

@@ -7,6 +7,7 @@ import { MoInstallSQL } from "./MoInstallSQL";
 import { Catalog } from "../crosscommon/entities/Catalog";
 import { iNode } from "./iNode";
 import * as Routes from './Routes';
+import { InstallModule } from './InstallModule';
 //import * as bodyParser from 'body-parser';
 const app = express();
 app.use(express.json());
@@ -89,8 +90,8 @@ app.get('/generator/type', (req, res) => {
         ,'User'
         ,'Logger'
         ,'Task','TaskTimeTracking','TaskSchedule'
-        , 'Account','Category','Place','Movement','Entry','Balance'
-        , 'LastTime','LastTimeHistory'
+        ,'Account','Category','Place','Movement','Entry','Balance'
+        ,'LastTime','LastTimeHistory'
     ];
     let gen: Generator.MoBasicGenerator;
     let message: string = entities.join(', ');
@@ -103,10 +104,9 @@ app.get('/generator/type', (req, res) => {
 });
 
 app.get('/generator/database', (req, res) => {
-    let model: Catalog = new Catalog();
-    let sqlMotor: MoInstallSQL = new MoInstallSQL(model);
-    let sqlCreate: string = sqlMotor.createTableSQL();
-    console.log('sql create', sqlCreate);
+    let sqlMotor: InstallModule = new InstallModule();
+    sqlMotor.install();
+    
     res.end(JSON.stringify({ operationOK: true, message: `success!` }));
 });
 
