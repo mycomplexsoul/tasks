@@ -19,6 +19,7 @@ import { DateCommon } from './common/date.common';
 import { ComboItemComponent } from './common/comboItem.component';
 import { SyncAPI } from './common/sync.api';
 import { UtilsCommon } from './common/utils.common';
+import { LoginComponent }  from './common/login.component';
 
 const appRoutes: Routes = [
     // { path: 'crisis-center', component: CrisisListComponent },
@@ -53,7 +54,7 @@ const appRoutes: Routes = [
 
 @NgModule({
   imports: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(appRoutes) ],
-  declarations: [ AppComponent, TasksComponent, AccountComponent, MovementComponent, BalanceComponent, ComboItemComponent, MenuComponent, RebuildComponent ], // parent & child components
+  declarations: [ AppComponent, TasksComponent, AccountComponent, MovementComponent, BalanceComponent, ComboItemComponent, MenuComponent, RebuildComponent, LoginComponent ], // parent & child components
   bootstrap: [ AppComponent ], // only parent components
   providers: [ DateCommon, StorageService, EntryService, SyncAPI, UtilsCommon ]
 })

@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.4.5 (2018-07-30)
+
+### Added
+* [AppCommon] Login basic UI components.
+
 ## v1.4.4 (2018-07-28)
 
 ### Modified
