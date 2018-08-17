@@ -1,94 +1,96 @@
 <strong>Movements</strong>
-
-<a routerLink="/new" routerLinkActive="active">New Movement</a>
+<br/>
+<button (click)="viewData.showCreateForm = !viewData.showCreateForm">New Movement</button>
 
 <form #newMovementForm="ngForm" (ngSubmit)="newMovement(newMovementForm)">
-    <input type="radio" name="fMovementFlowType" id="fMovementFlowTypeCustom"
-        [(ngModel)]="_movementFlowType" (click)="movementFlowType('custom')"
-        value="custom">
-    <label for="fMovementFlowTypeCustom">Custom</label>
-    <input type="radio" name="fMovementFlowType" id="fMovementFlowTypeTransfer"
-        [(ngModel)]="_movementFlowType" (click)="movementFlowType('transfer')"
-        value="transfer">
-    <label for="fMovementFlowTypeTransfer">Transfer</label>
+    <div *ngIf="viewData.showCreateForm">
+        <input type="radio" name="fMovementFlowType" id="fMovementFlowTypeCustom"
+            [(ngModel)]="_movementFlowType" (click)="movementFlowType('custom')"
+            value="custom">
+        <label for="fMovementFlowTypeCustom">Custom</label>
+        <input type="radio" name="fMovementFlowType" id="fMovementFlowTypeTransfer"
+            [(ngModel)]="_movementFlowType" (click)="movementFlowType('transfer')"
+            value="transfer">
+        <label for="fMovementFlowTypeTransfer">Transfer</label>
 
-    <div>
-        <h4 *ngIf="isCustom">Custom</h4>
-        <h4 *ngIf="isTransfer">Transfer</h4>
+        <div>
+            <h4 *ngIf="isCustom">Custom</h4>
+            <h4 *ngIf="isTransfer">Transfer</h4>
 
-        <span class="field" *ngIf="isCustom && viewData.presets.length">
-            <label for="fPreset" class="label-left">Use a Preset</label>
-            <select name="fPreset" id="fPreset" [(ngModel)]="model.selectedPreset" (change)="selectPreset(model.selectedPreset,newMovementForm)">
-                <option *ngFor="let opt of viewData.presets" value="{{opt.pre_id}}">{{opt.pre_name}}</option>
-            </select>
-            <hr>
-        </span>
-        <span class="field">
-            <label for="fDescription" class="label-left">Description</label>
-            <input type="text" name="fDescription" id="fDescription" ngModel>
-        </span>
-        <span class="field">
-            <label for="fAmount" class="label-left">Amount</label>
-            <input type="number" name="fAmount" id="fAmount" step="0.01" ngModel>
-        </span>
-        <span class="field">
-            <label for="fAccount" class="label-left">Account</label>
-            <select name="fAccount" id="fAccount" ngModel>
-                <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}}</option>
-            </select>
-        </span>
-        <span class="field" *ngIf="isTransfer">
-            <label for="fAccountTo" class="label-left">Account To</label>
-            <select name="fAccountTo" id="fAccountTo" ngModel>
-                <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}}</option>
-            </select>
-        </span>
-        <span class="field" *ngIf="!isTransfer">
-            <input type="radio" [value]="1" name="fMovementType" id="fMovementType_1" [(ngModel)]="model.type">
-            <label for="fMovementType_1" class="label-radio">Expense</label>
-            
-            <input type="radio" [value]="2" name="fMovementType" id="fMovementType_2" [(ngModel)]="model.type">
-            <label for="fMovementType_2" class="label-radio">Income</label>
-        </span>
-        <span class="field">
-            <label for="fDate" class="label-left">Movement Date</label>
-            <input type="date" name="fDate" [(ngModel)]="model.date">
-        </span>
-        <span class="field" *ngIf="!isTransfer">
-            <label for="fBudget" class="label-left">Budget</label>
-            <input type="text" name="fBudget" id="fBudget" ngModel>
-        </span>
-        <span class="field" *ngIf="!isTransfer">
-            <label for="fCategory" class="label-left">Category</label>
-            <select name="fCategory" id="fCategory" [(ngModel)]="model.category">
-                <option *ngFor="let opt of viewData.categories" [value]="opt.mct_id" [selected]="opt.mct_id === newMovementForm.value.fCategory">{{opt.mct_name}}</option>
-            </select>
-            <combo-item [name]="category" [addNewItem]="addNewCategoryForUser"></combo-item>
-        </span>
-        <span class="field" *ngIf="!isTransfer">
-            <label for="fPlace" class="label-left">Place</label>
-            <select name="fPlace" id="fPlace" [(ngModel)]="model.place">
-                <option *ngFor="let opt of viewData.places" [value]="opt.mpl_id" [selected]="opt.mpl_id === newMovementForm.value.fPlace">{{opt.mpl_name}}</option>
-            </select>
-            <combo-item [name]="place" [addNewItem]="addNewPlaceForUser"></combo-item>
-        </span>
-        <span class="field">
-            <label for="fNotes" class="label-left">Notes</label>
-            <input type="text" name="fNotes" id="fNotes" ngModel>
-        </span>
-        <span class="field" *ngIf="isCustom">
-            <hr>
-            <label for="fAsPreset" class="label-left">As Preset</label>
-            <input type="checkbox" name="fAsPreset" id="fAsPreset" [(ngModel)]="model.asPreset">
-        </span>
-        <span class="field" *ngIf="isCustom && model.asPreset">
-            <input type="text" name="fName" id="fName" ngModel>
-            <label for="fName" class="label-left">Preset Name</label>
-        </span>
-        <button>{{asPreset ? 'Save as Preset' : 'Apply Movement'}}</button>
+            <span class="field" *ngIf="isCustom && viewData.presets.length">
+                <label for="fPreset" class="label-left">Use a Preset</label>
+                <select name="fPreset" id="fPreset" [(ngModel)]="model.selectedPreset" (change)="selectPreset(model.selectedPreset,newMovementForm)">
+                    <option *ngFor="let opt of viewData.presets" value="{{opt.pre_id}}">{{opt.pre_name}}</option>
+                </select>
+                <hr>
+            </span>
+            <span class="field">
+                <label for="fDescription" class="label-left">Description</label>
+                <input type="text" name="fDescription" id="fDescription" class="movement-input-description" ngModel>
+            </span>
+            <span class="field">
+                <label for="fAmount" class="label-left">Amount</label>
+                <input type="number" name="fAmount" id="fAmount" step="0.01" ngModel>
+            </span>
+            <span class="field">
+                <label for="fAccount" class="label-left">Account</label>
+                <select name="fAccount" id="fAccount" ngModel>
+                    <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}}</option>
+                </select>
+            </span>
+            <span class="field" *ngIf="isTransfer">
+                <label for="fAccountTo" class="label-left">Account To</label>
+                <select name="fAccountTo" id="fAccountTo" ngModel>
+                    <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}}</option>
+                </select>
+            </span>
+            <span class="field" *ngIf="!isTransfer">
+                <input type="radio" [value]="1" name="fMovementType" id="fMovementType_1" [(ngModel)]="model.type">
+                <label for="fMovementType_1" class="label-radio">Expense</label>
+                
+                <input type="radio" [value]="2" name="fMovementType" id="fMovementType_2" [(ngModel)]="model.type">
+                <label for="fMovementType_2" class="label-radio">Income</label>
+            </span>
+            <span class="field">
+                <label for="fDate" class="label-left">Movement Date</label>
+                <input type="date" name="fDate" [(ngModel)]="model.date">
+            </span>
+            <span class="field" *ngIf="!isTransfer">
+                <label for="fBudget" class="label-left">Budget</label>
+                <input type="text" name="fBudget" id="fBudget" class="movement-input-budget" ngModel>
+            </span>
+            <span class="field" *ngIf="!isTransfer">
+                <label for="fCategory" class="label-left">Category</label>
+                <select name="fCategory" id="fCategory" [(ngModel)]="model.category">
+                    <option *ngFor="let opt of viewData.categories" [value]="opt.mct_id" [selected]="opt.mct_id === newMovementForm.value.fCategory">{{opt.mct_name}}</option>
+                </select>
+                <combo-item [name]="category" [addNewItem]="addNewCategoryForUser"></combo-item>
+            </span>
+            <span class="field" *ngIf="!isTransfer">
+                <label for="fPlace" class="label-left">Place</label>
+                <select name="fPlace" id="fPlace" [(ngModel)]="model.place">
+                    <option *ngFor="let opt of viewData.places" [value]="opt.mpl_id" [selected]="opt.mpl_id === newMovementForm.value.fPlace">{{opt.mpl_name}}</option>
+                </select>
+                <combo-item [name]="place" [addNewItem]="addNewPlaceForUser"></combo-item>
+            </span>
+            <span class="field">
+                <label for="fNotes" class="label-left">Notes</label>
+                <input type="text" name="fNotes" id="fNotes" class="movement-input-notes" ngModel>
+            </span>
+            <span class="field" *ngIf="isCustom">
+                <hr>
+                <label for="fAsPreset" class="label-left">As Preset</label>
+                <input type="checkbox" name="fAsPreset" id="fAsPreset" [(ngModel)]="model.asPreset">
+            </span>
+            <span class="field" *ngIf="isCustom && model.asPreset && false">
+                <input type="text" name="fName" id="fName" ngModel>
+                <label for="fName" class="label-left">Preset Name</label>
+            </span>
+            <button>{{asPreset ? 'Save as Preset' : 'Apply Movement'}}</button>
+        </div>
     </div>
 </form>
-
+<!--
 <table>
     <tr>
         <th>Id</th>
@@ -119,3 +121,25 @@
         <td>{{m.mov_txt_status}}</td>
     </tr>
 </table>
+-->
+<div class="movement-list">
+    <div *ngFor="let m of viewData.movements" class="movement-box" (click)="setModelDetails(m.mov_id,newMovementForm,'mov')">
+        <span *ngIf="false">{{m.mov_id}}<br/></span>
+        <span [ngClass]="{'movement-amount-income': m.mov_ctg_type === 2, 'movement-amount-expense': m.mov_ctg_type === 1, 'movement-amount-transfer': m.mov_ctg_type === 3}">
+            <span *ngIf="m.mov_txt_type === 'EXPENSE'">-</span>
+            <span *ngIf="m.mov_txt_type === 'INCOME'">+</span>
+            <span>{{m.mov_amount | currency:'MXN':'symbol-narrow':'1.2-2'}}</span>
+        </span>
+        <span class="movement-account">[{{m.mov_txt_account}}]</span>
+        <span class="movement-account" *ngIf="m.mov_txt_account_to"> -> [{{m.mov_txt_account_to}}]</span><br/>
+        <span class="movement-date">[{{m.mov_date | date: 'yyyy-MM-dd'}}]</span>
+        <span class="movement-description">{{m.mov_desc}}</span><br/>
+        <span class="movement-budget" *ngIf="m.mov_budget">#[{{m.mov_budget}}] | </span>
+        <span class="movement-category" *ngIf="m.mov_txt_type">{{m.mov_txt_category}} | </span>
+        <span class="movement-place" *ngIf="m.mov_txt_type">{{m.mov_txt_place}}<br/></span>
+        <span class="movement-notes">{{m.mov_notes}}</span>
+        <span class="movement-status" *ngIf="false">{{m.mov_txt_status}}</span>
+        <span class="movement-badge-new" *ngIf="m.isNew">new</span>
+        <span class="movement-badge-edited" *ngIf="m.isEdited">edited</span>
+    </div>
+</div>

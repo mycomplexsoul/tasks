@@ -6,9 +6,8 @@ import { NgForm } from '@angular/forms';
 import { LoginService } from './login.service';
 
 @Component({
-    selector: 'balance',
-    templateUrl: './balance.template.html',
-    styleUrls: ['./balance.css'],
+    selector: 'login',
+    templateUrl: './login.template.html',
     providers: [
         LoginService
     ]

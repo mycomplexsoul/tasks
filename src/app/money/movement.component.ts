@@ -9,6 +9,7 @@ import { Category } from './category.type';
 import { Place } from './place.type';
 import { Entry } from '../../crosscommon/entities/Entry';
 import { Preset } from './preset.type';
+import { iEntity } from '../../crosscommon/iEntity';
 
 // services
 import { StorageService }  from '../common/storage.service';
@@ -46,6 +47,7 @@ export class MovementComponent implements OnInit {
         , movements: Array<Movement>
         , entries: Array<Entry>
         , presets: Array<Preset>
+        , showCreateForm: boolean
     } = {
         accounts: []
         , types: []
@@ -56,6 +58,7 @@ export class MovementComponent implements OnInit {
         , movements: []
         , entries: []
         , presets: []
+        , showCreateForm: false
     };
     public model: any = { /* UI default form data */
         type: 1
@@ -64,6 +67,7 @@ export class MovementComponent implements OnInit {
         , place: 0
         , asPreset: false
         , selectedPreset: null
+        , id: null
     };
     public viewAddCategoryForm: boolean = false;
     public _movementFlowType: string = 'custom';
@@ -167,7 +171,7 @@ export class MovementComponent implements OnInit {
 
             this.viewData.movements = this.viewData.movements
             .sort((a: Movement, b: Movement) => a.mov_date >= b.mov_date ? -1 : 1)
-            .slice(0,10);
+            .slice(0,20);
         });
         /* analysis */
         // const year = 2017;
@@ -252,7 +256,11 @@ export class MovementComponent implements OnInit {
         } else {
             let m = new Movement();
             m.mov_date = this.stringDateToDate(form.value.fDate);
-            m.mov_id = this.services.movement.newId(m.mov_date);
+            if (this.model.id) { // we are editing instead of creating a new movement
+                m.mov_id = this.model.id;
+            } else {
+                m.mov_id = this.services.movement.newId(m.mov_date);
+            }
             m.mov_desc = form.value.fDescription;
             m.mov_amount = form.value.fAmount;
             m.mov_id_account = form.value.fAccount;
@@ -285,19 +293,37 @@ export class MovementComponent implements OnInit {
             m.mov_txt_place = this.findIn(this.viewData.places,(e: any) => e.mpl_id === m.mov_id_place,'mpl_name');
             m.mov_txt_status = this.findIn(this.viewData.statuses,(e: any) =>  e.ctg_ctg_value == m.mov_ctg_status,'ctg_desc');
     
-            this.services.movement.newItem(m);
-            console.log('this is the movement',m);
-    
-            // Entries
-            let localEntries: Array<Entry> = [];
-            localEntries = this.generateEntriesForMovement(m);
-            
-            console.log('these are all entries',this.services.entry.list);
-            
-            // add to balance
-            this.services.balance.add(localEntries);
-            console.log('these are all balance',this.services.balance.list);
-    
+            if (this.model.id) {
+                // edition
+                const existingIndex: number = this.viewData.movements.findIndex(m => m.mov_id === this.model.id);
+                m.mov_date_add = new Date(this.viewData.movements[existingIndex].mov_date_add);
+                this.services.movement.edit(m);
+                m['isEdited'] = true; // flag to render as edited on UI
+                this.viewData.movements[existingIndex] = m;
+                this.model.id = null;
+            } else {
+                // new movement
+                this.services.movement.newItem(m);
+                m['isNew'] = true; // flag to render as new on UI
+                console.log('this is the movement',m);
+                this.viewData.movements.unshift(m);
+                this.viewData.movements = this.viewData.movements
+                    .sort((a: Movement, b: Movement) => (new Date(a.mov_date)).getTime() >= (new Date(b.mov_date)).getTime() ? -1 : 1);
+        
+                // Entries
+                let localEntries: Array<Entry> = [];
+                localEntries = this.generateEntriesForMovement(m);
+                
+                console.log('these are all entries',this.services.entry.list);
+                
+                // add to balance
+                this.services.balance.add(localEntries);
+                console.log('these are all balance',this.services.balance.list);
+            }
+            form.reset();
+            form.controls['fMovemementFlowType'].setValue('custom');
+            form.controls['fMovemementType'].setValue('1');
+            form.controls['fDate'].setValue(this.DateToStringDate(new Date()));
             return false;
         }
     }
@@ -547,4 +573,72 @@ export class MovementComponent implements OnInit {
         // now apply to balance
         this.services.balance.rebuildAndTransferRange(yearInitial,monthInitial,yearFinal,monthFinal,this.user);
     }
+    setModelDetails(id: string, form: any, prefix: string){
+        let model: iEntity;
+        if (!this.viewData.showCreateForm) {
+            this.viewData.showCreateForm = !this.viewData.showCreateForm;
+        }
+
+        if (prefix === 'pre'){
+            /*model = this.services.preset.getAll()
+                .find((p: Preset) => p.pre_id === id);*/
+        } else {
+            model = this.viewData.movements
+                .find((m: Movement) => m.mov_id === id);
+            this.model.id = model[prefix + '_id']; // to tell the newMovementForm that this is an edition
+        }
+
+        if (model[prefix + '_ctg_type'] === 3){
+            this.movementFlowType('transfer');
+        } else {
+            this.movementFlowType('custom');
+        }
+
+    
+        let fields: Array<any> = [
+            {
+                'control': 'fDescription'
+                , 'value': '_desc'
+            },{
+                'control': 'fAmount'
+                , 'value': '_amount'
+            },{
+                'control': 'fAccount'
+                , 'value': '_id_account'
+            },{
+                'control': 'fAccountTo'
+                , 'value': '_id_account_to'
+            },{
+                'control': 'fMovementType'
+                , 'value': '_ctg_type'
+            },{
+                'control': 'fDate'
+                , 'value': '_date'
+            },{
+                'control': 'fBudget'
+                , 'value': '_budget'
+            },{
+                'control': 'fCategory'
+                , 'value': '_id_category'
+            },{
+                'control': 'fPlace'
+                , 'value': '_id_place'
+            },{
+                'control': 'fNotes'
+                , 'value': '_notes'
+            }
+        ];
+        setTimeout(() => {
+            fields.forEach((f: any) => {
+                if (form.controls[f.control]){
+                    if (f.value === '_date'){
+                        form.controls[f.control].setValue(this.DateToStringDate(new Date(model[prefix + f.value])));
+                    } else {
+                        form.controls[f.control].setValue(model[prefix + f.value] || null);
+                    }
+                }
+            });
+        }, 0);
+    }
+
 }

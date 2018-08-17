@@ -304,3 +304,68 @@ input[type="radio"] {
 .balance-negative {
   color: red;
 }
+
+.movement-box {
+  border: 1px solid lightgray;
+  margin: 5px;
+  padding: 5px;
+  display: block;
+  max-width: 350px;
+  min-width: 350px;
+}
+
+.movement-list {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.movement-amount-income {
+  color: green;
+}
+
+.movement-amount-expense {
+  color: red;
+}
+
+.movement-amount-transfer {
+  color: violet;
+}
+
+.movement-account {
+  color: gray;
+}
+
+.movement-date {
+  color: cornflowerblue;
+}
+
+.movement-description {
+  font-weight: bold;
+}
+
+.movement-budget {
+  color: gray;
+}
+
+.movement-category {
+  color: gray;
+}
+
+.movement-place {
+  color: gray;
+}
+
+.movement-input-description,
+.movement-input-budget,
+.movement-input-notes {
+  width: 60%;
+}
+
+.movement-badge-new,
+.movement-badge-edited {
+  border: 1px solid green;
+  padding: 0 5px;
+  background: lightgreen;
+  color: blue;
+}

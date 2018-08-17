@@ -120,7 +120,7 @@ export class BalanceService {
     }
 
     saveToStorage(){
-        this.storage.set(this.config.storageKey,JSON.stringify(this.data));
+        // this.storage.set(this.config.storageKey,JSON.stringify(this.data));
     }
 
     newItem(item: Balance): Balance{

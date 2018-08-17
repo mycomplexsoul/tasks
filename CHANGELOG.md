@@ -10,12 +10,52 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * [AppCommon] Login UI.
 
 ## [Unreleased / Work In Progress]
-* [AppMoney] Edit Movement UI, without endpoint integration.
 * [AppCommon] Node build into `/dist` folder.
 * [AppCommon] Angular build into `/dist` folder.
 * [AppCommon] Deploy BE + FE in `/dist` folder.
 
 <hr/>
+
+## v1.4.12 (2018-08-09)
+
+### Modified
+* [AppCommon] Fix login component template reference.
+* [AppMoney][Movements] Added CSS styling to card listing and form.
+
+## v1.4.11 (2018-08-08)
+
+### Added
+* [AppMoney][Movements] Show badges for new and updated movements to identify them on the card listing.
+* [AppMoney][Movements] Reset form after new movement is created or after a movement is edited/saved.
+
+## v1.4.10 (2018-08-07)
+
+### Added
+* [AppMoney][Movements] Push new movement into card listing and order properly.
+* [AppMoney][Movements] Update movement into card listing.
+
+## v1.4.9 (2018-08-06)
+
+### Added
+* [AppMoney][Movements] `model.id` to identify when the form data is an existing movement or not.
+* [AppMoney][Movements] `setModelDetails()` method for updating the form with values from an existing movement / details view.
+
+## v1.4.8 (2018-08-02)
+
+### Modified
+* [AppMoney][Movements] Refactored `sort()` method to use outside of the service.
+* [AppMoney][Movements] Refactored grid listing into card listing for movements page.
+
+## v1.4.7 (2018-08-01)
+
+### Added
+* [AppMoney][Movements] Edit method and integration with backend update REST API endpoint.
+
+## v1.4.6 (2018-07-31)
+
+### Modified
+* [AppCommon] Changes detection on `MoSQL` for dates now are properly handled and result is stored as date.
+* [AppMoney] Disable save to localStorage on balance and entry services.
 
 ## v1.4.5 (2018-07-30)
 

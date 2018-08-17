@@ -15,6 +15,7 @@ export class MovementService {
         , api: {
             list: '/api/movements'
             , create: '/api/movements'
+            , update: '/api/movements/:id'
             , batch: '/movement/batch' // not supported in NodeTS
         }
     }
@@ -117,20 +118,21 @@ export class MovementService {
             this.data = this.initialData();
         }*/
         // sort data
-        let sort = (a: Movement, b: Movement) => {
-            if (a.mov_date < b.mov_date) {
-                return -1;
-            } else if (a.mov_date > b.mov_date) {
-                return 1;
-            } else {
-                return 0;
-            }
-        };
         return this.sync.get(`${this.apiRoot}${this.config.api.list}`).then(data => {
             this.data = data.map((d: any): Movement => new Movement(d));
-            this.data = this.data.sort(sort);
+            this.data = this.data.sort(this.sort);
             return this.data;
         });
+    }
+
+    sort(a: Movement, b: Movement) {
+        if ((new Date(a.mov_date)).getTime() < (new Date(b.mov_date)).getTime()) {
+            return -1;
+        } else if ((new Date(a.mov_date)).getTime() > (new Date(b.mov_date)).getTime()) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
     getAllForUser(user: string){
@@ -189,4 +191,26 @@ export class MovementService {
             console.log('response movements batch',response);
         });
     }
+
+    edit(movement: Movement): Movement{
+        movement.mov_ctg_currency = 1;
+        movement.mov_date_mod = new Date();
+        const item: Movement = new Movement(movement);
+
+        this.sync.post(this.config.api.update.replace(':id', movement.mov_id), item).then(response => {
+            const index = this.data.findIndex(d => d.mov_id === item.mov_id);
+            if (!response.processOk) {
+                item['sync'] = false;
+            }
+            this.data[index] = item;
+        }).catch(err => {
+            // Append it to the listing but flag it as non-synced yet
+            const index = this.data.findIndex(d => d.mov_id === item.mov_id);
+            item['sync'] = false;
+            this.data[index] = item;
+        });
+
+        return item;
+    }
+
 }
