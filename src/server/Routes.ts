@@ -5,6 +5,7 @@ import * as MovementRoute from './Movement/MovementRoute';
 import * as EntryRoute from './Entry/EntryRoute';
 import * as AccountRoute from './Account/AccountRoute';
 import * as PlaceRoute from './Place/PlaceRoute';
+import * as PresetRoute from './Preset/PresetRoute';
 const router = express.Router();
 
 router.use('/categories', CategoryRoute.router);
@@ -13,5 +14,6 @@ router.use('/movements', MovementRoute.router);
 router.use('/entries', EntryRoute.router);
 router.use('/accounts', AccountRoute.router);
 router.use('/places', PlaceRoute.router);
+router.use('/presets', PresetRoute.router);
 
 export { router };

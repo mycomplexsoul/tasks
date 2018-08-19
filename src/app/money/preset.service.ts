@@ -1,18 +1,30 @@
-import { Preset } from './preset.type';
+import { Preset } from '../../crosscommon/entities/Preset';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
+import { SyncAPI } from '../common/sync.api';
+import { Utils } from '../../crosscommon/Utility';
 
 @Injectable()
 export class PresetService {
     private data: Array<Preset> = [];
     private storage: StorageService = null;
+    private sync: SyncAPI = null;
     private config = {
         storageKey: 'presets'
         , defaultUser: 'anon'
-    }
+        , api: {
+            list: '/api/presets'
+            , create: '/api/presets'
+            , update: '/api/presets/:id'
+        }
+    };
+    private apiRoot: string = '';
 
-    constructor(storage: StorageService){
+    constructor(storage: StorageService, sync: SyncAPI){
         this.storage = storage;
+        this.sync = sync;
+        // get api root
+        this.apiRoot = storage.getObject('Options')['optServerAddress'] || '';
     }
 
     list(): Array<Preset> {
@@ -82,35 +94,59 @@ export class PresetService {
     }
 
     getAll(){
-        let fromStorage = this.storage.get(this.config.storageKey);
-        if (fromStorage){
-            this.data = JSON.parse(fromStorage);
+        return this.sync.get(`${this.apiRoot}${this.config.api.list}`).then(data => {
+            this.data = data.map((d: any): Preset => new Preset(d));
+            this.data = this.data.sort(this.sort);
+            return this.data;
+        });
+    }
+
+    sort(a: Preset, b: Preset) {
+        if (a.pre_name > b.pre_name) {
+            return -1;
+        } else if (a.pre_name < b.pre_name) {
+            return 1;
         } else {
-            this.data = this.initialData();
+            return 0;
         }
-        return this.data;
     }
 
     getAllForUser(user: string){
-        const all: Array<Preset> = this.getAll();
-
-        return all.filter((x: Preset) => x.pre_id_user === user);
+        return this.getAll().then((list: Array<Preset>) => {
+            return list.filter((x: Preset) => x.pre_id_user === user);
+        });
     }
 
     saveToStorage(){
-        this.storage.set(this.config.storageKey,JSON.stringify(this.data));
+        //this.storage.set(this.config.storageKey,JSON.stringify(this.data));
     }
 
     newId(){
-        return this.data.length + 1 + '';
+        return  Utils.hashId('pre', 32);
     }
 
     newItem(preset: Preset): Preset{
-        let newId: string = this.newId();
+        const newId: string = this.newId();
         preset.pre_id = newId;
-        let newItem = new Preset(preset);
-        this.data.push(newItem);
-        this.saveToStorage();
+        preset.pre_ctg_currency = 1;
+        preset.pre_date_add = new Date();
+        preset.pre_date_mod = new Date();
+        const newItem = new Preset(preset);
+        //this.data.push(newItem);
+        //this.saveToStorage();
+        this.sync.post(this.config.api.create, newItem).then(response => {
+            if (response.processOk) {
+                this.data.push(newItem);
+            } else {
+                newItem['sync'] = false;
+                this.data.push(newItem);
+            }
+        }).catch(err => {
+            // Append it to the listing but flag it as non-synced yet
+            newItem['sync'] = false;
+            this.data.push(newItem);
+        });
+
         return newItem;
     }
 }

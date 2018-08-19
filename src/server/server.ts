@@ -90,7 +90,7 @@ app.get('/generator/type', (req, res) => {
         ,'User'
         ,'Logger'
         ,'Task','TaskTimeTracking','TaskSchedule'
-        ,'Account','Category','Place','Movement','Entry','Balance'
+        ,'Account','Category','Place','Movement','Entry','Balance', 'Preset'
         ,'LastTime','LastTimeHistory'
     ];
     let gen: Generator.MoBasicGenerator;

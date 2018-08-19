@@ -17,6 +17,7 @@ import { Entry } from '../crosscommon/entities/Entry';
 import { Balance } from '../crosscommon/entities/Balance';
 import { LastTime } from '../crosscommon/entities/LastTime';
 import { LastTimeHistory } from '../crosscommon/entities/LastTimeHistory';
+import { Preset } from '../crosscommon/entities/Preset';
 
 export class InstallModule {
     install = () => {
@@ -26,7 +27,7 @@ export class InstallModule {
             , new User()
             , new Logger()
             , new Task(), new TaskTimeTracking(), new TaskSchedule()
-            , new Account(), new Category(), new Place(), new Movement(), new Entry(), new Balance()
+            , new Account(), new Category(), new Place(), new Movement(), new Entry(), new Balance(), new Preset()
             , new LastTime(), new LastTimeHistory()
         ];
         const method = (msgOk: string) => {

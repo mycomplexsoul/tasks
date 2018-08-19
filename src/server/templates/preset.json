@@ -1,0 +1,204 @@
+{
+    "name": "Preset"
+    , "namespace": "Money"
+    , "removeMeans": "DELETION"
+    , "authNeeded": false
+    , "displayOnMenu": true
+    , "prefix": "pre"
+    , "permissionsTemplate": "permissions_all"
+    , "specialFeatures": [
+        "HEADERS(Preset,Presets)"
+        , "TABLE_NAME(PRESET)"
+        , "VIEW_NAME(VIPRESET)"
+    ]
+    , "fields": [
+        {
+            "templateId": "string"
+            , "dbName": "pre_id"
+            , "isPK": true
+            , "size": 32
+            , "minLength": 32
+            , "dbComment": "Id for the Preset"
+            , "entName": "PresetId"
+            , "captureRequired": true
+            , "specialRules": [
+                "DUPLICITY_ADD"
+            ]
+            , "displayName": "Preset Id"
+            , "isRecordName": true
+        },{
+            "templateId": "string"
+            , "dbName": "pre_name"
+            , "size": 150
+            , "minLength": 1
+            , "dbComment": "Name of the Preset"
+            , "entName": "Name"
+            , "captureRequired": true
+            , "specialRules": [
+                "DUPLICITY_ADD"
+            ]
+            , "displayName": "Name"
+            , "isRecordName": true
+        },{
+            "templateId": "datetime"
+            , "dbName": "pre_date"
+            , "dbComment": "Date when the Preset was made"
+            , "entName": "ApplicationDate"
+            , "captureRequired": true
+            , "displayName": "Date of Application"
+            , "isRecordName": true
+        },{
+            "templateId": "integer"
+            , "dbName": "pre_ctg_currency"
+            , "dbComment": "Currency of the Preset"
+            , "entName": "Currency"
+            , "displayName": "Currency"
+        },{
+            "templateId": "double"
+            , "dbName": "pre_amount"
+            , "dbComment": "Amount of the Preset"
+            , "entName": "Amount"
+            , "captureRequired": true
+            , "displayName": "Amount"
+            , "isRecordName": true
+        },{
+            "templateId": "string"
+            , "dbName": "pre_id_account"
+            , "size": 16
+            , "minLength": 1
+            , "dbComment": "Name for the account, appears on balance"
+            , "entName": "Account"
+            , "captureRequired": true
+            , "displayName": "Account"
+        },{
+            "templateId": "string"
+            , "dbName": "pre_id_account_to"
+            , "size": 16
+            , "minLength": 1
+            , "allowNull": true
+            , "dbComment": "Name for the destination account when doing a transfer, appears on balance"
+            , "entName": "AccountTo"
+            , "displayName": "Destination Account"
+        },{
+            "templateId": "integer"
+            , "dbName": "pre_ctg_type"
+            , "dbComment": "Type of Preset"
+            , "entName": "MovementType"
+            , "captureRequired": true
+            , "displayName": "Preset Type"
+            , "catalogId": "MOVEMENT_TYPES"
+        },{
+            "templateId": "string"
+            , "dbName": "pre_budget"
+            , "size": 50
+            , "minLength": 1
+            , "allowNull": true
+            , "dbComment": "Monthly Budget where this Preset sums up"
+            , "entName": "Budget"
+            , "displayName": "Budget"
+        },{
+            "templateId": "string"
+            , "dbName": "pre_id_category"
+            , "size": 32
+            , "minLength": 32
+            , "dbComment": "Category for this Preset, helps grouping Movements"
+            , "entName": "Category"
+            , "captureRequired": true
+            , "displayName": "Category"
+        },{
+            "templateId": "string"
+            , "dbName": "pre_id_place"
+            , "size": 32
+            , "minLength": 32
+            , "dbComment": "Place where this Preset was done, helps tracking Movements"
+            , "entName": "Place"
+            , "captureRequired": true
+            , "displayName": "Place"
+        },{
+            "templateId": "string"
+            , "dbName": "pre_desc"
+            , "size": 200
+            , "minLength": 1
+            , "dbComment": "Description of the Preset, something to remember and track the Preset"
+            , "entName": "Description"
+            , "displayName": "Description"
+        },{
+            "templateId": "string"
+            , "dbName": "pre_notes"
+            , "size": 200
+            , "minLength": 1
+            , "allowNull": true
+            , "dbComment": "Notes for Presets"
+            , "entName": "Notes"
+            , "displayName": "Notes"
+        },{
+            "templateId": "string"
+            , "dbName": "pre_id_user"
+            , "size": 50
+            , "dbComment": "User who this Preset belongs to"
+            , "entName": "User"
+            , "displayName": "User"
+        },{
+            "templateId": "creationDate"
+        },{
+            "templateId": "modificationDate"
+        },{
+            "templateId": "status"
+            , "catalogId": "RECORD_STATUS"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_type"
+            , "isRecordName": true
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_currency"
+        },{
+            "templateId": "table"
+            , "dbName": "pre_txt_account"
+            , "size": 100
+            , "originTable": "ACCOUNT"
+            , "linkedField": "ACCOUNT1.acc_name"
+            , "isRecordName": true
+        },{
+            "templateId": "table"
+            , "dbName": "pre_txt_account_to"
+            , "size": 100
+            , "originTable": "ACCOUNT"
+            , "linkedField": "ACCOUNT2.acc_name"
+        },{
+            "templateId": "table"
+            , "dbName": "pre_txt_category"
+            , "size": 100
+            , "originTable": "CATEGORY"
+            , "linkedField": "mct_name"
+        },{
+            "templateId": "table"
+            , "dbName": "pre_txt_place"
+            , "size": 100
+            , "originTable": "PLACE"
+            , "linkedField": "mpl_name"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_status"
+        }
+    ]
+    , "view": [
+        {
+            "joinType": "INNER"
+            , "joinTable": "ACCOUNT ACCOUNT1"
+            , "joinStatement": "pre_id_account = ACCOUNT1.acc_id and pre_id_user = ACCOUNT1.acc_id_user"
+        },{
+            "joinType": "LEFT"
+            , "joinTable": "ACCOUNT ACCOUNT2"
+            , "joinStatement": "pre_id_account_to = ACCOUNT2.acc_id and pre_id_user = ACCOUNT2.acc_id_user"
+        },{
+            "joinType": "LEFT"
+            , "joinTable": "CATEGORY"
+            , "joinStatement": "pre_id_category = mct_id and pre_id_user = mct_id_user"
+        },{
+            "joinType": "LEFT"
+            , "joinTable": "PLACE"
+            , "joinStatement": "pre_id_place = mpl_id and pre_id_user = mpl_id_user"
+        }
+    ]
+}

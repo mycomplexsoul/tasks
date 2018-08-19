@@ -8,7 +8,7 @@ import { Catalog } from '../common/catalog.type';
 import { Category } from './category.type';
 import { Place } from './place.type';
 import { Entry } from '../../crosscommon/entities/Entry';
-import { Preset } from './preset.type';
+import { Preset } from '../../crosscommon/entities/Preset';
 import { iEntity } from '../../crosscommon/iEntity';
 
 // services
@@ -159,7 +159,12 @@ export class MovementComponent implements OnInit {
             this.viewData.places = places;
         });
         this.services.entry.getAllForUser(this.user);
-        this.services.preset.getAllForUser(this.user);
+        this.services.preset.getAllForUser(this.user).then((list: Preset[]) => {
+            this.viewData.presets = list;
+            let p = new Preset();
+            p.pre_name = '';
+            this.viewData.presets.unshift(p);
+        });
         
         this.viewData.entries = this.services.entry.list();
         this.viewData.presets = this.services.preset.list();
@@ -246,12 +251,12 @@ export class MovementComponent implements OnInit {
             p.pre_txt_type = this.findIn(this.viewData.types,(e: any) => e.ctg_ctg_value == p.pre_ctg_type,'ctg_desc');
             p.pre_txt_account = this.findIn(this.viewData.accounts,(e: any) => e.acc_id == p.pre_id_account,'acc_name');
             //p.pre_txt_account_to = '';
-            p.pre_txt_budget = p.pre_budget;
             p.pre_txt_category = this.findIn(this.viewData.categories,(e: any) => e.mct_id === p.pre_id_category,'mct_name');
             p.pre_txt_place = this.findIn(this.viewData.places,(e: any) => e.mpl_id === p.pre_id_place,'mpl_name');
             p.pre_txt_status = this.findIn(this.viewData.statuses,(e: any) =>  e.ctg_ctg_value == p.pre_ctg_status,'ctg_desc');
 
             this.services.preset.newItem(p);
+            this.viewData.presets.push(p);
             console.log('this is the preset',p);
         } else {
             let m = new Movement();
@@ -424,48 +429,50 @@ export class MovementComponent implements OnInit {
         });
     }
 
-    selectPreset(presetId: string, form: any){
-        let preset: Preset = this.services.preset.getAll()
-            .find((p: Preset) => p.pre_id === presetId);
-        
-        let fields: Array<any> = [{
-            'control': 'fDescription'
-            , 'value': 'pre_desc'
-        },{
-            'control': 'fAmount'
-            , 'value': 'pre_amount'
-        },{
-            'control': 'fAccount'
-            , 'value': 'pre_id_account'
-        },{
-            'control': 'fAccountTo'
-            , 'value': 'pre_id_account_to'
-        },{
-            'control': 'fMovementType'
-            , 'value': 'pre_ctg_type'
-        }/*,{
-            'control': 'fDate'
-            , 'value': 'pre_date'
-        }*/,{
-            'control': 'fBudget'
-            , 'value': 'pre_budget'
-        },{
-            'control': 'fCategory'
-            , 'value': 'pre_id_category'
-        },{
-            'control': 'fPlace'
-            , 'value': 'pre_id_place'
-        },{
-            'control': 'fNotes'
-            , 'value': 'pre_notes'
-        }];
-
-        fields.forEach((f: any) => {
-            if (form.controls[f.control] && preset[f.value]){
-                form.controls[f.control].setValue(preset[f.value]);
-            }
+    /*selectPreset(presetId: string, form: any){
+        this.services.preset.getAll().then((list: Preset[]) => {
+            let preset: Preset = list.find((p: Preset) => p.pre_id === presetId);
+            let fields: Array<any> = [
+                {
+                    'control': 'fDescription'
+                    , 'value': 'pre_desc'
+                },{
+                    'control': 'fAmount'
+                    , 'value': 'pre_amount'
+                },{
+                    'control': 'fAccount'
+                    , 'value': 'pre_id_account'
+                },{
+                    'control': 'fAccountTo'
+                    , 'value': 'pre_id_account_to'
+                },{
+                    'control': 'fMovementType'
+                    , 'value': 'pre_ctg_type'
+                },{
+                    'control': 'fDate'
+                    , 'value': 'pre_date'
+                },{
+                    'control': 'fBudget'
+                    , 'value': 'pre_budget'
+                },{
+                    'control': 'fCategory'
+                    , 'value': 'pre_id_category'
+                },{
+                    'control': 'fPlace'
+                    , 'value': 'pre_id_place'
+                },{
+                    'control': 'fNotes'
+                    , 'value': 'pre_notes'
+                }
+            ];
+    
+            fields.forEach((f: any) => {
+                if (form.controls[f.control] && preset[f.value]){
+                    form.controls[f.control].setValue(preset[f.value]);
+                }
+            });
         });
-    }
+    }*/
 
     cancelMovement(){
         // TODO: upon cancellation, change status, modify other movement references to filter active movements, rebuild and transfer
@@ -580,8 +587,8 @@ export class MovementComponent implements OnInit {
         }
 
         if (prefix === 'pre'){
-            /*model = this.services.preset.getAll()
-                .find((p: Preset) => p.pre_id === id);*/
+            model = this.viewData.presets
+                .find((m: Preset) => m.pre_id === id);
         } else {
             model = this.viewData.movements
                 .find((m: Movement) => m.mov_id === id);

@@ -19,7 +19,7 @@
 
             <span class="field" *ngIf="isCustom && viewData.presets.length">
                 <label for="fPreset" class="label-left">Use a Preset</label>
-                <select name="fPreset" id="fPreset" [(ngModel)]="model.selectedPreset" (change)="selectPreset(model.selectedPreset,newMovementForm)">
+                <select name="fPreset" id="fPreset" [(ngModel)]="model.selectedPreset" (change)="setModelDetails(model.selectedPreset,newMovementForm,'pre')">
                     <option *ngFor="let opt of viewData.presets" value="{{opt.pre_id}}">{{opt.pre_name}}</option>
                 </select>
                 <hr>
@@ -82,7 +82,7 @@
                 <label for="fAsPreset" class="label-left">As Preset</label>
                 <input type="checkbox" name="fAsPreset" id="fAsPreset" [(ngModel)]="model.asPreset">
             </span>
-            <span class="field" *ngIf="isCustom && model.asPreset && false">
+            <span class="field" *ngIf="isCustom && model.asPreset">
                 <input type="text" name="fName" id="fName" ngModel>
                 <label for="fName" class="label-left">Preset Name</label>
             </span>

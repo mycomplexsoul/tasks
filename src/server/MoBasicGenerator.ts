@@ -163,6 +163,15 @@ export class MoBasicGenerator {
         // last bracket
         str += line + `}`;
 
+        // Peek into recordName fields to detect if an entity lacks of an identifier
+        const recordNameStr: string = this.entity.fields.filter(f => f.isRecordName)
+            .map(f => f.dbName).join(', ');
+        if (recordNameStr) {
+            console.log(`Entity ${entityName} has these recordName fields: ${recordNameStr}`);
+        } else {
+            console.error(`Entity ${entityName} has NO recordName fields!! it is better to have at least one.`);
+        }
+
         // write file
         this.saveToFile(`src/crosscommon/entities/${entityName}.ts`, str);
     }

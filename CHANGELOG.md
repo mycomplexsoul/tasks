@@ -16,6 +16,32 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.4.16 (2018-08-15)
+
+### Added
+* [AppMoney][Presets] Preset listing in movements UI form.
+* [AppMoney][Presets] Preset connection with backend service new endpoint.
+
+## v1.4.15 (2018-08-14)
+
+### Added
+* [AppCommon] Added Preset to installation.
+* [AppMoney][Presets] UI service changes to push to server new presets.
+
+## v1.4.14 (2018-08-13)
+
+### Added
+* [AppMoney][Presets] Entity File for Preset.
+* [AppMoney][Presets] Route and Server with listing, create and update REST API endpoint handlers.
+
+## v1.4.13 (2018-08-10)
+
+### Added
+* [AppMoney][Presets] Template definition for Preset entity.
+* [AppCommon] On File Type generation, added a flag to identify if recordName
+  has been set to at least one field on each Entity, not blocking but it
+  will show an error on console.
+
 ## v1.4.12 (2018-08-09)
 
 ### Modified
