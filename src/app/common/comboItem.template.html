@@ -1,8 +1,8 @@
-<button (click)="toggleView()">{{addLabel}}</button>
+<button (click)="toggleView()" title="Click to add an item to this list and select it">{{addLabel}}</button>
 
-<div *ngIf="viewAddForm">
+<div class="combo-item-container" *ngIf="viewAddForm">
     <label for="{{name}}">{{inputLabel}}</label>
     <input type="text" name="{{name}}" id="{{name}}" [(ngModel)]="value"
-        (keydown.enter)="onNewItem(value)">
-    <button (click)="onNewItem(value)">{{buttonLabel}}</button>
+        (keydown.enter)="onNewItem(value)" autofocus>
+    <button (click)="onNewItem(value)" [disabled]="!value">{{buttonLabel}}</button>
 </div>

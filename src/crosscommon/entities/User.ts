@@ -770,13 +770,13 @@ export class User implements iEntity {
 			this.usr_email = base.usr_email;
 			this.usr_ctg_connected = base.usr_ctg_connected;
 			this.usr_login_attempts = base.usr_login_attempts;
-			this.usr_date_last_login_attempt = new Date(base.usr_date_last_login_attempt);
-			this.usr_date_pwd_change = new Date(base.usr_date_pwd_change);
+			this.usr_date_last_login_attempt = (base.usr_date_last_login_attempt !== null) ? new Date(base.usr_date_last_login_attempt) : null;
+			this.usr_date_pwd_change = (base.usr_date_pwd_change !== null) ? new Date(base.usr_date_pwd_change) : null;
 			this.usr_ctg_pwd_temporal = base.usr_ctg_pwd_temporal;
 			this.usr_ctg_blocked = base.usr_ctg_blocked;
 			this.usr_config = base.usr_config;
-			this.usr_date_add = new Date(base.usr_date_add);
-			this.usr_date_mod = new Date(base.usr_date_mod);
+			this.usr_date_add = (base.usr_date_add !== null) ? new Date(base.usr_date_add) : null;
+			this.usr_date_mod = (base.usr_date_mod !== null) ? new Date(base.usr_date_mod) : null;
 			this.usr_ctg_status = base.usr_ctg_status;
 
 			this.usr_txt_user_type = base.usr_txt_user_type;

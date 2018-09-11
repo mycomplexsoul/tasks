@@ -456,8 +456,8 @@ export class Catalog implements iEntity {
 			this.ctg_meta1 = base.ctg_meta1;
 			this.ctg_meta2 = base.ctg_meta2;
 			this.ctg_ctg_permissions = base.ctg_ctg_permissions;
-			this.ctg_date_add = new Date(base.ctg_date_add);
-			this.ctg_date_mod = new Date(base.ctg_date_mod);
+			this.ctg_date_add = (base.ctg_date_add !== null) ? new Date(base.ctg_date_add) : null;
+			this.ctg_date_mod = (base.ctg_date_mod !== null) ? new Date(base.ctg_date_mod) : null;
 			this.ctg_ctg_status = base.ctg_ctg_status;
 
 			this.ctg_txt_permissions = base.ctg_txt_permissions;

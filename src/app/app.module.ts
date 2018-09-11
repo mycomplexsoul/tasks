@@ -45,6 +45,10 @@ const appRoutes: Routes = [
         component: RebuildComponent,
         data: { title: 'Rebuild' }
     },{
+        path: 'login',
+        component: LoginComponent,
+        data: { title: 'Login' }
+    },{
         path: '',
         redirectTo: '/tasks',
         pathMatch: 'full'

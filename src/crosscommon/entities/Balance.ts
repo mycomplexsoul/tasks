@@ -552,8 +552,8 @@ export class Balance implements iEntity {
 			this.bal_withdrawals = base.bal_withdrawals;
 			this.bal_final = base.bal_final;
 			this.bal_id_user = base.bal_id_user;
-			this.bal_date_add = new Date(base.bal_date_add);
-			this.bal_date_mod = new Date(base.bal_date_mod);
+			this.bal_date_add = (base.bal_date_add !== null) ? new Date(base.bal_date_add) : null;
+			this.bal_date_mod = (base.bal_date_mod !== null) ? new Date(base.bal_date_mod) : null;
 			this.bal_ctg_status = base.bal_ctg_status;
 
 			this.bal_txt_account = base.bal_txt_account;

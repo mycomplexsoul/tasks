@@ -382,8 +382,8 @@ export class LastTime implements iEntity {
 			this.lst_value = base.lst_value;
 			this.lst_notes = base.lst_notes;
 			this.lst_id_user = base.lst_id_user;
-			this.lst_date_add = new Date(base.lst_date_add);
-			this.lst_date_mod = new Date(base.lst_date_mod);
+			this.lst_date_add = (base.lst_date_add !== null) ? new Date(base.lst_date_add) : null;
+			this.lst_date_mod = (base.lst_date_mod !== null) ? new Date(base.lst_date_mod) : null;
 			this.lst_ctg_status = base.lst_ctg_status;
 
 			this.lst_txt_status = base.lst_txt_status;

@@ -17,6 +17,7 @@ export class ComboItemComponent {
 
     /* TODO: template does not have custom name/id */
     // TODO: input needs to be focused when displayed
+    // TODO: add optional validation for duplicated item value (needs a reference list)
 
     toggleView(){
         this.viewAddForm = !this.viewAddForm;

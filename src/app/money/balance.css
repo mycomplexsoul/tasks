@@ -1,5 +1,6 @@
 .currency-cell-right {
     text-align: right;
+    padding: 5px;
 }
 
 .balance-row:nth-child(odd) {

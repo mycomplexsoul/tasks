@@ -25,7 +25,8 @@ export class BalanceService {
         this.entryService = entryService;
         this.sync = sync;
         // get api root
-        this.apiRoot = storage.getObject('Options')['optServerAddress'] || '';
+        const options = storage.getObject('Options');
+        this.apiRoot = options ? options['optServerAddress'] : '';
     }
 
     list(): Array<Balance> {

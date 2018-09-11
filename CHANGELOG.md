@@ -16,6 +16,45 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+* Movement form validation server side.
+* Movement form validation client side.
+* Combo-item value validation against a provided list.
+* Login basic CSS.
+* Login server routing and user validation.
+* Login logged user identity.
+* Unit test runner for server.
+* Unit test runner for client.
+
+## v1.4.21 (2018-08-23)
+
+### Added
+* [AppGeneral] Fix date fields initialization when value is null, now it assigns null instead of the date returned by `new Date(null)`.
+
+## v1.4.20 (2018-08-22)
+
+### Added
+* [AppMoney][Movements] Form manage all cases independently.
+
+## v1.4.19 (2018-08-21)
+
+### Added
+* [AppMoney][ComboItem] Basic styling for integration.
+
+## v1.4.18 (2018-08-20)
+
+### Added
+* [AppMoney][Movements] Responsive form on mobile.
+
+## v1.4.18 (2018-08-17)
+
+### Added
+* [AppMoney][Movements] Reset form properly for new movements.
+
+## v1.4.17 (2018-08-16)
+
+### Added
+* [AppMoney][Movements] Show movement id if rendering an existing movement on form.
+
 ## v1.4.16 (2018-08-15)
 
 ### Added

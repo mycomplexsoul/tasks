@@ -20,7 +20,6 @@ body, input[text], button {
 }
 a {
   cursor: pointer;
-  cursor: hand;
 }
 button {
   font-family: Arial;
@@ -29,7 +28,6 @@ button {
   padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
-  cursor: hand;
 }
 button:hover {
   background-color: #cfd8dc;
@@ -157,7 +155,7 @@ tasks .task-in-process {
 }
 
 body {
-  margin: 5px;
+  margin: 10px;
   color: #333;
   font-family: monospace;
 }
@@ -169,8 +167,10 @@ body {
 button {
   color: #222;
   font-family: monospace;
-  padding: 0px;
+  padding: 1px 5px;
   border: 1px solid #2f93f7;
+  background-color: #e6ecff;
+  border-radius: 0;
 }
 
 input.task{
@@ -287,6 +287,41 @@ menu {
 
 .field {
   display: block;
+  margin: 10px 0;
+}
+
+.field-input {
+  display: block;
+  width: 100%;
+}
+
+.field-select {
+  width: calc(100% - 60px);
+  display: inline;
+}
+
+combo-item > button {
+  width: 50px;
+  display: inline;
+}
+
+@media (min-width: 505px) {
+  .field-input {
+    display: inline;
+    width: auto;
+  }
+
+  .field-input[type=text] {
+    width: 60%;
+  }
+
+  .field-select {
+    width: auto;
+  }
+
+  combo-item > button {
+    width: 50px;
+  }
 }
 
 input[type="radio"] {
@@ -312,6 +347,11 @@ input[type="radio"] {
   display: block;
   max-width: 350px;
   min-width: 350px;
+  cursor: pointer;
+}
+
+.movement-box:hover {
+  background-color: #e6e6e6;
 }
 
 .movement-list {
@@ -356,16 +396,28 @@ input[type="radio"] {
   color: gray;
 }
 
-.movement-input-description,
-.movement-input-budget,
-.movement-input-notes {
-  width: 60%;
-}
-
 .movement-badge-new,
 .movement-badge-edited {
   border: 1px solid green;
   padding: 0 5px;
   background: lightgreen;
   color: blue;
+}
+
+combo-item .combo-item-container {
+  border: 1px dashed cornflowerblue;
+  padding: 10px;
+  margin: 10px;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+  align-content: center;
+  justify-items: center;
+  border: 1px dashed gray;
+  width: 300px;
+  margin: 0 auto;
+  padding: 10px;
 }

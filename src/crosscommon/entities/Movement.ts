@@ -810,7 +810,7 @@ export class Movement implements iEntity {
 	constructor(base?: any){
 		if (base !== undefined){
 			this.mov_id = base.mov_id;
-			this.mov_date = new Date(base.mov_date);
+			this.mov_date = (base.mov_date !== null) ? new Date(base.mov_date) : null;
 			this.mov_ctg_currency = base.mov_ctg_currency;
 			this.mov_amount = base.mov_amount;
 			this.mov_id_account = base.mov_id_account;
@@ -822,8 +822,8 @@ export class Movement implements iEntity {
 			this.mov_desc = base.mov_desc;
 			this.mov_notes = base.mov_notes;
 			this.mov_id_user = base.mov_id_user;
-			this.mov_date_add = new Date(base.mov_date_add);
-			this.mov_date_mod = new Date(base.mov_date_mod);
+			this.mov_date_add = (base.mov_date_add !== null) ? new Date(base.mov_date_add) : null;
+			this.mov_date_mod = (base.mov_date_mod !== null) ? new Date(base.mov_date_mod) : null;
 			this.mov_ctg_status = base.mov_ctg_status;
 
 			this.mov_txt_type = base.mov_txt_type;

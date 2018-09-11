@@ -1,8 +1,8 @@
-<div class="login">
-    <form #loginForm="ngForm" (ngSubmit)="submit(loginForm)">
+<form #loginForm="ngForm" (ngSubmit)="submit(loginForm)">
+    <div class="login">
         <input type="text" id="fUsername" name="fUsername" ngModel />
         <input type="password" id="fPassword" name="fPassword" ngModel />
         <input type="submit" value="Login" />
         <div id="messages" *ngIf="viewData.error">{{ viewData.errorMessage }}</div>
-    </form>
-</div>
+    </div>
+</form>

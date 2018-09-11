@@ -347,12 +347,12 @@ export class TaskTimeTracking implements iEntity {
 			this.tsh_id = base.tsh_id;
 			this.tsh_num_secuential = base.tsh_num_secuential;
 			this.tsh_name = base.tsh_name;
-			this.tsh_date_start = new Date(base.tsh_date_start);
-			this.tsh_date_end = new Date(base.tsh_date_end);
+			this.tsh_date_start = (base.tsh_date_start !== null) ? new Date(base.tsh_date_start) : null;
+			this.tsh_date_end = (base.tsh_date_end !== null) ? new Date(base.tsh_date_end) : null;
 			this.tsh_time_spent = base.tsh_time_spent;
 			this.tsh_id_user = base.tsh_id_user;
-			this.tsh_date_add = new Date(base.tsh_date_add);
-			this.tsh_date_mod = new Date(base.tsh_date_mod);
+			this.tsh_date_add = (base.tsh_date_add !== null) ? new Date(base.tsh_date_add) : null;
+			this.tsh_date_mod = (base.tsh_date_mod !== null) ? new Date(base.tsh_date_mod) : null;
 		}
 	}
 

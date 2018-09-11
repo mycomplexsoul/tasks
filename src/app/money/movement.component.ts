@@ -276,7 +276,7 @@ export class MovementComponent implements OnInit {
                 m.mov_ctg_type = form.value.fMovementType;
             }
             if (!this.isTransfer){
-                m.mov_budget = form.value.fBudget;
+                m.mov_budget = form.value.fBudget || null;
                 m.mov_id_category = form.value.fCategory;
                 m.mov_id_place = form.value.fPlace;
             } else {
@@ -325,10 +325,7 @@ export class MovementComponent implements OnInit {
                 this.services.balance.add(localEntries);
                 console.log('these are all balance',this.services.balance.list);
             }
-            form.reset();
-            form.controls['fMovemementFlowType'].setValue('custom');
-            form.controls['fMovemementType'].setValue('1');
-            form.controls['fDate'].setValue(this.DateToStringDate(new Date()));
+            this.resetForm(form);
             return false;
         }
     }
@@ -638,14 +635,42 @@ export class MovementComponent implements OnInit {
         setTimeout(() => {
             fields.forEach((f: any) => {
                 if (form.controls[f.control]){
+                    const value = model[prefix + f.value];
+                    let valueToSet = null;
+
                     if (f.value === '_date'){
-                        form.controls[f.control].setValue(this.DateToStringDate(new Date(model[prefix + f.value])));
+                        if (value !== null) {
+                            valueToSet = this.DateToStringDate(new Date(value));
+                        } else {
+                            valueToSet = this.DateToStringDate(new Date());
+                        }
                     } else {
-                        form.controls[f.control].setValue(model[prefix + f.value] || null);
+                        valueToSet = value || null;
                     }
+                    
+                    form.controls[f.control].setValue(valueToSet);
                 }
             });
         }, 0);
     }
 
+    handleNewMovement(form: NgForm) {
+        if (this.viewData.showCreateForm) { // if it's visible, reset and then hide
+            this.resetForm(form);
+        }
+        this.viewData.showCreateForm = !this.viewData.showCreateForm;
+    }
+
+    resetForm(form: NgForm) {
+        this.model.id = null;
+        this.model.selectedPreset = null;
+        this.movementFlowType('custom');
+        form.reset();
+        form.controls['fMovementFlowType'].setValue('custom');
+        this.model.type = 1;
+        if (form.controls['fMovementType']) {
+            form.controls['fMovementType'].setValue(1);
+        }
+        form.controls['fDate'].setValue(this.DateToStringDate(new Date()));
+    }
 }

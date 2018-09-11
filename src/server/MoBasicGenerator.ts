@@ -146,7 +146,7 @@ export class MoBasicGenerator {
                 str += line;
             }
             if (['date', 'datetime'].indexOf(f.dbType) !== -1){
-                str += line + tab + tab + tab + `this.${f.dbName} = new Date(base.${f.dbName});`;
+                str += line + tab + tab + tab + `this.${f.dbName} = (base.${f.dbName} !== null) ? new Date(base.${f.dbName}) : null;`;
             } else {
                 str += line + tab + tab + tab + `this.${f.dbName} = base.${f.dbName};`;
             }
