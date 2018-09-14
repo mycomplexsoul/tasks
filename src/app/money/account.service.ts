@@ -11,7 +11,7 @@ export class AccountService {
     private config = {
         storageKey: 'accounts',
         api: {
-            list: '/api/accounts'
+            list: '/api/movements/accounts'
         }
     }
 
@@ -138,7 +138,11 @@ export class AccountService {
         };
         const query = `?q=${JSON.stringify(filter)}`;
         return this.sync.get(`${this.config.api.list}${query}`).then(data => {
-            this.data = data.map((d: any): Account => new Account(d));
+            this.data = data.map((d: any): Account => {
+                let item = new Account(d);
+                item['bal_final'] = d['bal_final'];
+                return item;
+            });
             this.data = this.data.sort(sort);
             return this.data;
         }).catch(err => {

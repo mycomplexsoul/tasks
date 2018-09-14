@@ -60,4 +60,13 @@ router.get('/generate-balance', (req, res) => {
     res.end(JSON.stringify({operationOk: true, message: `Batch finished, inserted ok`}));
 });
 
+router.get('/accounts', (req, res) => {
+    let server: MovementCustom = new MovementCustom();
+    let node: iNode = {
+        request: req
+        , response: res
+    };
+    server.accountsWithBalance(node);
+});
+
 export { router };

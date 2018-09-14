@@ -238,11 +238,21 @@ export class MovementComponent implements OnInit {
             p.pre_date = this.stringDateToDate(form.value.fDate);
             p.pre_amount = form.value.fAmount;
             p.pre_id_account = form.value.fAccount;
-            //p.pre_id_account_to = 0;
-            p.pre_ctg_type = form.value.fMovementType;
-            p.pre_budget = form.value.fBudget;
-            p.pre_id_category = form.value.fCategory;
-            p.pre_id_place = form.value.fPlace;
+            if (this.isTransfer){
+                p.pre_id_account_to = form.value.fAccountTo;
+                p.pre_ctg_type = 3;
+            } else {
+                p.pre_ctg_type = form.value.fMovementType;
+            }
+            if (!this.isTransfer){
+                p.pre_budget = form.value.fBudget || null;
+                p.pre_id_category = form.value.fCategory;
+                p.pre_id_place = form.value.fPlace;
+            } else {
+                p.pre_budget = null;
+                p.pre_id_category = '0';
+                p.pre_id_place = '0';
+            }
             p.pre_desc = form.value.fDescription;
             p.pre_notes = form.value.fNotes;
             p.pre_id_user = this.user;

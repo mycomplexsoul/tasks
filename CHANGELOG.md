@@ -14,7 +14,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * [AppCommon] Angular build into `/dist` folder.
 * [AppCommon] Deploy BE + FE in `/dist` folder.
 
-<hr/>
 
 * Movement form validation server side.
 * Movement form validation client side.
@@ -24,6 +23,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Login logged user identity.
 * Unit test runner for server.
 * Unit test runner for client.
+* Refactor accounts with balance endpoint to have an endpoint that uses a sql query as param.
+
+
+<hr/>
+
+## v1.4.24 (2018-08-28)
+
+### Added
+* [AppMoney][Movements] Enable Presets based on Transfers.
+
+## v1.4.23 (2018-08-27)
+
+### Added
+* [AppMoney][Movements] Account combo list displays current account balance.
+
+## v1.4.22 (2018-08-24)
+
+### Added
+* [AppMoney][Movements] Endpoint for retrieving accounts with current final balance for displaying in accounts combo.
 
 ## v1.4.21 (2018-08-23)
 
