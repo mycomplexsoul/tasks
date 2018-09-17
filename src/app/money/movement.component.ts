@@ -146,12 +146,16 @@ export class MovementComponent implements OnInit {
         this.model.date = this.DateToStringDate(new Date());
     }
 
-    ngOnInit(){
-        // TODO: this should be refactored the same way as categories and places
+    retrieveAccountsAndBalance(){
         this.services.account.getAll().then((accounts: Account[]) => {
             this.accounts = accounts;
             this.viewData.accounts = this.accounts;
         });
+    }
+
+    ngOnInit(){
+        // TODO: this should be refactored the same way as categories and places
+        this.retrieveAccountsAndBalance();
         this.services.category.getAllForUser(this.user).then((categories: Category[]) => {
             this.viewData.categories = categories;
         });
@@ -312,13 +316,13 @@ export class MovementComponent implements OnInit {
                 // edition
                 const existingIndex: number = this.viewData.movements.findIndex(m => m.mov_id === this.model.id);
                 m.mov_date_add = new Date(this.viewData.movements[existingIndex].mov_date_add);
-                this.services.movement.edit(m);
+                this.services.movement.edit(m, () => this.retrieveAccountsAndBalance());
                 m['isEdited'] = true; // flag to render as edited on UI
                 this.viewData.movements[existingIndex] = m;
                 this.model.id = null;
             } else {
                 // new movement
-                this.services.movement.newItem(m);
+                this.services.movement.newItem(m, () => this.retrieveAccountsAndBalance());
                 m['isNew'] = true; // flag to render as new on UI
                 console.log('this is the movement',m);
                 this.viewData.movements.unshift(m);

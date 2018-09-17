@@ -54,6 +54,21 @@ Unset schedule, unset link
 
 <hr/>
 
+## v1.4.31 (2018-09-06)
+
+### Modified
+* [AppMoney][Balance] Filter Non-Zero Balance now filters out based on all columns being zero, not just final balance.
+
+## v1.4.30 (2018-09-05)
+
+### Modified
+* [AppMoney][Fix] Fixed retrieval of accounts and balance after saving a movement (new/edit).
+
+## v1.4.29 (2018-09-04)
+
+### Modified
+* [AppCommon] Rename script to start application `start:node` to just `start`.
+
 ## v1.4.28 (2018-09-03)
 
 ### Added

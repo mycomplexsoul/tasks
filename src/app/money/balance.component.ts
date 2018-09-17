@@ -89,7 +89,8 @@ export class BalanceComponent implements OnInit {
     filterMonthBalance(){
         let filter = (b: Balance) => b.bal_year == this.model.year && b.bal_month == this.model.month;
         if (this.viewData.filterNonZero){
-            filter = (b: Balance) => b.bal_year == this.model.year && b.bal_month == this.model.month && b.bal_final !== 0;
+            filter = (b: Balance) => b.bal_year == this.model.year && b.bal_month == this.model.month
+                && !(b.bal_initial === 0 && b.bal_charges === 0 && b.bal_withdrawals === 0 && b.bal_final === 0);
         }
         
         return this.services.balance.list().filter((b: Balance) => filter(b));

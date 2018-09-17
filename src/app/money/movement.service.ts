@@ -150,7 +150,7 @@ export class MovementService {
         return Utils.hashId('mov', 32, date);
     }
 
-    newItem(movement: Movement): Movement{
+    newItem(movement: Movement, callback: Function): Movement{
         const newId: string = this.newId(new Date(movement.mov_date));
         //const newId: string = Utils.hashId('mov', 32, new Date(movement.mov_date));
         movement.mov_id = newId;
@@ -161,12 +161,12 @@ export class MovementService {
         //this.data.push(newItem);
         //this.saveToStorage();
         this.sync.post(this.config.api.create, newItem).then(response => {
-            if (response.processOk) {
-                this.data.push(newItem);
+            if (response.operationOk) {
+                callback();
             } else {
                 newItem['sync'] = false;
-                this.data.push(newItem);
             }
+            this.data.push(newItem);
         }).catch(err => {
             // Append it to the listing but flag it as non-synced yet
             newItem['sync'] = false;
@@ -188,19 +188,21 @@ export class MovementService {
 
     sendBatchToServer(list: Array<Movement>){
         this.sync.post(`${this.apiRoot}${this.config.api.batch}`, list).then((response: any) => {
-            // response: { processOk: true, details: {  } }
+            // response: { operationOk: true, details: {  } }
             console.log('response movements batch',response);
         });
     }
 
-    edit(movement: Movement): Movement{
+    edit(movement: Movement, callback: Function): Movement{
         movement.mov_ctg_currency = 1;
         movement.mov_date_mod = new Date();
         const item: Movement = new Movement(movement);
 
         this.sync.post(this.config.api.update.replace(':id', movement.mov_id), item).then(response => {
             const index = this.data.findIndex(d => d.mov_id === item.mov_id);
-            if (!response.processOk) {
+            if (response.operationOk) {
+                callback();
+            } else {
                 item['sync'] = false;
             }
             this.data[index] = item;
