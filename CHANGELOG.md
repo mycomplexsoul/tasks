@@ -14,6 +14,32 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * [AppCommon] Angular build into `/dist` folder.
 * [AppCommon] Deploy BE + FE in `/dist` folder.
 
+Remove automatically-asigned budget from movement import
+Tag properly from movement import
+Send an email with node
+Balance new fields: comment, date_last_valid, swap charges-withdrawals legends
+Movement report with shared movements
+    * 1809 shared-50  | movement shared 50/50
+    * 1809 shared-100 | movement payed 100% by mate (Lau)
+    * 1809 shared-me  | movement payed 100% by me and to be discounted from final amount
+Scheduled movements
+Display Average Balance on Balance page (using account daycheck information)
+Multimedia
+    * Entity Definition
+Last Time
+    * Entity Definition new fields
+        _validity Days to consider this as valid
+        _tags For grouping and filtering
+    * Routing and Basic capture
+    * Last Time listing
+Tasks
+    * Option to hide finished today section
+    * Indicator for last finished task timestamp
+    * Keyboard shortcuts for navigating from record list to next/previous record list and focus into first task in the list
+    * Once focused on estimated time, pressing arrow up/down should navigate to previous/next task in the list, focusing on the task description
+    * Option to show/hide Indicators
+    * Clean up Indicators legacy section
+Unset schedule, unset link
 
 * Movement form validation server side.
 * Movement form validation client side.
@@ -27,6 +53,35 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 <hr/>
+
+## v1.4.28 (2018-09-03)
+
+### Added
+* [AppMoney][Movements] Movement cards full width on mobile.
+
+## v1.4.27 (2018-08-31)
+
+### Added
+* [AppMoney][Movements] After saving a movement (new/edit) retrieves new account/balance information to populate account combo.
+
+## v1.4.26 (2018-08-30)
+
+### Added
+* [AppCommon] `DateUtils.lastDayInMonth()` and `DateUtils.addMonths()` added.
+* [AppMoney][Movements] Account to combo items now render current balance.
+
+## v1.4.25 (2018-08-29)
+
+### Added
+* [AppMoney][Movements] REST API Endpoint for calculating average balance for a period in `/api/movements/average-balance`.
+  query params are:
+  - account: account id for the account to be calculated.
+  - checkday: if true, use the account check day for the calculation, otherwise use day 1 of month.
+  - year: base year to be calculated.
+  - month: base month to be calculated.
+  If checkday is falsy, uses first day of the provided year/month to calculate the average balance through the last day of the month.
+  If checkday is true, it will start with calculation from the checkday of the account from the previous month through
+  provided year/month checkday-previous day.
 
 ## v1.4.24 (2018-08-28)
 

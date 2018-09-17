@@ -48,7 +48,7 @@
             <span class="field" *ngIf="isTransfer">
                 <label for="fAccountTo" class="label-left">Account To</label>
                 <select name="fAccountTo" id="fAccountTo" class="field-select" ngModel>
-                    <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}}</option>
+                    <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}} / {{opt.bal_final | currency:'MXN':'symbol-narrow':'1.2-2'}}</option>
                 </select>
             </span>
             <span class="field" *ngIf="!isTransfer">

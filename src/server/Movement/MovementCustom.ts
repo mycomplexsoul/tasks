@@ -15,6 +15,7 @@ import { iNode } from "../iNode";
 import { BalanceModule } from "../BalanceModule";
 import ConnectionService from "../ConnectionService";
 import { ApiModule } from "../ApiModule";
+import { DateUtils } from "../../crosscommon/DateUtility";
 
 export class MovementCustom {
     findIn = <T>(arr: T[], findCriteria: (e: T) => boolean, returnField: string) => {
@@ -547,6 +548,158 @@ export class MovementCustom {
             node.response.end(JSON.stringify(response));
         });
     };
+
+    sharedMovements = (node: iNode) => {
+        
+    }
+
+    averageBalance = (node: iNode) => {
+        const idAccount: string = node.request.query['account'];
+        const useCheckDay: boolean = node.request.query['checkday'] === 'true';
+        const year: number = node.request.query['year'];
+        const month: number = node.request.query['month'];
+
+        this.averageBalancePerAccount(idAccount, useCheckDay, year, month).then(result => {
+            node.response.end(JSON.stringify(result));
+        });
+    }
+
+    averageBalancePerAccount = (idAccount: string, useCheckDay: boolean, year: number, month: number): Promise<{
+        operationOk: boolean,
+        averageBalance: number,
+        message: string,
+        checkDay: number,
+        initialBalance: number,
+        startingDate: Date,
+        finalDate: Date,
+        averageMinBalance: number,
+        dailyBalance: number[]
+    }> => {
+        let dailyBalance: number[] = [];
+        let result: {
+            operationOk: boolean,
+            averageBalance: number,
+            message: string,
+            checkDay: number,
+            initialBalance: number,
+            startingDate: Date,
+            finalDate: Date,
+            averageMinBalance: number,
+            dailyBalance: number[]
+        } = {
+            operationOk: false,
+            averageBalance: 0,
+            message: null,
+            checkDay: 0,
+            initialBalance: 0,
+            startingDate: null,
+            finalDate: null,
+            averageMinBalance: 0,
+            dailyBalance: []
+        };
+        let startingDate: Date = new Date(year, month-1, 1, 0, 0, 0);
+
+        // [SQL] get current initial balance, as well as account check day starting date if it's based on check day
+        // if we're using check day we need to get initial balance from past month because we need to calculate balance at check day
+        const sqlBalance: string = `select bal_initial, acc_check_day, acc_average_min_balance from vibalance
+            inner join account on (bal_id_account = acc_id)
+            where bal_id_account = '${idAccount}'
+            and bal_year = ${year}
+            and bal_month = ${useCheckDay ? month - 1 : month}`;
+
+        const connection = ConnectionService.getConnection();
+        return connection.runSql(sqlBalance).then((balanceResponse) => {
+            if (balanceResponse.err){
+                result.message = 'Could not fetch balance for account';
+                return {};
+            }
+            const response = balanceResponse.rows[0];
+            console.log('balance', response);
+            return {
+                currentBalance: response['bal_initial'],
+                checkDay: response['acc_check_day'],
+                averageMinBalance: response['acc_average_min_balance'],
+            };
+        }).then(({currentBalance, checkDay, averageMinBalance}) => {
+            if (result.message){
+                return result;
+            }
+            if (useCheckDay) {
+                startingDate = new Date(year, month-2, checkDay+1, 0, 0, 0);
+            }
+            // final date should be in 1 month
+            const finalDate: Date = DateUtils.addDays(DateUtils.addMonths(startingDate, 1), -1);
+            const previousMonthDayOne: Date = new Date(year, month-2, 1, 0, 0, 0);
+            // [SQL] Get total amount spent each day for this account within the range
+            const sqlEntryAcumulation: string = `SELECT ent_date, SUM(CASE WHEN ent_ctg_type = 1
+                THEN -1 * ent_amount
+                ELSE ent_amount
+                END) as Amount
+                FROM vientry
+                where ent_id_account = '${idAccount}'
+                and ent_date >= '${useCheckDay ? previousMonthDayOne.toISOString().slice(0,10) : startingDate.toISOString().slice(0,10)}'
+                and ent_date <= '${finalDate.toISOString().slice(0,10)}'
+                GROUP BY ent_date
+                ORDER BY ent_date desc`;
+            
+            result.averageMinBalance = averageMinBalance;
+            result.startingDate = startingDate;
+            result.finalDate = finalDate;
+            result.checkDay = checkDay;
+            
+            return connection.runSql(sqlEntryAcumulation).then(entryResponse => {
+                if (entryResponse.err){
+                    result.message = 'Could not fetch entries for account';
+                    return result;
+                }
+                const entrySums: any[] = entryResponse.rows;
+                console.log('entries', entrySums);
+
+                let dateCounter: Date = useCheckDay ? previousMonthDayOne : startingDate;
+                if (useCheckDay) { // should iterate to rebuild from day 1 of previous month to startingDate
+                    while(dateCounter.getTime() < startingDate.getTime()) { // iterates each day within the range
+                        const daySum: any = entrySums.find(e => (new Date(e['ent_date'])).toISOString().slice(0,10) === dateCounter.toISOString().slice(0,10));
+                        if (daySum){
+                            currentBalance += daySum['Amount'];
+                        }
+                        dateCounter = DateUtils.addDays(dateCounter, 1);
+                    } // now currenBalance has all movements from day 1 to startingDate and is the correct balance that day
+                }
+                result.initialBalance = currentBalance;
+
+                while(dateCounter.getTime() <= finalDate.getTime()) { // iterates each day within the range
+                    const daySum: any = entrySums.find(e => (new Date(e['ent_date'])).toISOString().slice(0,10) === dateCounter.toISOString().slice(0,10));
+                    if (daySum){
+                        if (dailyBalance.length){ // following days use last day balance
+                            dailyBalance.push(Math.round((dailyBalance[dailyBalance.length-1] + daySum['Amount']) * 100) / 100);
+                        } else { // first day uses currentBalance
+                            dailyBalance.push(currentBalance + daySum['Amount']);
+                        }
+                    } else { // no movements means same balance for this day or currentBalance
+                        if (dailyBalance.length){
+                            dailyBalance.push(dailyBalance[dailyBalance.length-1]);
+                        } else {
+                            dailyBalance.push(currentBalance);
+                        }
+                    }
+
+                    dateCounter = DateUtils.addDays(dateCounter, 1);
+                }
+
+                // calculate the average
+                result.averageBalance = dailyBalance.reduce((prev, curr) => prev + curr, 0) / dailyBalance.length;
+                result.operationOk = true;
+                result.dailyBalance = dailyBalance;
+                console.log('result for average-balance process', result);
+                return result;
+            })
+        }).catch(err => {
+            result.message = err;
+            return result;
+        });
+    }
+
+    
 }
 
 

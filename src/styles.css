@@ -345,9 +345,14 @@ input[type="radio"] {
   margin: 5px;
   padding: 5px;
   display: block;
-  max-width: 350px;
-  min-width: 350px;
+  width: 100%;
   cursor: pointer;
+}
+
+@media (min-width: 505px) {
+  .movement-box {
+    width: 350px;
+  }
 }
 
 .movement-box:hover {

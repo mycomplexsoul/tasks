@@ -65,6 +65,18 @@ class DateUtility {
             ;
         return str;
     }
+
+    lastDayInMonth(year: number, month: number): number {
+        let date: Date = new Date(year, month + 1, 1);
+        date.setDate(date.getDate() - 1);
+        return date.getDate();
+    }
+
+    addMonths(date: Date, months: number): Date {
+        let newDate = new Date(date);
+        newDate.setMonth(newDate.getMonth() + months);
+        return newDate;
+    }
 }
 
 export let DateUtils = new DateUtility();

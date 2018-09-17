@@ -69,4 +69,13 @@ router.get('/accounts', (req, res) => {
     server.accountsWithBalance(node);
 });
 
+router.get('/average-balance', (req, res) => {
+    let server: MovementCustom = new MovementCustom();
+    let node: iNode = {
+        request: req
+        , response: res
+    };
+    server.averageBalance(node);
+});
+
 export { router };
