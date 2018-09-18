@@ -54,6 +54,11 @@ Unset schedule, unset link
 
 <hr/>
 
+## v1.4.33 (2018-09-10)
+
+### Added
+* [AppGenerator] `/api/type-generator/config` REST endpoint for type-generator config.
+
 ## v1.4.32 (2018-09-07)
 
 ### Added

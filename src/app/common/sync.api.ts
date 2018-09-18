@@ -118,6 +118,7 @@ export class SyncAPI {
             this.log(`Your navigator reports online status as: ${nav}`)
             return this.isServerReachable().then((data) => { // some request to BE
                 this.log(`Tried to contact the server, answer was`,data);
+                this.lastOnlineStamp = new Date();
                 return nav && data;
             });
         } else {
