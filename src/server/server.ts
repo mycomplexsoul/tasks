@@ -125,6 +125,8 @@ app.use(function(req, res) {
     }
 });
 
-const server = app.listen(8081, () => {
-    console.log('Server running at http://127.0.0.1:8081/');
+const port = process.env.PORT || 8081;
+//const server = 
+app.listen(port, () => { // to change it, set in a cmd >export PORT=3000  then run the app
+    console.log(`Server v${process.env.npm_package_version} running at http://127.0.0.1:${port}/`);
 });

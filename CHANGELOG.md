@@ -54,6 +54,12 @@ Unset schedule, unset link
 
 <hr/>
 
+## v1.4.32 (2018-09-07)
+
+### Added
+* [AppCommon] Launch node server with a different port, default is 8081.
+* [AppCommon] Node server startup now shows app version.
+
 ## v1.4.31 (2018-09-06)
 
 ### Modified
