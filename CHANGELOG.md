@@ -14,45 +14,66 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * [AppCommon] Angular build into `/dist` folder.
 * [AppCommon] Deploy BE + FE in `/dist` folder.
 
-Remove automatically-asigned budget from movement import
-Tag properly from movement import
-Send an email with node
-Balance new fields: comment, date_last_valid, swap charges-withdrawals legends
-Movement report with shared movements
-    * 1809 shared-50  | movement shared 50/50
-    * 1809 shared-100 | movement payed 100% by mate (Lau)
-    * 1809 shared-me  | movement payed 100% by me and to be discounted from final amount
-Scheduled movements
-Display Average Balance on Balance page (using account daycheck information)
-Multimedia
-    * Entity Definition
-Last Time
-    * Entity Definition new fields
-        _validity Days to consider this as valid
-        _tags For grouping and filtering
-    * Routing and Basic capture
-    * Last Time listing
-Tasks
-    * Option to hide finished today section
+* Money
+    * Import
+        * Remove automatically-asigned budget from movement import
+        * Tag properly from movement import
+    * Reports
+        * Send an email with node
+        * Movement report with shared movements
+            * 1809 shared-50  | movement shared 50/50
+            * 1809 shared-100 | movement payed 100% by mate (Lau)
+            * 1809 shared-me  | movement payed 100% by me and to be discounted from final amount
+    * Balance
+        * Balance new fields: comment, date_last_valid, swap charges-withdrawals legends
+        * Display Average Balance on Balance page (using account daycheck information)
+    * Movement features
+        * Scheduled movements
+        * Movement form validation server side.
+        * Movement form validation client side.
+        * Combo-item value validation against a provided list.
+* Tasks
+    * [AppTasks] Use tasks from server.
     * Indicator for last finished task timestamp
     * Keyboard shortcuts for navigating from record list to next/previous record list and focus into first task in the list
     * Once focused on estimated time, pressing arrow up/down should navigate to previous/next task in the list, focusing on the task description
     * Option to show/hide Indicators
     * Clean up Indicators legacy section
-Unset schedule, unset link
-
-* Movement form validation server side.
-* Movement form validation client side.
-* Combo-item value validation against a provided list.
-* Login basic CSS.
-* Login server routing and user validation.
-* Login logged user identity.
-* Unit test runner for server.
-* Unit test runner for client.
-* Refactor accounts with balance endpoint to have an endpoint that uses a sql query as param.
-
+    * Unset schedule, unset link
+* Common
+    * Refactor database view generation for using joins on catalog instead of subqueries.
+    * Unit test runner for server.
+    * Unit test runner for client.
+    * Refactor accounts with balance endpoint to have an endpoint that uses a sql query as param.
+* Multimedia
+    * Entity Definition
+* Last Time
+    * Entity Definition new fields
+        _validity Days to consider this as valid
+        _tags For grouping and filtering
+    * Routing and Basic capture
+    * Last Time listing
+* Login
+    * Login basic CSS.
+    * Login server routing and user validation.
+    * Login logged user identity.
 
 <hr/>
+
+## v1.4.34 (2018-09-11)
+
+### Added
+* [AppCommon] `ApiModule.listWithSQL()` method to create endpoints with just a sql query.
+
+## v1.4.33 (2018-09-10)
+
+### Added
+* [AppCommon] Support for `<` and `>=` operators in filter object parser for sql.
+
+## v1.4.32 (2018-09-07)
+
+### Added
+* [AppTasks] Create REST API list endpoint for tasks at `/api/tasks`.
 
 ## v1.4.31 (2018-09-06)
 

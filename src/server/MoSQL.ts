@@ -17,11 +17,14 @@ export class MoSQL {
         , _datetimeFormatDB: 'yyyy-MM-dd HH:mm:ss'
         , _s: ', '
         , _and: ' and '
+        , _or: ' or '
     };
     OPERATORS: any = {
         eq: '='
         , ne: '!='
         , in: 'in'
+        , lt: '<'
+        , ge: '>='
     };
     
     constructor(model?: iEntity){
@@ -43,6 +46,10 @@ export class MoSQL {
 
     concatAnd(sql: string, str: string) {
         return MoGen.concat(sql, this.constants._and) + str;
+    }
+
+    concatOr(sql: string, str: string) {
+        return MoGen.concat(sql, this.constants._or) + str;
     }
 
     concatSemicolon(sql: string, str: string) {
@@ -262,7 +269,11 @@ export class MoSQL {
                 }
                 if (model.metadata.fields.find(f => f.dbName === completeFieldName)){
                     let dbType: string = model.metadata.fields.find(f => f.dbName === completeFieldName).dbType;
-                    sql = this.concatAnd(sql, this.formatValueForSQL(dbType, crit.val, completeFieldName, this.OPERATORS[crit.op]));
+                    if (criteria.gc === 'AND'){
+                        sql = this.concatAnd(sql, this.formatValueForSQL(dbType, crit.val, completeFieldName, this.OPERATORS[crit.op]));
+                    } else {
+                        sql = this.concatOr(sql, this.formatValueForSQL(dbType, crit.val, completeFieldName, this.OPERATORS[crit.op]));
+                    }
                 } else {
                     // field not found inside this Entity, skip it
                 }

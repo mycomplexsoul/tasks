@@ -200,4 +200,25 @@ export class ApiModule {
             });
         }
     };
+
+    listWithSQL = (data: any, model?: iEntity): Promise<iEntity[]> => {
+        let m: iEntity = model ? model : this.model;
+        let connection: iConnection = ConnectionService.getConnection();
+        let params: string = data.q; //node.request.query['q'];
+        let sqlMotor: MoSQL = new MoSQL(m);
+        let sql: string = data.sql;
+        if (params){
+            sql += ` where ${sqlMotor.criteriaToSQL(sqlMotor.parseSQLCriteria(params), m)}`;
+        }
+        let array: iEntity[] = [];
+        
+        return connection.runSql(sql).then((response) => {
+            if (!response.err){
+                array = response.rows;
+                console.log(`api list with SQL query returned ${array.length} rows`);
+            }
+            connection.close();
+            return array;
+        });
+    };
 }
