@@ -60,6 +60,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.5.3 (2018-09-17)
+
+### Added
+* [AppLastTime] Basic listing and form creation UI.
+
+## v1.5.2 (2018-09-14)
+
+### Added
+* [AppCommon] Added `Utility.hashIdForEntity` for crosscommon generation of id's based on an entity field metadata.
+
+## v1.5.1 (2018-09-13)
+
+### Added
+* [AppLastTime] REST API endpoints and routing for listing and create last time items under `/api/lasttime`.
+
+## v1.5.0 (2018-09-12)
+
+### Added
+* [Breaking][AppLastTime] Added `validity` and `tags` fields to both `lasttime` and `lasttimehistory` entities.
+* [Breaking][AppLastTime] Incremented from 16 to 32 `id` field for both `lasttime` and `lasttimehistory` entities.
+
 ## v1.4.34 (2018-09-11)
 
 ### Added

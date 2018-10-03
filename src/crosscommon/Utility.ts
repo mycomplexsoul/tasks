@@ -1,3 +1,5 @@
+import { iEntity } from "./iEntity";
+
 class Utility {
     pad(value: string | number, fillChar: string, length: number, dir: number = -1){
         let result: string = value + '';
@@ -20,6 +22,11 @@ class Utility {
         datetimeString += `${this.pad(date.getHours(),'0',2)}${this.pad(date.getMinutes(),'0',2)}${this.pad(date.getSeconds(),'0',2)}`;
         let id = `${prefix}${datetimeString}-${random}`;
         return id;
+    }
+
+    hashIdForEntity(entity: iEntity, fieldName: string){
+        const length: number = entity.metadata.fields.find(f => f.dbName === fieldName).size;
+        return this.hashId(entity.metadata.prefix, length);
     }
 
     escapeRegExp(str: string){

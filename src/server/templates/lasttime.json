@@ -16,8 +16,8 @@
             "templateId": "string"
             , "dbName": "lst_id"
             , "isPK": true
-            , "size": 16
-            , "minLength": 16
+            , "size": 32
+            , "minLength": 32
             , "dbComment": "Id for the last time record"
             , "entName": "LastTimeId"
             , "captureRequired": true
@@ -25,13 +25,6 @@
                 "DUPLICITY_ADD"
             ]
             , "displayName": "Last Time Id"
-        },{
-            "templateId": "integer"
-            , "dbName": "lst_num_sequential"
-            , "isPK": true
-            , "dbComment": "Secuential of changes done to this record"
-            , "entName": "Secuential"
-            , "displayName": "Secuential"
         },{
             "templateId": "string"
             , "dbName": "lst_name"
@@ -48,6 +41,20 @@
             , "dbComment": "Value of the last time user does this thing"
             , "entName": "Value"
             , "displayName": "Value"
+        },{
+            "templateId": "integer"
+            , "dbName": "lst_validity"
+            , "dbComment": "Days to consider this value as valid"
+            , "entName": "Validity"
+            , "displayName": "Validity"
+        },{
+            "templateId": "string"
+            , "dbName": "lst_tags"
+            , "size": 200
+            , "minLength": 1
+            , "dbComment": "Tagos for grouping and filtering"
+            , "entName": "Tags"
+            , "displayName": "Tags"
         },{
             "templateId": "string"
             , "dbName": "lst_notes"

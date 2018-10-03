@@ -7,6 +7,7 @@ import * as AccountRoute from './Account/AccountRoute';
 import * as PlaceRoute from './Place/PlaceRoute';
 import * as PresetRoute from './Preset/PresetRoute';
 import * as TaskRoute from './Task/TaskRoute';
+import * as LastTimeRoute from './LastTime/LastTimeRoute';
 const router = express.Router();
 
 router.use('/categories', CategoryRoute.router);
@@ -17,5 +18,6 @@ router.use('/accounts', AccountRoute.router);
 router.use('/places', PlaceRoute.router);
 router.use('/presets', PresetRoute.router);
 router.use('/tasks', TaskRoute.router);
+router.use('/lasttime', LastTimeRoute.router);
 
 export { router };

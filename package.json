@@ -1,6 +1,6 @@
 {
   "name": "tasks",
-  "version": "1.4.34",
+  "version": "1.5.3",
   "description": "Task manager and money manager web application",
   "scripts": {
     "build": "tsc -p src/",

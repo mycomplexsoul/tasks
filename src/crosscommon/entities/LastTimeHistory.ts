@@ -7,6 +7,8 @@ export class LastTimeHistory implements iEntity {
 	public lth_num_sequential: number;
 	public lth_name: string;
 	public lth_value: string;
+	public lth_validity: number;
+	public lth_tags: string;
 	public lth_notes: string;
 	public lth_id_user: string;
 	public lth_date_add: Date;
@@ -60,9 +62,9 @@ export class LastTimeHistory implements iEntity {
 				, dbType: 'string'
 				, isTableField: true
 				, isPK: true
-				, size: 16
+				, size: 32
 				, decimal: 0
-				, minLength: 16
+				, minLength: 32
 				, allowNull: false
 				, default: ''
 				, dbComment: 'Id for the last time record'
@@ -181,6 +183,68 @@ export class LastTimeHistory implements iEntity {
 				, globalOrder: 0
 				, value: null
 			}, {
+				templateId: 'integer'
+				, dbName: 'lth_validity'
+				, dbType: 'integer'
+				, isTableField: true
+				, isPK: false
+				, size: 4
+				, decimal: 0
+				, minLength: 1
+				, allowNull: false
+				, default: ''
+				, dbComment: 'Days to consider this value as valid'
+				, catalogId: ''
+				, originTable: ''
+				, linkedField: ''
+				, entName: 'Validity'
+				, formControl: 'Textbox'
+				, captureRequired: false
+				, appearsByDefaultOnGrid: true
+				, specialRules: [
+				]
+				, displayName: 'Validity'
+				, tooltip: ''
+				, isRecordName: false
+				, gridOrder: 4
+				, orderOnNew: 4
+				, orderOnDetails: 4
+				, orderOnEdit: 4
+				, orderOnImport: 4
+				, globalOrder: 0
+				, value: null
+			}, {
+				templateId: 'string'
+				, dbName: 'lth_tags'
+				, dbType: 'string'
+				, isTableField: true
+				, isPK: false
+				, size: 200
+				, decimal: 0
+				, minLength: 1
+				, allowNull: false
+				, default: ''
+				, dbComment: 'Tagos for grouping and filtering'
+				, catalogId: ''
+				, originTable: ''
+				, linkedField: ''
+				, entName: 'Tags'
+				, formControl: 'Textbox'
+				, captureRequired: false
+				, appearsByDefaultOnGrid: true
+				, specialRules: [
+				]
+				, displayName: 'Tags'
+				, tooltip: ''
+				, isRecordName: false
+				, gridOrder: 5
+				, orderOnNew: 5
+				, orderOnDetails: 5
+				, orderOnEdit: 5
+				, orderOnImport: 5
+				, globalOrder: 0
+				, value: null
+			}, {
 				templateId: 'string'
 				, dbName: 'lth_notes'
 				, dbType: 'string'
@@ -204,11 +268,11 @@ export class LastTimeHistory implements iEntity {
 				, displayName: 'Notes'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 4
-				, orderOnNew: 4
-				, orderOnDetails: 4
-				, orderOnEdit: 4
-				, orderOnImport: 4
+				, gridOrder: 6
+				, orderOnNew: 6
+				, orderOnDetails: 6
+				, orderOnEdit: 6
+				, orderOnImport: 6
 				, globalOrder: 0
 				, value: null
 			}, {
@@ -235,11 +299,11 @@ export class LastTimeHistory implements iEntity {
 				, displayName: 'User'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 5
-				, orderOnNew: 5
-				, orderOnDetails: 5
-				, orderOnEdit: 5
-				, orderOnImport: 5
+				, gridOrder: 7
+				, orderOnNew: 7
+				, orderOnDetails: 7
+				, orderOnEdit: 7
+				, orderOnImport: 7
 				, globalOrder: 0
 				, value: null
 			}, {
@@ -267,11 +331,11 @@ export class LastTimeHistory implements iEntity {
 				, displayName: 'Creation Date'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 6
-				, orderOnNew: 6
-				, orderOnDetails: 6
-				, orderOnEdit: 6
-				, orderOnImport: 6
+				, gridOrder: 8
+				, orderOnNew: 8
+				, orderOnDetails: 8
+				, orderOnEdit: 8
+				, orderOnImport: 8
 				, globalOrder: 0
 				, value: null
 			}, {
@@ -300,11 +364,11 @@ export class LastTimeHistory implements iEntity {
 				, displayName: 'Last Modification Date'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 7
-				, orderOnNew: 7
-				, orderOnDetails: 7
-				, orderOnEdit: 7
-				, orderOnImport: 7
+				, gridOrder: 9
+				, orderOnNew: 9
+				, orderOnDetails: 9
+				, orderOnEdit: 9
+				, orderOnImport: 9
 				, globalOrder: 0
 				, value: null
 			}, {
@@ -331,11 +395,11 @@ export class LastTimeHistory implements iEntity {
 				, displayName: 'Status'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 8
-				, orderOnNew: 8
-				, orderOnDetails: 8
-				, orderOnEdit: 8
-				, orderOnImport: 8
+				, gridOrder: 10
+				, orderOnNew: 10
+				, orderOnDetails: 10
+				, orderOnEdit: 10
+				, orderOnImport: 10
 				, globalOrder: undefined
 				, value: null
 			}, {
@@ -362,11 +426,11 @@ export class LastTimeHistory implements iEntity {
 				, displayName: 'Status'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 9
-				, orderOnNew: 9
-				, orderOnDetails: 9
-				, orderOnEdit: 9
-				, orderOnImport: 9
+				, gridOrder: 11
+				, orderOnNew: 11
+				, orderOnDetails: 11
+				, orderOnEdit: 11
+				, orderOnImport: 11
 				, globalOrder: 0
 				, value: null
 			}
@@ -381,6 +445,8 @@ export class LastTimeHistory implements iEntity {
 			this.lth_num_sequential = base.lth_num_sequential;
 			this.lth_name = base.lth_name;
 			this.lth_value = base.lth_value;
+			this.lth_validity = base.lth_validity;
+			this.lth_tags = base.lth_tags;
 			this.lth_notes = base.lth_notes;
 			this.lth_id_user = base.lth_id_user;
 			this.lth_date_add = (base.lth_date_add !== null) ? new Date(base.lth_date_add) : null;

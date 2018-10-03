@@ -1,0 +1,52 @@
+<form #newForm="ngForm" (ngSubmit)="newItem(newForm)">
+    <button type="button" (click)="handleNewItem(newForm)">
+        {{(viewData.showCreateForm ? 'Hide Form' : 'New Item')}}
+    </button>
+
+    <div *ngIf="viewData.showCreateForm">
+        <div>
+            <span class="field" *ngIf="model.id">
+                <label for="id" class="label-left">Id</label>
+                <span type="text" name="id" id="id" class="lasttime-input-id">{{model.id}}</span>
+            </span>
+            <span class="field">
+                <label for="fName" class="label-left">Name</label>
+                <input type="text" name="fName" id="fName" class="field-input lasttime-input-name" ngModel>
+            </span>
+            <span class="field">
+                <label for="fValue" class="label-left">Value</label>
+                <input type="text" name="fValue" id="fValue" class="field-input lasttime-input-value" ngModel>
+            </span>
+            <span class="field">
+                <label for="fValidity" class="label-left">Validity</label>
+                <input type="number" name="fValidity" id="fValidity" class="field-input lasttime-input-validity" step="1" ngModel>
+            </span>
+            <span class="field">
+                <label for="fTags" class="label-left">Tags</label>
+                <input type="text" name="fTags" id="fTags" class="field-input lasttime-input-tags" ngModel>
+            </span>
+            <span class="field">
+                <label for="fNotes" class="label-left">Notes</label>
+                <input type="text" name="fNotes" id="fNotes" class="field-input lasttime-input-notes" ngModel>
+            </span>
+            
+            <button type="submit">Save</button>
+        </div>
+    </div>
+</form>
+
+<div *ngFor="let item of viewData.lastTime">
+    <div>
+        {{item.lst_name}}
+        [{{item.lst_date_mod | date: 'yyyy-MM-dd HH:mm'}}]
+        <br/>
+        {{item.lst_value}}
+        <br/>
+        {{item.lst_validity}}
+        {{item.expiryDate | date: 'yyyy-MM-dd'}}
+        {{item.ageSentence}}
+        {{item.ageClass}}
+        {{item.lst_tags}}
+        {{item.lst_notes}}
+    </div>
+</div>

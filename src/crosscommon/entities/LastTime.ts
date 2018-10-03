@@ -4,9 +4,10 @@ import { ViewJoinDefinition } from "../ViewJoinDefinition";
 
 export class LastTime implements iEntity {
 	public lst_id: string;
-	public lst_num_sequential: number;
 	public lst_name: string;
 	public lst_value: string;
+	public lst_validity: number;
+	public lst_tags: string;
 	public lst_notes: string;
 	public lst_id_user: string;
 	public lst_date_add: Date;
@@ -60,9 +61,9 @@ export class LastTime implements iEntity {
 				, dbType: 'string'
 				, isTableField: true
 				, isPK: true
-				, size: 16
+				, size: 32
 				, decimal: 0
-				, minLength: 16
+				, minLength: 32
 				, allowNull: false
 				, default: ''
 				, dbComment: 'Id for the last time record'
@@ -84,37 +85,6 @@ export class LastTime implements iEntity {
 				, orderOnDetails: 0
 				, orderOnEdit: 0
 				, orderOnImport: 0
-				, globalOrder: 0
-				, value: null
-			}, {
-				templateId: 'integer'
-				, dbName: 'lst_num_sequential'
-				, dbType: 'integer'
-				, isTableField: true
-				, isPK: true
-				, size: 4
-				, decimal: 0
-				, minLength: 1
-				, allowNull: false
-				, default: ''
-				, dbComment: 'Secuential of changes done to this record'
-				, catalogId: ''
-				, originTable: ''
-				, linkedField: ''
-				, entName: 'Secuential'
-				, formControl: 'Textbox'
-				, captureRequired: false
-				, appearsByDefaultOnGrid: true
-				, specialRules: [
-				]
-				, displayName: 'Secuential'
-				, tooltip: ''
-				, isRecordName: false
-				, gridOrder: 1
-				, orderOnNew: 1
-				, orderOnDetails: 1
-				, orderOnEdit: 1
-				, orderOnImport: 1
 				, globalOrder: 0
 				, value: null
 			}, {
@@ -141,11 +111,11 @@ export class LastTime implements iEntity {
 				, displayName: 'Name'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 2
-				, orderOnNew: 2
-				, orderOnDetails: 2
-				, orderOnEdit: 2
-				, orderOnImport: 2
+				, gridOrder: 1
+				, orderOnNew: 1
+				, orderOnDetails: 1
+				, orderOnEdit: 1
+				, orderOnImport: 1
 				, globalOrder: 0
 				, value: null
 			}, {
@@ -172,11 +142,73 @@ export class LastTime implements iEntity {
 				, displayName: 'Value'
 				, tooltip: ''
 				, isRecordName: false
+				, gridOrder: 2
+				, orderOnNew: 2
+				, orderOnDetails: 2
+				, orderOnEdit: 2
+				, orderOnImport: 2
+				, globalOrder: 0
+				, value: null
+			}, {
+				templateId: 'integer'
+				, dbName: 'lst_validity'
+				, dbType: 'integer'
+				, isTableField: true
+				, isPK: false
+				, size: 4
+				, decimal: 0
+				, minLength: 1
+				, allowNull: false
+				, default: ''
+				, dbComment: 'Days to consider this value as valid'
+				, catalogId: ''
+				, originTable: ''
+				, linkedField: ''
+				, entName: 'Validity'
+				, formControl: 'Textbox'
+				, captureRequired: false
+				, appearsByDefaultOnGrid: true
+				, specialRules: [
+				]
+				, displayName: 'Validity'
+				, tooltip: ''
+				, isRecordName: false
 				, gridOrder: 3
 				, orderOnNew: 3
 				, orderOnDetails: 3
 				, orderOnEdit: 3
 				, orderOnImport: 3
+				, globalOrder: 0
+				, value: null
+			}, {
+				templateId: 'string'
+				, dbName: 'lst_tags'
+				, dbType: 'string'
+				, isTableField: true
+				, isPK: false
+				, size: 200
+				, decimal: 0
+				, minLength: 1
+				, allowNull: false
+				, default: ''
+				, dbComment: 'Tagos for grouping and filtering'
+				, catalogId: ''
+				, originTable: ''
+				, linkedField: ''
+				, entName: 'Tags'
+				, formControl: 'Textbox'
+				, captureRequired: false
+				, appearsByDefaultOnGrid: true
+				, specialRules: [
+				]
+				, displayName: 'Tags'
+				, tooltip: ''
+				, isRecordName: false
+				, gridOrder: 4
+				, orderOnNew: 4
+				, orderOnDetails: 4
+				, orderOnEdit: 4
+				, orderOnImport: 4
 				, globalOrder: 0
 				, value: null
 			}, {
@@ -203,11 +235,11 @@ export class LastTime implements iEntity {
 				, displayName: 'Notes'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 4
-				, orderOnNew: 4
-				, orderOnDetails: 4
-				, orderOnEdit: 4
-				, orderOnImport: 4
+				, gridOrder: 5
+				, orderOnNew: 5
+				, orderOnDetails: 5
+				, orderOnEdit: 5
+				, orderOnImport: 5
 				, globalOrder: 0
 				, value: null
 			}, {
@@ -234,11 +266,11 @@ export class LastTime implements iEntity {
 				, displayName: 'User'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 5
-				, orderOnNew: 5
-				, orderOnDetails: 5
-				, orderOnEdit: 5
-				, orderOnImport: 5
+				, gridOrder: 6
+				, orderOnNew: 6
+				, orderOnDetails: 6
+				, orderOnEdit: 6
+				, orderOnImport: 6
 				, globalOrder: 0
 				, value: null
 			}, {
@@ -266,11 +298,11 @@ export class LastTime implements iEntity {
 				, displayName: 'Creation Date'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 6
-				, orderOnNew: 6
-				, orderOnDetails: 6
-				, orderOnEdit: 6
-				, orderOnImport: 6
+				, gridOrder: 7
+				, orderOnNew: 7
+				, orderOnDetails: 7
+				, orderOnEdit: 7
+				, orderOnImport: 7
 				, globalOrder: 0
 				, value: null
 			}, {
@@ -299,11 +331,11 @@ export class LastTime implements iEntity {
 				, displayName: 'Last Modification Date'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 7
-				, orderOnNew: 7
-				, orderOnDetails: 7
-				, orderOnEdit: 7
-				, orderOnImport: 7
+				, gridOrder: 8
+				, orderOnNew: 8
+				, orderOnDetails: 8
+				, orderOnEdit: 8
+				, orderOnImport: 8
 				, globalOrder: 0
 				, value: null
 			}, {
@@ -330,11 +362,11 @@ export class LastTime implements iEntity {
 				, displayName: 'Status'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 8
-				, orderOnNew: 8
-				, orderOnDetails: 8
-				, orderOnEdit: 8
-				, orderOnImport: 8
+				, gridOrder: 9
+				, orderOnNew: 9
+				, orderOnDetails: 9
+				, orderOnEdit: 9
+				, orderOnImport: 9
 				, globalOrder: undefined
 				, value: null
 			}, {
@@ -361,11 +393,11 @@ export class LastTime implements iEntity {
 				, displayName: 'Status'
 				, tooltip: ''
 				, isRecordName: false
-				, gridOrder: 9
-				, orderOnNew: 9
-				, orderOnDetails: 9
-				, orderOnEdit: 9
-				, orderOnImport: 9
+				, gridOrder: 10
+				, orderOnNew: 10
+				, orderOnDetails: 10
+				, orderOnEdit: 10
+				, orderOnImport: 10
 				, globalOrder: 0
 				, value: null
 			}
@@ -377,9 +409,10 @@ export class LastTime implements iEntity {
 	constructor(base?: any){
 		if (base !== undefined){
 			this.lst_id = base.lst_id;
-			this.lst_num_sequential = base.lst_num_sequential;
 			this.lst_name = base.lst_name;
 			this.lst_value = base.lst_value;
+			this.lst_validity = base.lst_validity;
+			this.lst_tags = base.lst_tags;
 			this.lst_notes = base.lst_notes;
 			this.lst_id_user = base.lst_id_user;
 			this.lst_date_add = (base.lst_date_add !== null) ? new Date(base.lst_date_add) : null;
