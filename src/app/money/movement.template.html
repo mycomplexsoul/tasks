@@ -63,8 +63,11 @@
                 <input type="date" name="fDate" [(ngModel)]="model.date">
             </span>
             <span class="field" *ngIf="!isTransfer">
-                <label for="fBudget" class="field-input label-left">Budget</label>
-                <input type="text" name="fBudget" id="fBudget" class="field-input movement-input-budget" ngModel>
+                <label for="fPlace" class="label-left">Place</label>
+                <select name="fPlace" id="fPlace" class="field-select" [(ngModel)]="model.place">
+                    <option *ngFor="let opt of viewData.places" [value]="opt.mpl_id" [selected]="opt.mpl_id === newMovementForm.value.fPlace">{{opt.mpl_name}}</option>
+                </select>
+                <combo-item [name]="place" [addNewItem]="addNewPlaceForUser"></combo-item>
             </span>
             <span class="field" *ngIf="!isTransfer">
                 <label for="fCategory" class="label-left">Category</label>
@@ -74,11 +77,8 @@
                 <combo-item [name]="category" [addNewItem]="addNewCategoryForUser"></combo-item>
             </span>
             <span class="field" *ngIf="!isTransfer">
-                <label for="fPlace" class="label-left">Place</label>
-                <select name="fPlace" id="fPlace" class="field-select" [(ngModel)]="model.place">
-                    <option *ngFor="let opt of viewData.places" [value]="opt.mpl_id" [selected]="opt.mpl_id === newMovementForm.value.fPlace">{{opt.mpl_name}}</option>
-                </select>
-                <combo-item [name]="place" [addNewItem]="addNewPlaceForUser"></combo-item>
+                <label for="fBudget" class="field-input label-left">Budget</label>
+                <input type="text" name="fBudget" id="fBudget" class="field-input movement-input-budget" ngModel>
             </span>
             <span class="field">
                 <label for="fNotes" class="label-left">Notes</label>

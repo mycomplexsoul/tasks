@@ -60,6 +60,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.5.5 (2018-09-23)
+
+### Added
+* [AppTasks] Added `age` and `elapsedDays` methods to `DateUtility`.
+
+## v1.5.4 (2018-09-22)
+
+### Modified
+* [AppMoney][Movements] Moved Place capture before Category, there's a change Category can be inferred from Place in the future.
+
 ## v1.5.3 (2018-09-19)
 
 ### Added

@@ -6,6 +6,14 @@ class DateUtility {
         return 0;
     }
 
+    elapsedDays(date1: Date, date2: Date): number {
+        return Math.floor(this.elapsedTime(this.dateOnly(date1),this.dateOnly(date2)) / (60 * 60 * 24));
+    }
+
+    age(baseDate: Date){
+        return this.elapsedDays(new Date(baseDate),new Date());
+    }
+
     dateOnly(base?: Date): Date {
         if (base) {
             return new Date(base.getFullYear(),base.getMonth(),base.getDate(),0,0,0);
