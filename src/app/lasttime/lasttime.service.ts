@@ -15,6 +15,7 @@ export class LastTimeService {
         , api: {
             list: '/api/lasttime'
             , create: '/api/lasttime'
+            , update: '/api/lasttime/:id'
         }
     }
 
@@ -78,6 +79,29 @@ export class LastTimeService {
             newItem['sync'] = false;
             this.data.push(newItem);
             return newItem;
+        });
+    }
+
+    updateItem(item: LastTime): Promise<LastTime>{
+        const updateLocal = () => {
+            const index = this.data.findIndex(e => e.lst_id === item.lst_id);
+            if (index !== -1){
+                this.data[index] = item;
+            }
+        };
+
+        return this.sync.post(this.config.api.update.replace(':id', item.lst_id), Utils.entityToRawTableFields(item)).then(response => {
+            if (!response.operationOk) {
+                item['sync'] = false;
+            }
+            updateLocal();
+            return item;
+        }).catch(err => {
+            // Append it to the listing but flag it as non-synced yet
+            console.log('error on update', err);
+            item['sync'] = false;
+            updateLocal();
+            return item;
         });
     }
 }

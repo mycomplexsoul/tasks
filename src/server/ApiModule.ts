@@ -122,7 +122,7 @@ export class ApiModule {
                         let resultAfterUpdateOK: any;
                         if (hooks && hooks.afterUpdateOK){
                             return hooks.afterUpdateOK(responseUpdate, m).then((resultAfterUpdateOk: any) => {
-                                return {operationOk: true, message: `${m.metadata.tableName} created correctly. id: ${recordName}${resultAfterUpdateOK ? `, afterUpdateOk: ${resultAfterUpdateOK.message}` : ''}`};
+                                return {operationOk: true, message: `${m.metadata.tableName} created correctly. id: ${recordName}${resultAfterUpdateOk ? `, afterUpdateOk: ${resultAfterUpdateOk.message}` : ''}`};
                             });
                         }
                         return {operationOk: true, message: `${m.metadata.tableName} updated correctly. id: ${recordName}`};

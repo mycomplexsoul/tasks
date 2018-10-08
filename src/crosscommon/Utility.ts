@@ -40,6 +40,14 @@ class Utility {
     parseSimpleQuoteForSQL(str: string){
         return this.replaceAll(str,"'","''");
     }
+
+    entityToRawTableFields(entity: iEntity): any {
+        let obj = {};
+        entity.metadata.fields.filter(f => f.isTableField).forEach(f => {
+            obj[f.dbName] = entity[f.dbName];
+        });
+        return obj;
+    }
 }
 
 export let Utils = new Utility();

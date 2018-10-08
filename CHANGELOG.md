@@ -5,67 +5,77 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Notes / To Do / Roadmap]
-* [AppCommon] Test runner for node.
-* [AppCommon] Display version in main page footer.
-* [AppCommon] Login UI.
-
-## [Unreleased / Work In Progress]
-* [AppCommon] Node build into `/dist` folder.
-* [AppCommon] Angular build into `/dist` folder.
-* [AppCommon] Deploy BE + FE in `/dist` folder.
-
 * Money
-    * Import
-        * Remove automatically-asigned budget from movement import
-        * Tag properly from movement import
     * Reports
+        * Create sql query listing balance and movements for shared movements
         * Send an email with node
-        * Movement report with shared movements
-            * 1809 shared-50  | movement shared 50/50
-            * 1809 shared-100 | movement payed 100% by mate (Lau)
-            * 1809 shared-me  | movement payed 100% by me and to be discounted from final amount
     * Balance
         * Balance new fields: comment, date_last_valid, swap charges-withdrawals legends
         * Display Average Balance on Balance page (using account daycheck information)
     * Movement features
+        * Movements with pending status
         * Scheduled movements
-        * Movement form validation server side.
-        * Movement form validation client side.
-        * Combo-item value validation against a provided list.
+        * Movement form validation server side
+        * Movement form validation client side
+        * Combo-item value validation against a provided list
 * Tasks
-    * [AppTasks] Use tasks from server.
+    * [AppTasks] Use tasks from server (do not save on localStorage)
     * Indicator for last finished task timestamp
     * Keyboard shortcuts for navigating from record list to next/previous record list and focus into first task in the list
     * Once focused on estimated time, pressing arrow up/down should navigate to previous/next task in the list, focusing on the task description
     * Option to show/hide Indicators
     * Clean up Indicators legacy section
     * Unset schedule, unset link
-* Common
-    * Refactor database view generation for using joins on catalog instead of subqueries.
-    * Unit test runner for server.
-    * Unit test runner for client.
-    * Refactor accounts with balance endpoint to have an endpoint that uses a sql query as param.
-* Multimedia
-    * Entity Definition
 * Last Time
-    * Entity Definition new fields
-        _validity Days to consider this as valid
-        _tags For grouping and filtering
-    * Routing and Basic capture
-    * Last Time listing
+    * Basic Features
+        * Tag filtering and grouping
 * Login
     * Login basic CSS.
     * Login server routing and user validation.
-    * Login logged user identity.
+    * Login logged user identity service.
+* Common
+    * Refactor database view generation for using joins on catalog instead of subqueries.
+    * Refactor accounts with balance endpoint to have an endpoint that uses a sql query as param.
+    * Unit test runner for server.
+    * Unit test runner for client.
+    * [AppCommon] Display version in main page footer.
+    * [AppCommon] Node build into `/dist` folder.
+    * [AppCommon] Angular build into `/dist` folder.
+    * [AppCommon] Deploy BE + FE in `/dist` folder.
+* Multimedia
+    * Entity Definition
+    * Listing and creation service endpoint
+
+## [Unreleased / Work In Progress]
 
 <hr/>
 
-## v1.5.5 (2018-09-23)
+## v1.5.9 (2018-09-27)
+
+### Added
+* [AppLastTime] Use endpoint to create and update from front end.
+
+## v1.5.8 (2018-09-26)
+
+### Added
+* [AppCommon] Added `Utils.entityToRawTableFields()` to convert an entity to a raw object with field-values.
+
+## v1.5.7 (2018-09-25)
+
+### Added
+* [AppLastTime] Generate history on creation and edition on backend.
+
+## v1.5.6 (2018-09-24)
+
+### Added
+* [AppLastTime] Update REST endpoint in `/api/lasttime/:id`.
+
+## v1.5.5 (2018-09-21)
 
 ### Added
 * [AppTasks] Added `age` and `elapsedDays` methods to `DateUtility`.
 
-## v1.5.4 (2018-09-22)
+## v1.5.4 (2018-09-20)
 
 ### Modified
 * [AppMoney][Movements] Moved Place capture before Category, there's a change Category can be inferred from Place in the future.

@@ -97,4 +97,12 @@ export class LastTimeComponent implements OnInit {
         }
         return '';
     }
+
+    editValue(item: LastTime, event: KeyboardEvent) {
+        const newValue: string = event.target['textContent'];
+
+        item.lst_value = newValue;
+
+        this.services.lastTime.updateItem(item);
+    }
 }

@@ -22,4 +22,13 @@ router.post('/', (req, res) => {
     server.create(node);
 });
 
+router.post('/:lst_id', (req, res) => {
+    let server: LastTimeServer = new LastTimeServer();
+    let node: iNode = {
+        request: req
+        , response: res
+    };
+    server.update(node);
+});
+
 export { router };
