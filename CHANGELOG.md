@@ -50,6 +50,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.5.11 (2018-10-01)
+
+### Added
+* [AppLastTime] Improve UI listing and styling.
+
+## v1.5.10 (2018-09-28)
+
+### Added
+* [AppLastTime] Sort listing by expiry date.
+
 ## v1.5.9 (2018-09-27)
 
 ### Added

@@ -35,18 +35,20 @@
     </div>
 </form>
 
-<div *ngFor="let item of viewData.lastTime">
-    <div>
-        {{item.lst_name}}
-        [{{item.lst_date_mod | date: 'yyyy-MM-dd HH:mm'}}]
+<div class="lasttime-list">
+    <div *ngFor="let item of viewData.lastTime" class="lasttime-item-container">
+        <span class="lasttime-name">{{item.lst_name}}:</span>
+        <span contenteditable="true" (blur)="editValue(item,$event)" class="lasttime-value">{{item.lst_value}}</span>
         <br/>
-        <span contenteditable="true" (blur)="editValue(item,$event)">{{item.lst_value}}</span>
-        <br/>
-        <span [ngClass]="item.ageClass">
+        <span [ngClass]="item.ageClass" class="lasttime-age" [title]="item.lst_date_mod | date: 'yyyy-MM-dd HH:mm'">
             {{item.ageSentence}}
         </span>
         <br/>
-        {{item.lst_tags}}
-        {{item.lst_notes}}
+        <span class="lasttime-tags">
+            #[{{item.lst_tags}}]
+        </span>
+        <span class="lasttime-notes">
+            {{item.lst_notes}}
+        </span>
     </div>
 </div>

@@ -11,6 +11,7 @@ import { DateUtils } from '../../crosscommon/DateUtility';
 @Component({
     selector: 'lasttime',
     templateUrl: './lasttime.template.html',
+    styleUrls: ['./lasttime.css'],
     providers: [
         LastTimeService
     ]
@@ -63,10 +64,15 @@ export class LastTimeComponent implements OnInit {
     }
 
     calculateValidityForAll(){
-        const list: LastTime[] = this.services.lastTime.list();
+        let list: LastTime[] = this.services.lastTime.list();
         list.forEach(item => {
             this.calculateValidity(item);
         });
+        const sort = ((a: LastTime, b: LastTime) => {
+            return a['expiryDate'].getTime() >= b['expiryDate'].getTime() ? 1 : -1;
+        });
+        list = list.sort(sort);
+        console.log('listing', list);
     }
 
     newItem(form: NgForm) {
@@ -80,29 +86,61 @@ export class LastTimeComponent implements OnInit {
     
     ageSentence(baseDate: Date){
         let diff = DateUtils.age(baseDate);
-        return `${(diff > 1 ? '(' + diff + ' days ago)' : (diff === 1 ? '(yesterday)' : ''))}`;
+        let str = '';
+        if (diff > 1){
+            str = `(${diff} days left)`;
+        }
+        if (diff === 1){
+            str = '(tomorrow)';
+        }
+        if (diff === 0){
+            str = '(today)';
+        }
+        if (diff === -1){
+            str = '(yesterday)';
+        }
+        if (diff < -1){
+            str = `(${Math.abs(diff)} days ago)`;
+        }
+        return str;
     }
 
     ageClass(baseDate: Date){
         let diff = DateUtils.age(baseDate);
-        let classes = ['lasttime-age-0','lasttime-age-1','lasttime-age-2','lasttime-age-10'];
-        if (diff <= 2){
-            return classes[diff];
-        }
-        if (2 < diff && diff < 10){
-            return classes[2];
-        }
+        let str = '';
         if (diff >= 10){
-            return classes[3];
+            str = 'lasttime-age-10-left';
         }
-        return '';
+        if (diff > 1 && diff < 10){
+            str = 'lasttime-age-2-left';
+        }
+        if (diff === 1){
+            str = 'lasttime-age-1-left';
+        }
+        if (diff === 0){
+            str = 'lasttime-age-0';
+        }
+        if (diff === -1){
+            str = 'lasttime-age-1-ago';
+        }
+        if (diff < -1 && diff > -10){
+            str = 'lasttime-age-2-ago';
+        }
+        if (diff < -10){
+            str = 'lasttime-age-10-ago';
+        }
+       
+        return str;
     }
 
     editValue(item: LastTime, event: KeyboardEvent) {
         const newValue: string = event.target['textContent'];
 
         item.lst_value = newValue;
+        item.lst_date_mod = DateUtils.newDateUpToSeconds();
 
-        this.services.lastTime.updateItem(item);
+        this.services.lastTime.updateItem(item).then(response => {
+            this.calculateValidityForAll();
+        });
     }
 }

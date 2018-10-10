@@ -1,0 +1,47 @@
+.lasttime-list {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.lasttime-item-container {
+    border: 1px solid lightgray;
+    margin: 5px;
+    padding: 5px;
+    display: block;
+    width: 100%;
+    cursor: pointer;
+}
+
+@media (min-width: 505px) {
+    .lasttime-item-container {
+        width: 350px;
+    }
+}
+
+.lasttime-value {
+    font-weight: bold;
+}
+
+
+.lasttime-age-0 {
+    color: black;
+}
+.lasttime-age-1-ago {
+    color: rgb(107, 0, 0);
+}
+.lasttime-age-2-ago {
+    color: brown;
+}
+.lasttime-age-10-ago {
+    color: red;
+}
+.lasttime-age-1-left {
+    color: gray;
+}
+.lasttime-age-2-left {
+    color: green;
+}
+.lasttime-age-10-left {
+    color: blue;
+}
