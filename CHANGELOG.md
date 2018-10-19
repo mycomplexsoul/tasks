@@ -50,6 +50,41 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.5.16 (2018-10-08)
+
+### Modified
+* [AppLastTime] Fixed sorting.
+* [AppLastTime] Fixed date recognition when calculating expiry date.
+* [AppLastTime] No update if value does not change.
+
+## v1.5.15 (2018-10-05)
+
+### Modified
+* [AppCommon] `DateUtility.elapsedTime()` now returns difference with sign, previously it returned unsigned difference.
+* [AppCommon] `DateUtility.isDate()` added for validating strings that follow a date format, uses reg exp.
+
+## v1.5.14 (2018-10-04)
+
+### Modified
+* [AppCommon] Changed default port to 8001 to avoid conflict with legacy project.
+
+## v1.5.13 (2018-10-03)
+
+### Modified
+* [AppTasks] `/api/tasks` listing now returns tasks and time tracking listings in the same response.
+Example response:
+```javascript
+{
+    tasks: [],
+    timetracking: []
+}
+```
+
+## v1.5.12 (2018-10-02)
+
+### Added
+* [AppCommon] `ApiModule.multipleListWithSQL()` method to create get endpoints that obtain an object with a property for each sql entry on a sql array.
+
 ## v1.5.11 (2018-10-01)
 
 ### Added

@@ -56,7 +56,7 @@ export class LastTimeComponent implements OnInit {
     }
 
     calculateValidity(item: LastTime) {
-        const valueIsDate: boolean = item.lst_value.length === 10; // TODO: improve date recognize process
+        const valueIsDate: boolean = DateUtils.isDate(item.lst_value);
         const baseValue: Date = valueIsDate ? new Date(item.lst_value) : item.lst_date_mod;
         item['expiryDate'] = DateUtils.addDays(baseValue, item.lst_validity);
         item['ageSentence'] = this.ageSentence(item['expiryDate']);
@@ -71,8 +71,8 @@ export class LastTimeComponent implements OnInit {
         const sort = ((a: LastTime, b: LastTime) => {
             return a['expiryDate'].getTime() >= b['expiryDate'].getTime() ? 1 : -1;
         });
-        list = list.sort(sort);
-        console.log('listing', list);
+        this.viewData.lastTime = list.sort(sort);
+        console.log('listing', this.viewData.lastTime);
     }
 
     newItem(form: NgForm) {
@@ -136,11 +136,13 @@ export class LastTimeComponent implements OnInit {
     editValue(item: LastTime, event: KeyboardEvent) {
         const newValue: string = event.target['textContent'];
 
-        item.lst_value = newValue;
-        item.lst_date_mod = DateUtils.newDateUpToSeconds();
-
-        this.services.lastTime.updateItem(item).then(response => {
-            this.calculateValidityForAll();
-        });
+        if (item.lst_value !== newValue) {
+            item.lst_value = newValue;
+            item.lst_date_mod = DateUtils.newDateUpToSeconds();
+    
+            this.services.lastTime.updateItem(item).then(response => {
+                this.calculateValidityForAll();
+            });
+        }
     }
 }

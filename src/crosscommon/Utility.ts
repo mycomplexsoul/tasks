@@ -43,6 +43,9 @@ class Utility {
 
     entityToRawTableFields(entity: iEntity): any {
         let obj = {};
+        if (!entity.metadata){
+            return entity;
+        }
         entity.metadata.fields.filter(f => f.isTableField).forEach(f => {
             obj[f.dbName] = entity[f.dbName];
         });

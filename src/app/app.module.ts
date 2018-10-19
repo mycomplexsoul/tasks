@@ -13,6 +13,8 @@ import { MovementComponent }  from './money/movement.component';
 import { BalanceComponent }  from './money/balance.component';
 import { RebuildComponent }  from './money/rebuild.component';
 
+import { LastTimeComponent }  from './lasttime/lasttime.component';
+
 import { StorageService }  from './common/storage.service';
 import { EntryService }  from './money/entry.service';
 import { DateCommon } from './common/date.common';
@@ -52,13 +54,28 @@ const appRoutes: Routes = [
         path: '',
         redirectTo: '/tasks',
         pathMatch: 'full'
+    },{
+        path: 'lasttime',
+        component: LastTimeComponent,
+        data: { title: 'Last Time' }
     }
     // { path: '**', component: PageNotFoundComponent }
 ];
 
 @NgModule({
   imports: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(appRoutes) ],
-  declarations: [ AppComponent, TasksComponent, AccountComponent, MovementComponent, BalanceComponent, ComboItemComponent, MenuComponent, RebuildComponent, LoginComponent ], // parent & child components
+  declarations: [
+    AppComponent,
+    TasksComponent,
+    AccountComponent,
+    MovementComponent,
+    BalanceComponent,
+    ComboItemComponent,
+    MenuComponent,
+    RebuildComponent,
+    LoginComponent,
+    LastTimeComponent
+  ], // parent & child components
   bootstrap: [ AppComponent ], // only parent components
   providers: [ DateCommon, StorageService, EntryService, SyncAPI, UtilsCommon ]
 })

@@ -1,7 +1,7 @@
 class DateUtility {
     elapsedTime(date1: Date, date2: Date): number { // return diff in seconds
         if (date1 && date2){
-            return Math.floor(Math.abs(date1.getTime() - date2.getTime()) / 1000);
+            return Math.floor((date1.getTime() - date2.getTime()) / 1000);
         }
         return 0;
     }
@@ -84,6 +84,11 @@ class DateUtility {
         let newDate = new Date(date);
         newDate.setMonth(newDate.getMonth() + months);
         return newDate;
+    }
+
+    isDate(date: string): boolean {
+        const format = /\d{4}-\d{2}-\d{2}/;
+        return date.length === 10 && format.test(date);
     }
 }
 

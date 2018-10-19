@@ -221,4 +221,32 @@ export class ApiModule {
             return array;
         });
     };
+
+    multipleListWithSQL = (data: any): Promise<any> => {
+        let connection: iConnection = ConnectionService.getConnection();
+        let sqlMotor: MoSQL = new MoSQL();
+
+        return Promise.all(
+            connection.runSqlArray(
+                data.queue.map((item) => {
+                    sqlMotor = new MoSQL(item.model);
+                    let finalSql: string = item.sql;
+                    if (item.q){
+                        finalSql += ` where ${sqlMotor.criteriaToSQL(sqlMotor.parseSQLCriteria(item.q), item.model)}`;
+                    }
+                    return finalSql;
+                })
+            )
+        ).then(array => {
+            let obj = {};
+            data.queue.forEach((item, index) => {
+                obj[item.name] = array[index].rows;
+            });
+            connection.close();
+            return obj;
+        }).catch(err => {
+            connection.close();
+            return {};
+        });
+    };
 }
