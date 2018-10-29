@@ -113,7 +113,7 @@ export class Task implements iEntity {
 				]
 				, displayName: 'Task Id'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 0
 				, orderOnNew: 0
 				, orderOnDetails: 0
@@ -206,7 +206,7 @@ export class Task implements iEntity {
 				]
 				, displayName: 'Name'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 3
 				, orderOnNew: 3
 				, orderOnDetails: 3

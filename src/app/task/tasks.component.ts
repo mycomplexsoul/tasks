@@ -4,7 +4,7 @@ import { SyncAPI } from '../common/sync.api';
 import { Task } from './task.type';
 import { TaskIndicator } from './task.indicator.service';
 import { DateCommon } from '../common/date.common';
-import { validateConfig } from '@angular/router/src/config';
+import { TaskTimeTracking } from '../../crosscommon/entities/TaskTimeTracking';
 
 @Component({
     selector: 'tasks',
@@ -69,6 +69,7 @@ export class TasksComponent implements OnInit {
         task: null
         , element: null
     };
+    public events: any[] = [];
 
     constructor(tasksCore: TasksCore, private sync: SyncAPI, private taskIndicator: TaskIndicator, private dateUtils: DateCommon, private rendered: Renderer){
         this.services.tasksCore = tasksCore;
@@ -81,14 +82,31 @@ export class TasksComponent implements OnInit {
                 this.options = this.defaultOptions;
             }
             this.services.tasksCore.setApiRoot(this.options.optServerAddress);
-            this.services.sync.setApiRoot(this.options.optServerAddress);
+            //this.services.sync.setApiRoot(this.options.optServerAddress);
         }
         this.nextTasks = [];
         this.updateState();
         this.notification({
             body: 'Hello there!! you have ' + this.state.openTasksCount + ' tasks open'
         });
+        this.services.tasksCore.getAllForUser('anon').then(taskList => {
+            this.tasks = taskList;
+            this.load = true;
+            this.updateState();
+        });
         this.services.tasksCore.computeComparisonData().then((data: any) => this.comparisonData = data);
+
+        // events
+        this.subscribe('updateTimeTracking', (timeTrackingItem: any) => {
+            let foundItem: Task = null;
+            // Looks into open tasks
+            foundItem = this.state.openTasks.find((item: Task) => item.tsk_id === timeTrackingItem.tsh_id);
+            if (foundItem) {
+                const historyIndex = foundItem['tsk_time_history'].findIndex((item: any) => item.tsh_id === timeTrackingItem.tsh_id && item.tsh_num_secuential === timeTrackingItem.tsh_num_secuential);
+                foundItem['tsk_time_history'][historyIndex] = timeTrackingItem;
+            }
+            // Looks into closed tasks
+        });
     }
 
     ngOnInit(){
@@ -1381,15 +1399,20 @@ export class TasksComponent implements OnInit {
             let parts = newValue.split(':');
             let data = {};
             data[`tsh_date_${target}`] = new Date(this.services.tasksCore.dateOnly(this.services.dateUtils.newDateUpToSeconds()).getTime() + (parseInt(parts[0]) * 60 * 60 * 1000) + (parseInt(parts[1]) * 60 * 1000) + (parseInt(parts[2]) * 1000));
-            task.tsk_time_history[task.tsk_time_history.length-1][`tsh_date_${target}`] = data[`tsh_date_${target}`];
-            this.updateTaskTimeTracking(task.tsk_id,task.tsk_time_history.length,data);
-
-            if (this.timers[task.tsk_id]){
-                let dom: HTMLElement = this.getTaskDOMElement(task.tsk_id); 
-                this.hideTimer(task,dom);
-                this.showTimer(task,dom);
+            // only update if value changed
+            let previousValue = new Date(task.tsk_time_history[task.tsk_time_history.length-1][`tsh_date_${target}`]);
+            if (data[`tsh_date_${target}`].getTime() !== previousValue.getTime()) {
+                task.tsk_time_history[task.tsk_time_history.length-1][`tsh_date_${target}`] = data[`tsh_date_${target}`];
+                this.updateTaskTimeTracking(task.tsk_id,task.tsk_time_history.length,data);
+    
+                if (this.timers[task.tsk_id]){
+                    let dom: HTMLElement = this.getTaskDOMElement(task.tsk_id); 
+                    this.hideTimer(task,dom);
+                    this.showTimer(task,dom);
+                }
+                this.calculateTotalTimeSpentToday();
+                this.triggerEvent('updateTimeTracking', task.tsk_time_history[task.tsk_time_history.length-1]);
             }
-            this.calculateTotalTimeSpentToday();
         }
         let parent = event.target["parentNode"]["parentNode"]["parentNode"];
         if (!event.altKey && event.keyCode==38){ // detect jump up
@@ -1409,7 +1432,7 @@ export class TasksComponent implements OnInit {
     
     saveOption(optionName: string,value: string){
         this.options[optionName] = value;
-        this.sync.setApiRoot(value);
+        //this.sync.setApiRoot(value);
         if (typeof(window.localStorage) !== "undefined") {
             localStorage.setItem("Options", JSON.stringify(this.options));
         }
@@ -1424,7 +1447,7 @@ export class TasksComponent implements OnInit {
             this.tasks.filter((t: any) => t.not_sync === true).forEach((t: any) => t.not_sync = undefined);
         } else {
             this.services.sync.queue.filter((q: any) => q.status !== 'processed').forEach((q: any) => {
-                let task = this.tasks.find((t: Task) => t.tsk_id === q.data.tsk_id);
+                let task = this.tasks.find((t: Task) => t.tsk_id === q.model.tsk_id);
                 task.not_sync = true;
             });
         }
@@ -1593,5 +1616,16 @@ export class TasksComponent implements OnInit {
         });
         this.updateTask(taskDiff[0].id, upd);
         this.services.tasksCore.computeComparisonData().then((data: any) => this.comparisonData = data);
+    }
+
+    subscribe(event: string, callback: Function) {
+        this.events.push({ event, callback });
+    }
+
+    triggerEvent(event: string, params: any) {
+        const handlers = this.events.filter((e: any) => e.event === event).map(e => e.callback);
+        handlers.forEach((handler: Function) => {
+            handler(params);
+        });
     }
 }

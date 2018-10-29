@@ -51,6 +51,16 @@ class Utility {
         });
         return obj;
     }
+
+    getPKFromEntity(entity: iEntity): any {
+        let pk = {};
+        if (!entity.metadata){
+            return null;
+        }
+        entity.metadata.fields.filter(f => f.isPK).forEach(f => {
+            pk[f.dbName] = entity[f.dbName];
+        });
+    }
 }
 
 export let Utils = new Utility();

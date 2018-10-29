@@ -19,7 +19,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
         * Movement form validation client side
         * Combo-item value validation against a provided list
 * Tasks
-    * [AppTasks] Use tasks from server (do not save on localStorage)
     * Indicator for last finished task timestamp
     * Keyboard shortcuts for navigating from record list to next/previous record list and focus into first task in the list
     * Once focused on estimated time, pressing arrow up/down should navigate to previous/next task in the list, focusing on the task description
@@ -49,6 +48,71 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased / Work In Progress]
 
 <hr/>
+
+## v1.6.3 (2018-10-24)
+
+### Modified
+* [AppTasks][Breaking] Sync API v1.3 to consume new NodeTS Sync endpoint.
+
+## v1.6.2 (2018-10-23)
+
+### Modified
+* [AppTasks][Breaking] No localStorage for Tasks.
+
+## v1.6.1 (2018-10-22)
+
+### Modified
+* [AppTasks][Breaking] Listing with NodeTS and params.
+
+## v1.6.0 (2018-10-19)
+
+### Modified
+* [AppTasks][Breaking] UI changes in order to consume new Sync API on NodeTS for Tasks.
+* [AppTasks][Breaking] UI changes in order to consume new Sync API on NodeTS for Time Tracking edition flows.
+
+## v1.5.24 (2018-10-18)
+
+### Added
+* [AppCommon] Set page title in Last Time, Movements and Balance pages.
+* [AppLastTime] Badges for new and edited items.
+
+## v1.5.23 (2018-10-17)
+
+### Added
+* [AppCommon] `Utility.getPKFromEntity()` method in order to get an object with just the primary key fields of an entity.
+
+## v1.5.22 (2018-10-16)
+
+### Modified
+* [AppCommon][Fix] Changes detection handles correctly date field changes from/to null values.
+
+## v1.5.21 (2018-10-15)
+
+### Added
+* [AppCommon] Sync routes and sync all backend method to handle sync to POST `/api/sync`.
+
+## v1.5.20 (2018-10-12)
+
+### Added
+* [AppTasks] Listing returns time tracking information.
+
+## v1.5.19 (2018-10-11)
+
+### Added
+* [AppTasks] Update REST API route handler for Tasks and Time Tracking.
+
+## v1.5.18 (2018-10-10)
+
+### Added
+* [AppTasks] Create REST API route handler for Tasks and Time Tracking.
+
+## v1.5.17 (2018-10-09)
+
+### Modified
+* [AppTasks] Added record name fields to JSON template.
+
+### Added
+* [AppCommon] Added `/online` route.
 
 ## v1.5.16 (2018-10-08)
 

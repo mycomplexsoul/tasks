@@ -1,5 +1,5 @@
 import { NgModule }      from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, Title } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule, Routes } from '@angular/router';
@@ -63,7 +63,12 @@ const appRoutes: Routes = [
 ];
 
 @NgModule({
-  imports: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(appRoutes) ],
+  imports: [
+      BrowserModule,
+      FormsModule,
+      HttpModule,
+      RouterModule.forRoot(appRoutes)
+    ],
   declarations: [
     AppComponent,
     TasksComponent,
@@ -77,6 +82,13 @@ const appRoutes: Routes = [
     LastTimeComponent
   ], // parent & child components
   bootstrap: [ AppComponent ], // only parent components
-  providers: [ DateCommon, StorageService, EntryService, SyncAPI, UtilsCommon ]
+  providers: [
+      DateCommon,
+      StorageService,
+      EntryService,
+      SyncAPI,
+      UtilsCommon,
+      Title
+    ]
 })
 export class AppModule { }

@@ -4,10 +4,10 @@ import { Http, Headers, RequestOptions } from '@angular/http';
 @Injectable()
 export class SyncAPI {
     public queue: Array<SyncQueue> = [];
-    private apiRoot: string = 'http://10.230.9.78:8081';
+    //private apiRoot: string = 'http://10.230.9.78:8081';
     private headers = new Headers({'Content-Type': 'application/json', 'Access-Control-Allow-Headers': 'Content-Type'});
     private options = new RequestOptions({ headers: this.headers });
-    private version = 'v1.2';
+    private version = 'v1.3';
     private logPrefix = `Sync API ${this.version} -`;
     private currentOperation: any = null;
     private lastOnlineStamp: Date = null;
@@ -30,33 +30,44 @@ export class SyncAPI {
         }
     }
 
-    request(method: string, url: string, data: any, matchMethod: (val: any) => boolean, objNameMethod: (e: any) => string, callback: Function){
+    /**
+     * Adds a single request to the queue and process it when server is reachable.
+     */
+    request(action: string, model: any, pk: any, entity: string, callback: Function, recordName: (e: any) => string, matchMethod: (val: any) => boolean){
         this.log(`Handling new request`);
+        const queueItem: SyncQueue = {
+            action,
+            model,
+            pk,
+            entity,
+            callback,
+            recordName,
+            matchMethod,
+            status: 'queue' // this is ignored
+        };
+        this.handleRequest([queueItem]);
+    }
+
+    /**
+     * Adds multiple requests to the queue and process them when server is reachable.
+     */
+    multipleRequest(list: SyncQueue[]){
+        this.log(`Handling new multiple requests`);
+        this.handleRequest(list);
+    }
+
+    /**
+     * Internal method that adds a request list to the queue and process it when server is reachable.
+     * For API purposes use either `request` or `multipleRequest` instead of this one.
+     */
+    private handleRequest(list: SyncQueue[]) {
         if (this.currentOperation) {
             this.log('Cancelling sync operation with timer id',this.currentOperation);
             clearTimeout(this.currentOperation);
         }
-        if (matchMethod){
-            let foundIndex = this.queue.findIndex((val: any) => matchMethod(val.data) && (val.status === 'queue' || val.status === 'error'));
-
-            if (foundIndex !== -1) { // if record has a match, replace data only
-                this.log(`Recieved a request, found record with id ${objNameMethod(data)} and updated it`);
-                this.queue[foundIndex].data = data;
-            } else { // if not found, add it
-                this.queue.push({
-                    method, url, data, callback
-                    , status: 'queue'
-                });
-            }
-        } else {
-            // by request
-            this.queue.push({
-                method, url, data, callback
-                , status: 'queue'
-            });
-        }
-
-        this.log(`Recieved a request to ${url} and added it to the queue`);
+        list.forEach((e: SyncQueue) => {
+            this.addToQueue(e);
+        });
 
         this.isOnline().then((online) => {
             if (online){
@@ -70,46 +81,30 @@ export class SyncAPI {
         });
     }
 
-    multipleRequest(list: any, objNameMethod: (e: any) => string){
-        this.log(`Handling new multiple requests`);
-        if (this.currentOperation) {
-            this.log('Cancelling sync operation with timer id',this.currentOperation);
-            clearTimeout(this.currentOperation);
+    /**
+     * Adds the request to the queue.
+     * This is an internal method.
+     */
+    private addToQueue(item: SyncQueue) {
+        const { matchMethod, recordName, ...queueItem } = item;
+        let foundIndex: number = -1;
+
+        if (matchMethod){
+            foundIndex = this.queue.findIndex((val: SyncQueue) => matchMethod(val.model) && (val.status === 'queue' || val.status === 'error'));
         }
-        list.forEach((e: any) => {
-            if (e.matchMethod){
-                let foundIndex = this.queue.findIndex((val: any) => e.matchMethod(val.data) && (val.status === 'queue' || val.status === 'error'));
-    
-                if (foundIndex !== -1) { // if record has a match, replace data only
-                    this.log(`Recieved a request, found record with id ${objNameMethod(e.data)} and updated it`);
-                    this.queue[foundIndex].data = e.data;
-                } else { // if not found, add it
-                    this.queue.push({
-                        method: e.method, url: e.url, data: e.data, callback: e.callback
-                        , status: 'queue'
-                    });
-                }
-            } else {
-                // by request
-                this.queue.push({
-                    method: e.method, url: e.url, data: e.data, callback: e.callback
-                    , status: 'queue'
-                });
-            }
-    
-            this.log(`Recieved a request to ${e.url} and added it to the queue`);
+
+        if (foundIndex !== -1) { // if record has a match, replace model only
+            this.log(`Recieved a request, found record with id <<${recordName(queueItem.model)}>> and updated it`);
+            this.queue[foundIndex].model = queueItem.model;
+            return;
+        }
+        // if not found or no match method, add it
+        this.queue.push({
+            ...queueItem
+            , status: 'queue'
         });
 
-        this.isOnline().then((online) => {
-            if (online){
-                this.currentOperation = setTimeout(() => {
-                    //this.processQueue();
-                    this.syncQueue();
-                    this.currentOperation = null;
-                }, 5000);
-                this.log('Scheduled sync with timer id',this.currentOperation);
-            }
-        });
+        this.log(`Recieved a request to ${queueItem.entity} and added it to the queue`);
     }
 
     isOnline(){
@@ -127,58 +122,12 @@ export class SyncAPI {
     }
 
     isServerReachable(){
-        return this.http.get(`${this.apiRoot}/online`).toPromise()
+        return this.http.get('/online').toPromise()
         .then((data) => {
             return true;
         }).catch((err) => {
             return false;
         });
-    }
-
-    processQueue(){
-        this.queue.filter((q: any) => { // retry the ones with error
-            return q.status === 'error';
-        }).forEach((q: any) => {
-            this.log('Processing request that before had an error', q);
-            if (q.method === 'POST'){
-                this.http.post(q.url,q.data,this.options).toPromise()
-                .then((data) => {
-                    this.log('Processed request and response',data.json());
-                    q.callback(data.json());
-                    q.status = 'processed';
-                    this.queueStatus();
-                    this.toStorage();
-                }).catch((err) => {
-                    this.log('Error for request (again)', [q, err]);
-                    q.status = 'error';
-                    this.queueStatus();
-                    this.toStorage();
-                });
-            }
-        });
-        
-        this.queue.filter((q: any) => { // process queue
-            return q.status === 'queue';
-        }).forEach((q: any) => {
-            this.log('Processing request', q);
-            if (q.method === 'POST'){
-                this.http.post(q.url,q.data,this.options).toPromise()
-                .then((data) => {
-                    this.log('Processed request and response', data.json());
-                    q.callback(data.json());
-                    q.status = 'processed';
-                    this.queueStatus();
-                    this.toStorage();
-                }).catch((err) => {
-                    this.log('Error for request', [q, err]);
-                    q.status = 'error';
-                    this.queueStatus();
-                    this.toStorage();
-                });
-            }
-
-        });
-
     }
 
     queueStatus(){
@@ -211,28 +160,34 @@ export class SyncAPI {
     syncQueue(){
         let dataToSend = <any>[];
         
-        this.queue.filter((q: any) => { // process queue
+        dataToSend = this.queue.filter((q: any) => { // process queue
             return q.status !== 'processed';
-        }).forEach((q: any) => {
-            dataToSend.push({
-                action: (q.url.indexOf('create') !== -1 ? 'create' : 'update')
-                , data: q.data
-            });
         });
 
-        this.http.post(`${this.apiRoot}/task/sync`, dataToSend, this.options).toPromise()
+        const compareObjects = (o1: any, o2: any) => {
+            const keys1 = Object.keys(o1);
+            const keys2 = Object.keys(o2);
+
+            // all keys from o1 should exist on o2 and their values must match
+            const test1 = keys1.every(k1 => keys2.find((k2) => k2 === k1) && o1[k1] === o2[k1]);
+            // same for o2
+            const test2 = keys2.every(k2 => keys1.find((k1) => k1 === k2) && o2[k2] === o1[k2]);
+
+            return test1 && test2;
+        };
+
+        this.http.post('/api/sync', { queue: dataToSend }, this.options).toPromise()
         .then((data) => {
-            this.log('Processed sync, response was', data.json());
-            // q.callback(data.json());
-            //q.status = 'processed';
-            let response = data.json();
+            const response = data.json();
+            this.log('Processed sync, response was', response);
+            
             // get status from response
-            response.batchResultTasks.forEach((r: any) => {
-                let Q = this.queue.find((q: any) => q.data.tsk_id === r.id);
-                if (Q) {
-                    Q.status = r.operationOk ? 'processed' : 'error';
+            response.result.forEach((r: any) => {
+                let found = this.queue.find((q: SyncQueue) => compareObjects(q.pk, r.pk));
+                if (found) {
+                    found.status = r.operationOk ? 'processed' : 'error';
                     if (r.operationOk) {
-                        Q.callback(Q.data, data.json());
+                        found.callback(found.model, response);
                     }
                 }
             });
@@ -244,11 +199,6 @@ export class SyncAPI {
             this.queueStatus();
             this.toStorage();
         });
-    }
-
-    setApiRoot(root: string){
-        this.apiRoot = root;
-        console.log('api root has changed to:',root);
     }
 
     /**
@@ -267,9 +217,12 @@ export class SyncAPI {
 }
 
 interface SyncQueue {
-    method: string
-    , url: string
-    , data: any
-    , callback: Function
+    action: string
+    , model: any
+    , pk: any
+    , entity: string
     , status: string
+    , callback: Function
+    , recordName?: Function
+    , matchMethod?: Function
 }

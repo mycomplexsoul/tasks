@@ -402,7 +402,9 @@ input[type="radio"] {
 }
 
 .movement-badge-new,
-.movement-badge-edited {
+.movement-badge-edited,
+.lasttime-badge-new,
+.lasttime-badge-edited {
   border: 1px solid green;
   padding: 0 5px;
   background: lightgreen;

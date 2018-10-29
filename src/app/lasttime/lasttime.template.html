@@ -50,5 +50,7 @@
         <span class="lasttime-notes">
             {{item.lst_notes}}
         </span>
+        <span class="lasttime-badge-new" *ngIf="item.isNew">new</span>
+        <span class="lasttime-badge-edited" *ngIf="item.isEdited">edited</span>
     </div>
 </div>

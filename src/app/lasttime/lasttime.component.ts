@@ -1,5 +1,6 @@
 import { Component, OnInit, Renderer } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 // types
 import { LastTime } from '../../crosscommon/entities/LastTime';
 
@@ -37,9 +38,11 @@ export class LastTimeComponent implements OnInit {
     };
 
     constructor(
-        lastTimeService: LastTimeService
+        lastTimeService: LastTimeService,
+        private titleService: Title
     ){
         this.services.lastTime = lastTimeService;
+        titleService.setTitle('Last Time');
     }
 
     ngOnInit(){
@@ -80,6 +83,8 @@ export class LastTimeComponent implements OnInit {
 
         this.services.lastTime.newItem(values.fName, values.fValue, values.fValidity, values.fTags, values.fNotes, this.user).then(item => {
             this.viewData.lastTime = this.services.lastTime.list();
+            const listItem = this.viewData.lastTime.find(elem => elem.lst_id === item.lst_id);
+            listItem['isNew'] = true;
             this.calculateValidityForAll();
         });
     }
@@ -139,6 +144,7 @@ export class LastTimeComponent implements OnInit {
         if (item.lst_value !== newValue) {
             item.lst_value = newValue;
             item.lst_date_mod = DateUtils.newDateUpToSeconds();
+            item['isEdited'] = true;
     
             this.services.lastTime.updateItem(item).then(response => {
                 this.calculateValidityForAll();

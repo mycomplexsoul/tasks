@@ -130,8 +130,20 @@ export class MoSQL {
         const handlePossibleChange = (dbName: string, dbType: string, previousValue: any, value: any) => {
             let areDifferent: boolean;
             if ([c._date, c._datetime].indexOf(dbType) !== -1){
-                value = new Date(value);
-                areDifferent = !this.datesAreEqual(previousValue, value);
+                if (value === null && previousValue === null) {
+                    areDifferent = false;
+                }
+                if (value === null && previousValue !== null) {
+                    areDifferent = true;
+                }
+                if (value !== null && previousValue === null) {
+                    value = new Date(value);
+                    areDifferent = true;
+                }
+                if (value !== null && previousValue !== null) {
+                    value = new Date(value);
+                    areDifferent = !this.datesAreEqual(previousValue, value);
+                }
             } else {
                 areDifferent = previousValue !== value;
             }

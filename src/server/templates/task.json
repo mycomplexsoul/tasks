@@ -26,6 +26,7 @@
                 "DUPLICITY_ADD"
             ]
             , "displayName": "Task Id"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "tsk_id_container"
@@ -50,6 +51,7 @@
             , "dbComment": "Name of the task, meaning the task itself"
             , "entName": "Name"
             , "displayName": "Name"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "tsk_notes"

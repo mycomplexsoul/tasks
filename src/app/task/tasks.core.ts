@@ -1,9 +1,11 @@
 import { Injectable } from "@angular/core";
 import { Http, Headers } from '@angular/http';
-import { Task } from './task.type';
+import { Task } from '../../crosscommon/entities/Task';
+import { TaskTimeTracking } from '../../crosscommon/entities/TaskTimeTracking';
 import 'rxjs/add/operator/toPromise';
 import { SyncAPI } from '../common/sync.api';
 import { DateCommon } from '../common/date.common';
+import { Utils } from '../../crosscommon/Utility';
 
 @Injectable()
 export class TasksCore {
@@ -27,6 +29,43 @@ export class TasksCore {
         this.sync = sync;
     }
 
+    getAll(): Promise<Array<Task>>{
+        const filter = {
+            gc: 'OR'
+            , cont: [{
+                f: 'tsk_ctg_status'
+                , op: 'lt'
+                , val: 3
+            }, {
+                f: 'tsk_date_add'
+                , op: 'ge'
+                , val: '2018-08-01'
+            }]
+        };
+        const query = `?q=${JSON.stringify(filter)}`;
+        return this.sync.get(`/api/tasks${query}`).then(data => {
+            this.data.taskList = data.tasks.map((d: any): Task => {
+                let item: Task = new Task(d);
+                item['tsk_time_history'] = data.timetracking.filter((tt: TaskTimeTracking) => {
+                    return tt.tsh_id === item.tsk_id;
+                }) || [];
+                if (item['tsk_time_history'].length) {
+                    item['tsk_time_history'].sort((a: TaskTimeTracking, b: TaskTimeTracking) => {
+                        return a.tsh_num_secuential < b.tsh_num_secuential ? 1 : -1;
+                    });
+                }
+                return item;
+            });
+            return this.data.taskList;
+        });
+    }
+
+    getAllForUser(user: string){
+        return this.getAll().then((list: Array<Task>) => {
+            return list.filter((x: Task) => x.tsk_id_user_asigned === user);
+        });
+    }
+
     /** BEGIN API methods */
     /**
      * Creation and addition of a new task to the collection.
@@ -41,7 +80,7 @@ export class TasksCore {
         T.push(this.newTaskTemplate(parsedTask));
         // console.log(T[T.length-1]);
         this.postTask(T[T.length-1]);
-        this.tasksToStorage();
+        //this.tasksToStorage();
         return T[T.length-1];
     }
 
@@ -493,7 +532,7 @@ export class TasksCore {
             // let recent = this.data.taskList.filter((t: any) => new Date(t.tsk_date_add) >= date || t.tsk_ctg_status !== 3);
             //console.log('old storage',old.length);
             //console.log('recent storage',recent.length);
-            localStorage.setItem("Tasks", JSON.stringify(this.data.taskList));
+        //    localStorage.setItem("Tasks", JSON.stringify(this.data.taskList));
             // localStorage.setItem("Tasks", JSON.stringify(recent));
             //localStorage.setItem("Tasks.old", JSON.stringify(old));
         }
@@ -513,6 +552,8 @@ export class TasksCore {
             task[k] = newData[k];
         });
         task.tsk_date_mod = this.services.dateUtils.newDateUpToSeconds();
+        const index = this.tasks().findIndex((e: any) => e.tsk_id === task.tsk_id);
+        this.data.taskList[index] = task;
         this.updateTaskBE(task);
         this.tasksToStorage();
     }
@@ -550,6 +591,7 @@ export class TasksCore {
             sum += t.tsh_time_spent;
         });
         task.tsk_total_time_spent = sum;
+        return task;
     }
 
     elapsedTime(date1: Date, date2: Date) :number{ // return diff in seconds
@@ -573,8 +615,13 @@ export class TasksCore {
             taskTimeTracking.tsh_time_spent = 0;
         }
         taskTimeTracking.tsh_date_mod = this.services.dateUtils.newDateUpToSeconds();
-        this.recalculateTotalTimeSpent(this.data.taskList.find((t: any) => t.tsk_id === taskTimeTracking.tsh_id));
+        const task = this.recalculateTotalTimeSpent(this.data.taskList.find((t: any) => t.tsk_id === taskTimeTracking.tsh_id));
+        const index = this.data.taskList.findIndex((t: any) => t.tsk_id === taskTimeTracking.tsh_id);
+        this.data.taskList[index] = task;
+        const historyIndex = task.tsk_time_history.findIndex((h: any) => h.tsh_id === taskTimeTracking.tsh_id && h.tsh_num_secuential === taskTimeTracking.tsh_num_secuential);
+        task.tsk_time_history[historyIndex] = taskTimeTracking;
         this.tasksToStorage();
+        this.updateTaskBE(task);
     }
 
     deleteTasks(){
@@ -725,21 +772,22 @@ export class TasksCore {
     // }
 
     getTasks(){
-        return this.http.get(`${this.apiRoot}/task/list`).toPromise()
+        //return this.http.get(`${this.apiRoot}/api/tasks`).toPromise() // => data.json()
+        return this.getAllForUser('anon')
         .then((data) => {
-            this.serverData.tasks = data.json();
+            this.serverData.tasks = data;
             console.log('from BE',this.serverData.tasks);
-            return data.json();
+            return data;
         }).catch((err) => {
             console.log(err);
         });
     }
 
     getTasksFromServer(){
-        this.http.get(`${this.apiRoot}/task/list`).toPromise()
+        return this.getAllForUser('anon')
         .then((data) => {
             let task;
-            let server = data.json();
+            let server = data;
             server.forEach((t: any) => {
                 t.tsk_time_history = t.tsk_time_history || [];
                 
@@ -803,12 +851,17 @@ export class TasksCore {
 
     postTask(t: any){
         t.not_sync = true;
-        this.sync.request('POST', `${this.apiRoot}/task/create`, t
-            , (val: any) => val.tsk_id === t.tsk_id
-            , (e: Task) => e.tsk_id + ' / ' + e.tsk_name
-            , (data: any) => {
+        this.sync.request('create',
+            Utils.entityToRawTableFields(t),
+            {
+                tsk_id: t.tsk_id
+            },
+            'Task',
+            () => {
                 t.not_sync = false;
-            }
+            },
+            (e: Task) => e.tsk_id + ' / ' + e.tsk_name,
+            (val: Task) => val.tsk_id === t.tsk_id
         );
     }
 
@@ -817,28 +870,42 @@ export class TasksCore {
         list.forEach((t: any) => {
             t.not_sync = true;
             syncList.push({
-                method: 'POST'
-                , url: `${this.apiRoot}/task/create`
-                , data: t
-                , matchMethod: (val: any) => val.tsk_id === t.tsk_id
-                , callback: (task: any, data: any) => {
-                    task.not_sync = false;
+                action: 'create'
+                , model: t
+                , pk: {
+                    tsk_id: t.tsk_id
                 }
+                , entity: 'Task'
+                , callback: (model: any, response: any) => {
+                    model.not_sync = false;
+                }
+                , recordName: (task: any) => task.tsk_id
+                , matchMethod: (val: any) => val.tsk_id === t.tsk_id // use pk's instead
             });
         });
-        this.sync.multipleRequest(syncList
-            , (e: Task) => e.tsk_id + ' / ' + e.tsk_name
-        );
+        this.sync.multipleRequest(syncList);
+    }
+
+    prepareTaskToPostBE(t: Task): any {
+        const history = t['tsk_time_history'];
+        const simpleTask = Utils.entityToRawTableFields(t);
+        simpleTask['tsk_time_history'] = history;
+        return simpleTask;
     }
 
     updateTaskBE(t: any){
         t.not_sync = true;
-        this.sync.request('POST', `${this.apiRoot}/task/update`, t
-            , (val: any) => val.tsk_id === t.tsk_id
-            , (e: Task) => e.tsk_id + ' / ' + e.tsk_name
-            , (data: any) => {
+        this.sync.request('update',
+            this.prepareTaskToPostBE(t),
+            {
+                tsk_id: t.tsk_id
+            },
+            'Task',
+            () => {
                 t.not_sync = false;
-            }
+            },
+            (e: Task) => e.tsk_id + ' / ' + e.tsk_name,
+            (val: Task) => val.tsk_id === t.tsk_id
         );
     }
 
@@ -891,7 +958,7 @@ export class TasksCore {
     }
 
     computeComparisonData(){
-        return this.getTasks().then((serverData) => {
+        return this.getAllForUser('anon').then((serverData) => {
             let clientData = this.data.taskList;
             let singleTask: any;
             let comparisonResults: Array<any> = [];

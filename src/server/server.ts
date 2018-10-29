@@ -67,6 +67,10 @@ app.get('/status', (req, res) => {
     res.end(JSON.stringify({ operationOK: true, message: `Hi! server time is ${new Date()}` }));
 });
 
+app.get('/online', (req, res) => {
+    res.end(JSON.stringify({ operationOK: true, message: "Hi! I'm online!" }));
+});
+
 app.get('/task/list', (req, res) => {
     let user = req.query['u'];
     // Query string validation on params

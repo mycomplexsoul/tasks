@@ -1,5 +1,6 @@
 import { Component, OnInit, Renderer } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 // types
 import { Balance } from '../../crosscommon/entities/Balance';
 import { Movement } from '../../crosscommon/entities/Movement';
@@ -53,9 +54,12 @@ export class BalanceComponent implements OnInit {
     constructor(
         balanceService: BalanceService
         , movementService: MovementService
+        , private titleService: Title
     ){
         this.services.balance = balanceService;
         this.services.movement = movementService;
+
+        titleService.setTitle('Balance');
     }
 
     ngOnInit(){

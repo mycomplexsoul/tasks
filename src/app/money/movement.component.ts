@@ -1,5 +1,6 @@
 import { Component, OnInit, Renderer, transition } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 //import { CurrencyPipe } from '@angular/common';
 // types
 import { Movement } from '../../crosscommon/entities/Movement';
@@ -100,6 +101,7 @@ export class MovementComponent implements OnInit {
         , entryService: EntryService
         , balanceService: BalanceService
         , presetService: PresetService
+        , private titleService: Title
     ){
         this.services.account = accountService;
         this.services.category = categoryService;
@@ -108,6 +110,8 @@ export class MovementComponent implements OnInit {
         this.services.entry = entryService;
         this.services.balance = balanceService;
         this.services.preset = presetService;
+
+        titleService.setTitle('Movements');
 
         // TODO: this data should come from localStorage, if not present then fetch from BE
         this.viewData.types = [{

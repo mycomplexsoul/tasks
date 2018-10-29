@@ -114,12 +114,11 @@ export class ApiModule {
                     });
                 }
                 sql = sqlMotor.toUpdateSQL(m, baseModel);
-                connection.runSql(sql).then((responseUpdate) => {
+                return connection.runSql(sql).then((responseUpdate) => {
                     connection.close();
                     if (responseUpdate.err){
                         return {operationOk: false, message: `Error on ${m.metadata.tableName} modification. id: ${recordName}`};
                     } else {
-                        let resultAfterUpdateOK: any;
                         if (hooks && hooks.afterUpdateOK){
                             return hooks.afterUpdateOK(responseUpdate, m).then((resultAfterUpdateOk: any) => {
                                 return {operationOk: true, message: `${m.metadata.tableName} created correctly. id: ${recordName}${resultAfterUpdateOk ? `, afterUpdateOk: ${resultAfterUpdateOk.message}` : ''}`};
@@ -228,7 +227,7 @@ export class ApiModule {
 
         return Promise.all(
             connection.runSqlArray(
-                data.queue.map((item) => {
+                data.queue.map((item: any) => {
                     sqlMotor = new MoSQL(item.model);
                     let finalSql: string = item.sql;
                     if (item.q){
@@ -239,7 +238,7 @@ export class ApiModule {
             )
         ).then(array => {
             let obj = {};
-            data.queue.forEach((item, index) => {
+            data.queue.forEach((item: any, index: number) => {
                 obj[item.name] = array[index].rows;
             });
             connection.close();
