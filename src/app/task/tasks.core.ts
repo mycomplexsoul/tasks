@@ -39,7 +39,7 @@ export class TasksCore {
             }, {
                 f: 'tsk_date_add'
                 , op: 'ge'
-                , val: '2018-08-01'
+                , val: '2018-10-01'
             }]
         };
         const query = `?q=${JSON.stringify(filter)}`;
@@ -104,13 +104,22 @@ export class TasksCore {
                 task = this.newTaskTemplate(parsedTask);
                 T.push(task);
                 list.push(task);
+                task['not_sync'] = true;
                 //this.postTask(T[T.length-1]);
                 //return T[T.length-1];
                 //console.log("added task:",t);
             }
         });
         this.tasksToStorage();
-        this.postMultipleTasks(list);
+        this.postBatch(list);
+    }
+
+    postBatch(list: any[]) {
+        this.sync.post('/api/tasks/batch', list).then((response: any) => {
+            list.forEach((item: any) => {
+                item['not_sync'] = false;
+            });
+        });
     }
 
     parseTask(task: any, options: any){
@@ -947,11 +956,40 @@ export class TasksCore {
         }
     }
 
+    /**
+     * @deprecated Old way to push tasks to BE, no need anymore
+     */
     batchAdd(){
-        let t = this.data.taskList;
+        const date1 = new Date(2018, 8, 1);
+        const date2 = new Date(2018, 9, 1);
+        const dateFrom = (d: any) => new Date(d);
+        const dateGreaterThan = (d1: any, d2: any) => dateFrom(d1).getTime() > dateFrom(d2).getTime();
+        const dateGreaterOrEqualThan = (d1: any, d2: any) => dateFrom(d1).getTime() >= dateFrom(d2).getTime();
+        const dateLowerThan = (d1: any, d2: any) => dateFrom(d1).getTime() < dateFrom(d2).getTime();
+        const dateLowerOrEqualThan = (d1: any, d2: any) => dateFrom(d1).getTime() <= dateFrom(d2).getTime();
+
+        let t = this.data.taskList.filter((task: Task) => dateGreaterOrEqualThan(task.tsk_date_add, date1) && dateLowerThan(task.tsk_date_add, date2));
+        console.log('tasks to push', t);
         this.http.post(`${this.apiRoot}/task/batch`,t,{headers: this.headers})
         .toPromise().then(response => {
             console.log('post response',response.json());
+            // cleanup
+            let filtered = this.data.taskList.filter((task: Task) => {
+                return (dateGreaterOrEqualThan(task.tsk_date_add, date2)) || task.tsk_ctg_status <= 2; // BACKLOG, OPEN
+            });
+            let cleanedup = this.data.taskList.filter((task: Task) => {
+                return (dateGreaterOrEqualThan(task.tsk_date_add, date1) && dateLowerThan(task.tsk_date_add, date2)) && task.tsk_ctg_status > 2; // CLOSED, CANCELLED
+            });
+            let preservedPush = this.data.taskList.filter((task: Task) => {
+                return (dateGreaterOrEqualThan(task.tsk_date_add, date1) && dateLowerThan(task.tsk_date_add, date2)) && task.tsk_ctg_status <= 2; // BACKLOG, OPEN
+            });
+
+            console.log('tasks remaining after cleanup', filtered);
+            console.log('cleanedup tasks', cleanedup);
+            console.log('preserved from push', preservedPush);
+    
+            this.data.taskList = filtered;
+            this.tasksToStorage();
         }).catch((err) => {
             console.log('err',err);
         });

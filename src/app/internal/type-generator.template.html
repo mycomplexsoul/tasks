@@ -1,0 +1,13 @@
+<div>
+    <div *ngFor="let e of viewData.entityList">
+        <input type="checkbox" [id]="e" (click)="toggleSelection(e)" />
+        <label [for]="e">{{e}}</label>
+    </div>
+
+    <div>
+        <input type="checkbox" id="all" (click)="toggleSelectAll($event)" />
+        <label for="all">Select All</label>
+    </div>
+    
+    <button (click)="generate()">Generate Types</button>
+</div>

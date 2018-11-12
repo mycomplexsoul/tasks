@@ -13,4 +13,13 @@ router.get('/', (req, res) => {
     server.list(node);
 });
 
+router.post('/batch', (req, res) => {
+    let server: TaskCustom = new TaskCustom();
+    let node: iNode = {
+        request: req
+        , response: res
+    };
+    server.batchRequestHandler(node);
+});
+
 export { router };

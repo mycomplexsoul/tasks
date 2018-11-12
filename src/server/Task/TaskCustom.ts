@@ -16,7 +16,7 @@ export class TaskCustom {
             model: new Task(),
             name: 'tasks'
         }, {
-            sql: `select * from vitasktimetracking where tsh_id in (select tsk_id from task where tsk_ctg_status < 3 or tsk_date_add >= '2018-08-01')`,
+            sql: `select * from vitasktimetracking where tsh_id in (select tsk_id from task where tsk_ctg_status < 3 or tsk_date_add >= '2018-10-01')`,
             model: new TaskTimeTracking(),
             name: 'timetracking'
         }];
@@ -92,5 +92,17 @@ export class TaskCustom {
         };
 
         return api.update({ body, pk }, hooks);
+    };
+
+    batchRequestHandler = (node: iNode) => {
+        this.batch(node.request.body).then((response: any) => {
+            node.response.end(JSON.stringify(response));
+        });
+    };
+
+    batch = (body: any) => {
+        const api: ApiModule = new ApiModule(new Task());
+
+        return api.batch({ body }, {});
     };
 }

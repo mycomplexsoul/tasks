@@ -48,7 +48,7 @@ export class SyncCustom {
      */
     syncAll = (node: iNode) => {
         const { queue } = node.request.body;
-        let resultPromiseList = [];
+        let resultPromiseList: any[] = [];
 
         queue.forEach((q: syncItem) => {
             if (q.status !== 'queue') {

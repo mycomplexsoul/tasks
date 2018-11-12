@@ -49,6 +49,31 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.6.8 (2018-10-31)
+
+### Added
+* [AppCommon] Type Generator basic UI.
+
+## v1.6.7 (2018-10-30)
+
+### Added
+* [AppCommon] Angular routing on client side to prevent reloading when navigating from menu.
+
+## v1.6.6 (2018-10-29)
+
+### Modified
+* [AppTasks] Sync v1.3 implementation fixes.
+
+## v1.6.5 (2018-10-26)
+
+### Added
+* [AppTasks] `/api/tasks/batch` endpoint to process batch task creation without sync complexity using Api Module batch base method.
+
+## v1.6.4 (2018-10-25)
+
+### Added
+* [AppCommon] Api Module `batch` method for processing multiple inserts of same entity.
+
 ## v1.6.3 (2018-10-24)
 
 ### Modified

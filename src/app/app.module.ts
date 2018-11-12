@@ -22,6 +22,7 @@ import { ComboItemComponent } from './common/comboItem.component';
 import { SyncAPI } from './common/sync.api';
 import { UtilsCommon } from './common/utils.common';
 import { LoginComponent }  from './common/login.component';
+import { TypeGeneratorComponent } from './internal/type-generator.component';
 
 const appRoutes: Routes = [
     // { path: 'crisis-center', component: CrisisListComponent },
@@ -51,13 +52,17 @@ const appRoutes: Routes = [
         component: LoginComponent,
         data: { title: 'Login' }
     },{
-        path: '',
-        redirectTo: '/tasks',
-        pathMatch: 'full'
-    },{
         path: 'lasttime',
         component: LastTimeComponent,
         data: { title: 'Last Time' }
+    },{
+        path: 'type-generator',
+        component: TypeGeneratorComponent,
+        data: { title: 'Type Generator' }
+    },{
+        path: '',
+        redirectTo: '/tasks',
+        pathMatch: 'full'
     }
     // { path: '**', component: PageNotFoundComponent }
 ];
@@ -79,7 +84,8 @@ const appRoutes: Routes = [
     MenuComponent,
     RebuildComponent,
     LoginComponent,
-    LastTimeComponent
+    LastTimeComponent,
+    TypeGeneratorComponent
   ], // parent & child components
   bootstrap: [ AppComponent ], // only parent components
   providers: [

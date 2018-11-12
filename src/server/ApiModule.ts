@@ -131,75 +131,6 @@ export class ApiModule {
         }
     };
 
-    /**
-     * Data structure for sync: {
-     *  queue: [{
-     *      method: 'create|update|delete'
-     *      , entity: 'movement|catalog|...'
-     *      , pk: {
-     *          ... // pk_field: value (only for update)
-     *      }
-     *      , data: {
-     *          ... // field: value
-     *      }
-     *  }]
-     * }
-     */
-    sync = (data: any, hooks: any): Promise<any> => {
-        if (data.body){
-            let promiseQueue: Promise<any>[] = [];
-            
-            // Iterate queue
-            const queue: any[] = data.body.queue;
-            promiseQueue = queue.map(({method, entity, body, pk}) => {
-                let model: iEntity;
-
-                switch(entity){
-                    case 'movement': {
-                        model = new Movement();
-                        break;
-                    }
-                    case 'category': {
-                        model = new Category();
-                        break;
-                    }
-                    case 'place': {
-                        model = new Place();
-                        break;
-                    }
-                    default: {
-                        // skip this but add something to identify it for the response
-                    }
-                }
-
-                if (method === 'create') {
-                    return this.create({ body }, hooks, model).then(createResponse => {
-                        return {
-                            method
-                            , entity
-                            , res: createResponse
-                        };
-                    });
-                }
-
-                if (method === 'update') {
-                    return this.update({ body, pk }, hooks, model).then(updateResponse => {
-                        return {
-                            method
-                            , entity
-                            , pk
-                            , res: updateResponse
-                        };
-                    });
-                }
-            });
-
-            return Promise.all(promiseQueue).then(allResponses => {
-                return allResponses;
-            });
-        }
-    };
-
     listWithSQL = (data: any, model?: iEntity): Promise<iEntity[]> => {
         let m: iEntity = model ? model : this.model;
         let connection: iConnection = ConnectionService.getConnection();
@@ -246,6 +177,51 @@ export class ApiModule {
         }).catch(err => {
             connection.close();
             return {};
+        });
+    };
+
+    batch = (data: any, hooks: any, model?: iEntity): Promise<any> => {
+        let m: iEntity = model ? model : this.model;
+        let connection: iConnection;
+        let results: Promise<any>[] = [];
+        if (data.body){
+            connection = ConnectionService.getConnection();
+            results = data.body.map((item: any) => { // map items to entities
+                // Assign data from request
+                m.metadata.fields.filter(f => f.isTableField).forEach(f => {
+                    m[f.dbName] = item[f.dbName];
+                });
+                return {...m};
+            }).map((model: any) => { // map entities to (entities, sql select)
+                const sqlMotor: MoSQL = new MoSQL(model);
+                return {
+                    model: model,
+                    sqlSelect: sqlMotor.toSelectPKSQL(),
+                    sqlInsert: sqlMotor.toInsertSQL()
+                };
+            }).map((item: any) => { // map entities to promises
+                const recordName: string = item.model.recordName();
+    
+                return connection.runSql(item.sqlInsert).then(responseCreate => {
+                    if (responseCreate.err){
+                        return {operationOk: false, message: `Error on ${m.metadata.tableName} creation. id: ${recordName}`};
+                    } else {
+                        let resultAfterInsertOK: any;
+                        if (hooks && hooks.afterInsertOK){
+                            return hooks.afterInsertOK(responseCreate, m).then((resultAfterInsertOk: any) => {
+                                return {operationOk: true, message: `${m.metadata.tableName} created correctly. id: ${recordName}${resultAfterInsertOK ? `, afterInsertOk: ${resultAfterInsertOK.message}` : ''}`};
+                            });
+                        }
+                        return {operationOk: true, message: `${m.metadata.tableName} created correctly. id: ${recordName}`};
+                    }
+                });
+            });
+        }
+        return Promise.all(results).then((response: any) => {
+            if (connection) {
+                connection.close();
+            }
+            return response;
         });
     };
 }
