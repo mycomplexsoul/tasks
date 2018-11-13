@@ -90,6 +90,11 @@ class DateUtility {
         const format = /\d{4}-\d{2}-\d{2}/;
         return date.length === 10 && format.test(date);
     }
+
+    getMonthName(month: number) {
+        const months: string[] = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        return months[month - 1];
+    }
 }
 
 export let DateUtils = new DateUtility();

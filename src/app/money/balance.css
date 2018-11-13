@@ -1,12 +1,11 @@
-.currency-cell-right {
-    text-align: right;
-    padding: 5px;
-}
-
-.balance-row:nth-child(odd) {
+.balance-row:nth-child(even) {
     background-color: lightgrey;
 }
 
 .balance-row:hover {
     background-color: lightblue;
+}
+
+.movements-listing-row:nth-child(even) {
+    background-color: lightgrey;
 }

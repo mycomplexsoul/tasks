@@ -49,6 +49,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.6.10 (2018-11-02)
+
+### Added
+* [AppMoney][Balance] Improved UX on movement listing, added listing view selector and a "compact" and "cards" view.
+
+## v1.6.9 (2018-11-01)
+
+### Added
+* [AppCommon] Promoted `DateUtility.getMonthName()` method to reuse it, returns month name.
+
 ## v1.6.8 (2018-10-31)
 
 ### Added

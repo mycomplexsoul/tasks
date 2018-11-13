@@ -4,6 +4,7 @@ import { EntryService } from './entry.service';
 import { StorageService } from '../common/storage.service';
 import { Injectable } from '@angular/core';
 import { SyncAPI } from '../common/sync.api';
+import { DateUtils } from '../../crosscommon/DateUtility';
 
 @Injectable()
 export class BalanceService {
@@ -276,8 +277,8 @@ export class BalanceService {
     parseMonthName(iterable: number){
         let year: number = Math.floor(iterable / 100);
         let month: number = iterable % 100;
-        const months: string[] = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-        return `${year} / ${months[month - 1]}`;
+        const monthName: string = DateUtils.getMonthName(month);
+        return `${year} / ${monthName}`;
     }
 
     monthList(user: string){

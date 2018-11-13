@@ -23,17 +23,30 @@
         </tr>
         <tr *ngFor="let b of viewData.monthBalance" class="balance-row">
             <td>{{b.bal_txt_account}}</td>
-            <td class="currency-cell-right">{{b.bal_initial | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
-            <td class="currency-cell-right">{{b.bal_charges | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
-            <td class="currency-cell-right">{{b.bal_withdrawals | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
-            <td class="currency-cell-right" [ngClass]="{'balance-zero': b.bal_final == 0, 'balance-positive': b.bal_final > 0, 'balance-negative': b.bal_final < 0}">
+            <td class="text-align-right padding-all-5">{{b.bal_initial | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+            <td class="text-align-right padding-all-5">{{b.bal_charges | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+            <td class="text-align-right padding-all-5">{{b.bal_withdrawals | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+            <td class="text-align-right padding-all-5"
+                [ngClass]="{'balance-zero': b.bal_final == 0, 'balance-positive': b.bal_final > 0, 'balance-negative': b.bal_final < 0}">
                 {{b.bal_final | currency:'MXN':'symbol-narrow':'1.2-2'}}
             </td>
             <td><a href="#" (click)="renderMovements(b, $event)">View Movements</a></td>
         </tr>
     </table>
 
-    <table *ngIf="viewData.movements.length">
+    <div *ngIf="model.selectedBalance">
+        Listing {{viewData.movements.length}} movements for account <strong>{{model.selectedBalance.bal_txt_account}}</strong> for period {{model.selectedBalance.bal_year}} - {{model.selectedBalance.bal_month}}
+        <div>
+            Use View
+            <select [(ngModel)]="model.movementListingView">
+                <option value="compact">Compact</option>
+                <option value="cards">Cards</option>
+                <option value="grid">Grid</option>
+            </select>
+        </div>
+    </div>
+
+    <table *ngIf="viewData.movements.length && model.movementListingView === 'grid'">
         <tr>
             <th>Id</th>
             <th>Date</th>
@@ -63,4 +76,59 @@
             <td>{{m.mov_txt_status}}</td>
         </tr>
     </table>
+
+    <div *ngIf="viewData.movements.length && model.movementListingView === 'cards'">
+        <div class="movement-list">
+            <div *ngFor="let m of viewData.movements" class="movement-box">
+                <span *ngIf="false">{{m.mov_id}}<br/></span>
+                <span [ngClass]="{'movement-amount-income': m.mov_ctg_type === 2, 'movement-amount-expense': m.mov_ctg_type === 1, 'movement-amount-transfer': m.mov_ctg_type === 3}">
+                    <span *ngIf="m.mov_txt_type === 'EXPENSE'">-</span>
+                    <span *ngIf="m.mov_txt_type === 'INCOME'">+</span>
+                    <span>{{m.mov_amount | currency:'MXN':'symbol-narrow':'1.2-2'}}</span>
+                </span>
+                <span class="movement-account">[{{m.mov_txt_account}}]</span>
+                <span class="movement-account" *ngIf="m.mov_txt_account_to"> -> [{{m.mov_txt_account_to}}]</span><br/>
+                <span class="movement-date">[{{m.mov_date | date: 'yyyy-MM-dd'}}]</span>
+                <span class="movement-description">{{m.mov_desc}}</span>
+                <br/>
+                <span class="movement-category" *ngIf="m.mov_txt_category">{{m.mov_txt_category}}</span>
+                <span class="movement-place" *ngIf="m.mov_txt_place"> | {{m.mov_txt_place}}</span>
+                <span class="movement-budget" *ngIf="m.mov_budget"> | #[{{m.mov_budget}}]</span>
+                <br *ngIf="m.mov_ctg_type === 1 || m.mov_ctg_type === 2" />
+                <span class="movement-notes">{{m.mov_notes}}</span>
+                <span class="movement-status" *ngIf="false">{{m.mov_txt_status}}</span>
+                <span class="movement-badge-new" *ngIf="m.isNew">new</span>
+                <span class="movement-badge-edited" *ngIf="m.isEdited">edited</span>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="viewData.movements.length && model.movementListingView === 'compact'">
+        <table>
+            <tr>
+                <th class="padding-all-5 width-80">Date</th>
+                <th class="padding-all-5 width-100">Amount</th>
+                <th class="padding-all-5">Place</th>
+                <th class="padding-all-5">Description</th>
+            </tr>
+            <tr class="movements-listing-row">
+                <td class="padding-all-5"></td>
+                <td class="padding-all-5 text-align-right"><strong>{{model.selectedBalance.bal_initial | currency:'MXN':'symbol-narrow':'1.2-2'}}</strong></td>
+                <td class="padding-all-5"></td>
+                <td class="padding-all-5"><strong>INITIAL BALANCE</strong></td>
+            </tr>
+            <tr class="movements-listing-row" *ngFor="let m of viewData.movements">
+                <td class="padding-all-5">{{m.mov_date | date: 'yyyy-MM-dd'}}</td>
+                <td class="padding-all-5 text-align-right">{{(((m.mov_ctg_type === 1) || (m.mov_ctg_type === 3 && m.mov_id_account === model.selectedBalance.bal_id_account)) ? -1 * m.mov_amount : m.mov_amount) | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+                <td class="padding-all-5">{{m.mov_ctg_type === 3 ? 'TRANSFER' : m.mov_txt_place}}</td>
+                <td class="padding-all-5">{{m.mov_desc}}</td>
+            </tr>
+            <tr class="movements-listing-row">
+                <td class="padding-all-5"></td>
+                <td class="padding-all-5 text-align-right"><strong>{{model.selectedBalance.bal_final | currency:'MXN':'symbol-narrow':'1.2-2'}}</strong></td>
+                <td class="padding-all-5"></td>
+                <td class="padding-all-5"><strong>FINAL BALANCE</strong></td>
+            </tr>
+        </table>
+    </div>
 </div>

@@ -45,10 +45,14 @@ export class BalanceComponent implements OnInit {
         iterable: number
         , year: number
         , month: number
+        , selectedBalance: Balance
+        , movementListingView: string
     } = {
         iterable: 0
         , year: 2017
         , month: 12
+        , selectedBalance: null
+        , movementListingView: 'compact'
     };
 
     constructor(
@@ -88,6 +92,8 @@ export class BalanceComponent implements OnInit {
     reloadBalance(){
         this.parseIterable();
         this.viewData.monthBalance = this.filterMonthBalance();
+        this.model.selectedBalance = this.viewData.balance.find(b => b.bal_id_account === this.model.selectedBalance.bal_id_account && b.bal_year === this.model.year && b.bal_month === this.model.month);
+        this.renderMovements(this.model.selectedBalance, undefined);
     }
 
     filterMonthBalance(){
@@ -106,13 +112,14 @@ export class BalanceComponent implements OnInit {
     }
 
     renderMovements(balance: Balance, event: Event){
-        event.preventDefault();
+        event && event.preventDefault && event.preventDefault();
         this.services.movement.getAllForUser(this.user).then((list: Array<Movement>) => {
             let ref = balance.bal_year * 100 + balance.bal_month;
             this.viewData.movements = list.filter(m => {
                 let movRef = (new Date(m.mov_date)).getFullYear() * 100 + ((new Date(m.mov_date)).getMonth() + 1);
                 return ref === movRef && (balance.bal_id_account === m.mov_id_account || balance.bal_id_account === m.mov_id_account_to);
             });
+            this.model.selectedBalance = balance;
             console.log(`movements fetched for balance`, balance, this.viewData.movements);
         });
     }
