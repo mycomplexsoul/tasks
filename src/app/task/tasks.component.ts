@@ -1,4 +1,5 @@
 import { Component, OnInit, Renderer } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { TasksCore } from './tasks.core';
 import { SyncAPI } from '../common/sync.api';
 import { Task } from './task.type';
@@ -71,7 +72,15 @@ export class TasksComponent implements OnInit {
     };
     public events: any[] = [];
 
-    constructor(tasksCore: TasksCore, private sync: SyncAPI, private taskIndicator: TaskIndicator, private dateUtils: DateCommon, private rendered: Renderer){
+    constructor(
+        tasksCore: TasksCore,
+        private sync: SyncAPI,
+        private taskIndicator: TaskIndicator,
+        private dateUtils: DateCommon,
+        private titleService: Title
+    ){
+        titleService.setTitle('Tasks');
+
         this.services.tasksCore = tasksCore;
         this.services.sync = sync;
         this.services.taskIndicator = taskIndicator;

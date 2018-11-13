@@ -49,6 +49,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.6.11 (2018-11-05)
+
+### Added
+* [AppTasks] Set title according to Title service and renamed as Intranet for initial view.
+
 ## v1.6.10 (2018-11-02)
 
 ### Added
