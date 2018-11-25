@@ -42,13 +42,13 @@
             <span class="field">
                 <label for="fAccount" class="label-left">Account</label>
                 <select name="fAccount" id="fAccount" class="field-select" ngModel>
-                    <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}} / {{opt.bal_final | currency:'MXN':'symbol-narrow':'1.2-2'}}</option>
+                    <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}} / {{opt.bal_final | currency:'USD':'symbol-narrow':'1.2-2'}}</option>
                 </select>
             </span>
             <span class="field" *ngIf="isTransfer">
                 <label for="fAccountTo" class="label-left">Account To</label>
                 <select name="fAccountTo" id="fAccountTo" class="field-select" ngModel>
-                    <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}} / {{opt.bal_final | currency:'MXN':'symbol-narrow':'1.2-2'}}</option>
+                    <option *ngFor="let opt of viewData.accounts" value="{{opt.acc_id}}">{{opt.acc_name}} / {{opt.bal_final | currency:'USD':'symbol-narrow':'1.2-2'}}</option>
                 </select>
             </span>
             <span class="field" *ngIf="!isTransfer">
@@ -119,7 +119,7 @@
         <td>{{m.mov_txt_account}}</td>
         <td>{{m.mov_txt_account_to}}</td>
         <td>{{m.mov_txt_type}}</td>
-        <td>{{m.mov_amount | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+        <td>{{m.mov_amount | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
         <td>{{m.mov_budget}}</td>
         <td>{{m.mov_txt_category}}</td>
         <td>{{m.mov_txt_place}}</td>
@@ -135,7 +135,7 @@
         <span [ngClass]="{'movement-amount-income': m.mov_ctg_type === 2, 'movement-amount-expense': m.mov_ctg_type === 1, 'movement-amount-transfer': m.mov_ctg_type === 3}">
             <span *ngIf="m.mov_txt_type === 'EXPENSE'">-</span>
             <span *ngIf="m.mov_txt_type === 'INCOME'">+</span>
-            <span>{{m.mov_amount | currency:'MXN':'symbol-narrow':'1.2-2'}}</span>
+            <span>{{m.mov_amount | currency:'USD':'symbol-narrow':'1.2-2'}}</span>
         </span>
         <span class="movement-account">[{{m.mov_txt_account}}]</span>
         <span class="movement-account" *ngIf="m.mov_txt_account_to"> -> [{{m.mov_txt_account_to}}]</span><br/>

@@ -23,12 +23,12 @@
         </tr>
         <tr *ngFor="let b of viewData.monthBalance" class="balance-row">
             <td>{{b.bal_txt_account}}</td>
-            <td class="text-align-right padding-all-5">{{b.bal_initial | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
-            <td class="text-align-right padding-all-5">{{b.bal_charges | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
-            <td class="text-align-right padding-all-5">{{b.bal_withdrawals | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+            <td class="text-align-right padding-all-5">{{b.bal_initial | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+            <td class="text-align-right padding-all-5">{{b.bal_charges | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+            <td class="text-align-right padding-all-5">{{b.bal_withdrawals | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
             <td class="text-align-right padding-all-5"
                 [ngClass]="{'balance-zero': b.bal_final == 0, 'balance-positive': b.bal_final > 0, 'balance-negative': b.bal_final < 0}">
-                {{b.bal_final | currency:'MXN':'symbol-narrow':'1.2-2'}}
+                {{b.bal_final | currency:'USD':'symbol-narrow':'1.2-2'}}
             </td>
             <td><a href="#" (click)="renderMovements(b, $event)">View Movements</a></td>
         </tr>
@@ -67,7 +67,7 @@
             <td>{{m.mov_txt_account}}</td>
             <td>{{m.mov_txt_account_to}}</td>
             <td>{{m.mov_txt_type}}</td>
-            <td>{{m.mov_amount | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+            <td>{{m.mov_amount | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
             <td>{{m.mov_budget}}</td>
             <td>{{m.mov_txt_category}}</td>
             <td>{{m.mov_txt_place}}</td>
@@ -84,7 +84,7 @@
                 <span [ngClass]="{'movement-amount-income': m.mov_ctg_type === 2, 'movement-amount-expense': m.mov_ctg_type === 1, 'movement-amount-transfer': m.mov_ctg_type === 3}">
                     <span *ngIf="m.mov_txt_type === 'EXPENSE'">-</span>
                     <span *ngIf="m.mov_txt_type === 'INCOME'">+</span>
-                    <span>{{m.mov_amount | currency:'MXN':'symbol-narrow':'1.2-2'}}</span>
+                    <span>{{m.mov_amount | currency:'USD':'symbol-narrow':'1.2-2'}}</span>
                 </span>
                 <span class="movement-account">[{{m.mov_txt_account}}]</span>
                 <span class="movement-account" *ngIf="m.mov_txt_account_to"> -> [{{m.mov_txt_account_to}}]</span><br/>
@@ -113,19 +113,19 @@
             </tr>
             <tr class="movements-listing-row">
                 <td class="padding-all-5"></td>
-                <td class="padding-all-5 text-align-right"><strong>{{model.selectedBalance.bal_initial | currency:'MXN':'symbol-narrow':'1.2-2'}}</strong></td>
+                <td class="padding-all-5 text-align-right"><strong>{{model.selectedBalance.bal_initial | currency:'USD':'symbol-narrow':'1.2-2'}}</strong></td>
                 <td class="padding-all-5"></td>
                 <td class="padding-all-5"><strong>INITIAL BALANCE</strong></td>
             </tr>
             <tr class="movements-listing-row" *ngFor="let m of viewData.movements">
                 <td class="padding-all-5">{{m.mov_date | date: 'yyyy-MM-dd'}}</td>
-                <td class="padding-all-5 text-align-right">{{(((m.mov_ctg_type === 1) || (m.mov_ctg_type === 3 && m.mov_id_account === model.selectedBalance.bal_id_account)) ? -1 * m.mov_amount : m.mov_amount) | currency:'MXN':'symbol-narrow':'1.2-2'}}</td>
+                <td class="padding-all-5 text-align-right">{{(((m.mov_ctg_type === 1) || (m.mov_ctg_type === 3 && m.mov_id_account === model.selectedBalance.bal_id_account)) ? -1 * m.mov_amount : m.mov_amount) | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
                 <td class="padding-all-5">{{m.mov_ctg_type === 3 ? 'TRANSFER' : m.mov_txt_place}}</td>
                 <td class="padding-all-5">{{m.mov_desc}}</td>
             </tr>
             <tr class="movements-listing-row">
                 <td class="padding-all-5"></td>
-                <td class="padding-all-5 text-align-right"><strong>{{model.selectedBalance.bal_final | currency:'MXN':'symbol-narrow':'1.2-2'}}</strong></td>
+                <td class="padding-all-5 text-align-right"><strong>{{model.selectedBalance.bal_final | currency:'USD':'symbol-narrow':'1.2-2'}}</strong></td>
                 <td class="padding-all-5"></td>
                 <td class="padding-all-5"><strong>FINAL BALANCE</strong></td>
             </tr>

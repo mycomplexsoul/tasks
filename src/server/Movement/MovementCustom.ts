@@ -16,6 +16,8 @@ import { BalanceModule } from "../BalanceModule";
 import ConnectionService from "../ConnectionService";
 import { ApiModule } from "../ApiModule";
 import { DateUtils } from "../../crosscommon/DateUtility";
+import EmailModule from "../EmailModule";
+import { configModule } from "../ConfigModule";
 
 export class MovementCustom {
     findIn = <T>(arr: T[], findCriteria: (e: T) => boolean, returnField: string) => {
@@ -549,10 +551,6 @@ export class MovementCustom {
         });
     };
 
-    sharedMovements = (node: iNode) => {
-        
-    }
-
     averageBalance = (node: iNode) => {
         const idAccount: string = node.request.query['account'];
         const useCheckDay: boolean = node.request.query['checkday'] === 'true';
@@ -579,6 +577,7 @@ export class MovementCustom {
         let result: {
             operationOk: boolean,
             averageBalance: number,
+            accountName: string,
             message: string,
             checkDay: number,
             initialBalance: number,
@@ -589,6 +588,7 @@ export class MovementCustom {
         } = {
             operationOk: false,
             averageBalance: 0,
+            accountName: null,
             message: null,
             checkDay: 0,
             initialBalance: 0,
@@ -601,7 +601,7 @@ export class MovementCustom {
 
         // [SQL] get current initial balance, as well as account check day starting date if it's based on check day
         // if we're using check day we need to get initial balance from past month because we need to calculate balance at check day
-        const sqlBalance: string = `select bal_initial, acc_check_day, acc_average_min_balance from vibalance
+        const sqlBalance: string = `select bal_initial, acc_check_day, acc_average_min_balance, acc_name from vibalance
             inner join account on (bal_id_account = acc_id)
             where bal_id_account = '${idAccount}'
             and bal_year = ${year}
@@ -619,8 +619,9 @@ export class MovementCustom {
                 currentBalance: response['bal_initial'],
                 checkDay: response['acc_check_day'],
                 averageMinBalance: response['acc_average_min_balance'],
+                accountName: response['acc_name']
             };
-        }).then(({currentBalance, checkDay, averageMinBalance}) => {
+        }).then(({currentBalance, checkDay, averageMinBalance, accountName}) => {
             if (result.message){
                 return result;
             }
@@ -646,6 +647,7 @@ export class MovementCustom {
             result.startingDate = startingDate;
             result.finalDate = finalDate;
             result.checkDay = checkDay;
+            result.accountName = accountName;
             
             return connection.runSql(sqlEntryAcumulation).then(entryResponse => {
                 if (entryResponse.err){
@@ -699,7 +701,87 @@ export class MovementCustom {
         });
     }
 
+    emailAccountMovements = (req: any, res: any) => {
+        const {
+            account,
+            year,
+            month
+        } = req.query;
+        
+        this._emailAccountMovements(account, year, month).then(result => {
+            res.end(JSON.stringify(result));
+        });
+    }
     
+    _emailAccountMovements = async (account: string, year: number, month: number): Promise<any> => {
+        let html: string = '';
+
+        const connection: iConnection = ConnectionService.getConnection();
+        // get balance information
+        const sqlBalance: string = `select * from vibalance where bal_id_account = '${account}' and bal_year = ${year} and bal_month = ${month}`;
+        const {
+            rows: BalanceList
+        } = await connection.runSql(sqlBalance);
+        const balance: Balance = new Balance(BalanceList[0]);
+
+        // get period movements
+        const initialDate: Date = new Date(year, month-1, 1);
+        const finalDate: Date = new Date(year, month-1, DateUtils.lastDayInMonth(year, month-1));
+        const sqlMovements: string = `select * from vimovement where (mov_id_account = '${account}' or mov_id_account = '${account}') and mov_date >= '${DateUtils.formatDate(initialDate)}' and mov_date <= '${DateUtils.formatDate(finalDate)}'`;
+        const {
+            rows: MovementList
+        } = await connection.runSql(sqlMovements);
+        const movements: Movement[] = MovementList.map((m: any) => new Movement(m));
+
+        const currencyFormatHelper = (amount: number) => {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currencyDisplay: 'symbol',
+                currency: 'USD'
+            }).format(amount);
+        };
+        // build html
+        const styleAmount = `style="padding: 5px; text-align: right;"`;
+        html += `Listing ${movements.length} movements for account <strong>${balance.bal_txt_account}</strong> for period ${year} ${DateUtils.getMonthName(month)}.`;
+        html += `<br/><br/>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Place</th>
+                <th>Description</th>
+            </tr>
+            <tr style="background-color: lightgrey;">
+                <td></td>
+                <td ${styleAmount}><strong>${currencyFormatHelper(balance.bal_initial)}</strong></td>
+                <td></td>
+                <td><strong>INITIAL BALANCE</strong></td>
+            </tr>
+            ${movements.map((item, index) => {
+                return `
+                <tr ${index % 2 !== 0 ? 'style="background-color: lightgrey"' : ''}>
+                    <td>${DateUtils.formatDate(item.mov_date)}</td>
+                    <td ${styleAmount}>${currencyFormatHelper(item.mov_amount)}</td>
+                    <td>${item.mov_ctg_type === 3 ? 'TRANSFER' : item.mov_txt_place}</td>
+                    <td>${item.mov_desc}</td>
+                </tr>`;
+            }).join('')}
+            <tr ${movements.length % 2 !== 0 ? 'style="background-color: lightgrey"' : ''}>
+                <td></td>
+                <td ${styleAmount}><strong>${currencyFormatHelper(balance.bal_final)}</strong></td>
+                <td></td>
+                <td><strong>FINAL BALANCE</strong></td>
+            </tr>
+        </table>`;
+        html = html.replace(new RegExp('<td>', 'g'), '<td style="padding: 5px;">');
+
+        const subject: string = `Account Balance ${year} ${DateUtils.getMonthName(month)}`;
+        const to: string = configModule.getConfigValue('money-mail-to');
+        EmailModule.sendHTMLEmail(subject, html, to);
+
+        return Promise.resolve({operationResult: true, message: 'email sent'});
+    }
+
 }
 
 

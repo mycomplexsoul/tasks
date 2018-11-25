@@ -5,8 +5,8 @@ import { MovementCustom } from './MovementCustom';
 const router = express.Router();
 
 router.get('/', (req, res) => {
-    let server: MovementCustom = new MovementCustom();
-    let node: iNode = {
+    const server: MovementCustom = new MovementCustom();
+    const node: iNode = {
         request: req
         , response: res
     };
@@ -14,8 +14,8 @@ router.get('/', (req, res) => {
 });
 
 router.get('/import', (req, res) => {
-    let mov: MovementCustom = new MovementCustom();
-    let node: iNode = {
+    const mov: MovementCustom = new MovementCustom();
+    const node: iNode = {
         request: req
         , response: res
     };
@@ -23,8 +23,8 @@ router.get('/import', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    let mov: MovementCustom = new MovementCustom();
-    let node: iNode = {
+    const mov: MovementCustom = new MovementCustom();
+    const node: iNode = {
         request: req
         , response: res
     };
@@ -32,8 +32,8 @@ router.post('/', (req, res) => {
 });
 
 router.post('/:mov_id', (req, res) => {
-    let mov: MovementCustom = new MovementCustom();
-    let node: iNode = {
+    const mov: MovementCustom = new MovementCustom();
+    const node: iNode = {
         request: req
         , response: res
     };
@@ -41,8 +41,8 @@ router.post('/:mov_id', (req, res) => {
 });
 
 router.get('/generate-entries', (req, res) => {
-    let mov: MovementCustom = new MovementCustom();
-    let node: iNode = {
+    const mov: MovementCustom = new MovementCustom();
+    const node: iNode = {
         request: req
         , response: res
     };
@@ -50,8 +50,8 @@ router.get('/generate-entries', (req, res) => {
 });
 
 router.get('/generate-balance', (req, res) => {
-    let mov: MovementCustom = new MovementCustom();
-    let node: iNode = {
+    const mov: MovementCustom = new MovementCustom();
+    const node: iNode = {
         request: req
         , response: res
     };
@@ -61,7 +61,7 @@ router.get('/generate-balance', (req, res) => {
 });
 
 router.get('/accounts', (req, res) => {
-    let server: MovementCustom = new MovementCustom();
+    const server: MovementCustom = new MovementCustom();
     let node: iNode = {
         request: req
         , response: res
@@ -69,13 +69,27 @@ router.get('/accounts', (req, res) => {
     server.accountsWithBalance(node);
 });
 
+/**
+ * Average balance.
+ * Example: /api/movements/average-balance?account=3&checkday=true&year=2018&month=11
+ */
 router.get('/average-balance', (req, res) => {
-    let server: MovementCustom = new MovementCustom();
-    let node: iNode = {
+    const server: MovementCustom = new MovementCustom();
+    const node: iNode = {
         request: req
         , response: res
     };
     server.averageBalance(node);
+});
+
+/**
+ * Send account movements for a specified account/year/month in an email.
+ * Example: /api/movements/email-account-movements?account=11&year=2018&month=11
+ */
+router.get('/email-account-movements', (req, res) => {
+    const server: MovementCustom = new MovementCustom();
+    
+    server.emailAccountMovements(req, res);
 });
 
 export { router };

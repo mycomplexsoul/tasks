@@ -1,6 +1,6 @@
 {
   "name": "tasks",
-  "version": "1.6.11",
+  "version": "1.6.17",
   "description": "Task manager and money manager web application",
   "scripts": {
     "build": "tsc -p src/",
@@ -43,10 +43,12 @@
     "@angular/platform-browser": "~4.3.4",
     "@angular/platform-browser-dynamic": "~4.3.4",
     "@angular/router": "~4.3.4",
+    "@types/nodemailer": "^4.6.5",
     "angular-in-memory-web-api": "~0.3.0",
     "core-js": "^2.4.1",
-    "rxjs": "5.4.2",
     "mysql": "^2.12.0",
+    "nodemailer": "^4.7.0",
+    "rxjs": "5.4.2",
     "systemjs": "0.19.40",
     "zone.js": "^0.8.4"
   },

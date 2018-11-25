@@ -49,6 +49,37 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.6.17 (2018-11-13)
+
+### Modified
+* [AppMoney] Fixed currency format symbols by using USD currency.
+
+## v1.6.16 (2018-11-12)
+
+### Added
+* [AppMoney] Created REST API `/api/movements/email-account-movements` endpoint to send movements from an account/year/month through email.
+
+## v1.6.15 (2018-11-09)
+
+### Added
+* [AppMoney] Added `accountName` to average balance endpoint response.
+
+## v1.6.14 (2018-11-08)
+
+### Added
+* [AppCommon] Created REST API `/email/test` to test email configuration.
+
+## v1.6.13 (2018-11-07)
+
+### Added
+* [AppCommon] Created module `EmailModule` in order to send emails from node layer.
+* [AppCommon] Added `nodemailer` as a dependency to send email.
+
+## v1.6.12 (2018-11-06)
+
+### Added
+* [AppCommon] Created module `ConfigModule` in order to get application configuration from cfg.json.
+
 ## v1.6.11 (2018-11-05)
 
 ### Added

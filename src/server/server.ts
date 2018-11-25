@@ -8,6 +8,7 @@ import { Catalog } from "../crosscommon/entities/Catalog";
 import { iNode } from "./iNode";
 import * as Routes from './Routes';
 import { InstallModule } from './InstallModule';
+import EmailModule from './EmailModule';
 //import * as bodyParser from 'body-parser';
 const app = express();
 app.use(express.json());
@@ -112,6 +113,11 @@ app.get('/generator/database', (req, res) => {
     sqlMotor.install();
     
     res.end(JSON.stringify({ operationOK: true, message: `success!` }));
+});
+
+app.get('/email/test', (req, res) => {
+    EmailModule.sendHTMLEmail('Test email', 'Hey! hello from somewhere in the <strong>world</strong>!', 'mycomplexsoul@gmail.com');
+    res.end(JSON.stringify({ operationOK: true, message: 'Success!' }));
 });
 
 app.use('/api', Routes.router);
