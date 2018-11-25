@@ -19,6 +19,7 @@ import { StorageService }  from './common/storage.service';
 import { EntryService }  from './money/entry.service';
 import { DateCommon } from './common/date.common';
 import { ComboItemComponent } from './common/comboItem.component';
+import { DrinkWaterComponent } from './common/drinkwater.component';
 import { SyncAPI } from './common/sync.api';
 import { UtilsCommon } from './common/utils.common';
 import { LoginComponent }  from './common/login.component';
@@ -81,6 +82,7 @@ const appRoutes: Routes = [
     MovementComponent,
     BalanceComponent,
     ComboItemComponent,
+    DrinkWaterComponent,
     MenuComponent,
     RebuildComponent,
     LoginComponent,

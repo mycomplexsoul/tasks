@@ -1,0 +1,6 @@
+<span class="drink-water-widget">
+    <span>Water Count: {{count}}</span>
+    <button *ngIf="notifyEnabled" (click)="addOne()" title="Click to add one to current count">+1</button>
+    <button *ngIf="notifyEnabled" (click)="stopNotification()" title="Click to stop notifying">stop</button>
+    <button *ngIf="!notifyEnabled" (click)="startNotification()" title="Click to start notifying">start</button>
+</span>
