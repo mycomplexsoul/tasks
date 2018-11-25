@@ -389,23 +389,23 @@ export class TasksCore {
             , 'tsk_notes': task.tsk_notes || ''
             , 'tsk_parent': task.tsk_parent || '0'
             , 'tsk_order': this.nextOrder()
-            , 'tsk_date_done': <Date>undefined
+            , 'tsk_date_done': task.tsk_date_done || null
             , 'tsk_total_time_spent': 0
             , 'tsk_time_history': task.tsk_time_history || <any>[]
             , 'tsk_ctg_in_process': task.tsk_ctg_in_process || 1
             , 'tsk_qualifiers': task.tsk_qualifiers || ''
             , 'tsk_tags': task.tsk_tags || ''
             , 'tsk_estimated_duration': task.tsk_estimated_duration || 0
-            , 'tsk_schedule_date_start': task.tsk_schedule_date_start || undefined
-            , 'tsk_schedule_date_end': task.tsk_schedule_date_end || undefined
+            , 'tsk_schedule_date_start': task.tsk_schedule_date_start || null
+            , 'tsk_schedule_date_end': task.tsk_schedule_date_end || null
             , 'tsk_schedule_history': <any>[]
-            , 'tsk_date_view_until': task.tsk_date_view_until || <Date>undefined
+            , 'tsk_date_view_until': task.tsk_date_view_until || null
             , 'tsk_notifications': <any>[]
             , 'tsk_id_user_added': task.tsk_id_user_added || this.data.user
             , 'tsk_id_user_asigned': task.tsk_id_user_asigned || this.data.user
             , 'tsk_template': task.tsk_template || ''
             , 'tsk_template_state': task.tsk_template_state || ''
-            , 'tsk_date_due': task.tsk_date_due || <Date>undefined
+            , 'tsk_date_due': task.tsk_date_due || null
             , 'tsk_id_related': task.tsk_id_related || '0'
             , 'tsk_url': task.tsk_url || ''
             , 'tsk_ctg_repeats': task.tsk_ctg_repeats || 0
@@ -413,7 +413,7 @@ export class TasksCore {
             , 'tsk_ctg_rep_type': task.tsk_ctg_rep_type || 0
             , 'tsk_ctg_rep_after_completion': task.tsk_ctg_rep_after_completion || 0
             , 'tsk_ctg_rep_end': task.tsk_ctg_rep_end || 0
-            , 'tsk_rep_date_end': task.tsk_rep_date_end || <Date>undefined
+            , 'tsk_rep_date_end': task.tsk_rep_date_end || null
             , 'tsk_rep_end_iteration': task.tsk_rep_end_iteration || 0
             , 'tsk_rep_iteration': task.tsk_rep_iteration || 0
             , 'tsk_rep_frequency': task.tsk_rep_frequency || 0

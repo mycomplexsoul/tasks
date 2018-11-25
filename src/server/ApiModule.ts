@@ -113,20 +113,30 @@ export class ApiModule {
                         baseModel[f.dbName] = response.rows[0][f.dbName];
                     });
                 }
-                sql = sqlMotor.toUpdateSQL(m, baseModel);
-                return connection.runSql(sql).then((responseUpdate) => {
-                    connection.close();
-                    if (responseUpdate.err){
-                        return {operationOk: false, message: `Error on ${m.metadata.tableName} modification. id: ${recordName}`};
-                    } else {
-                        if (hooks && hooks.afterUpdateOK){
-                            return hooks.afterUpdateOK(responseUpdate, m).then((resultAfterUpdateOk: any) => {
-                                return {operationOk: true, message: `${m.metadata.tableName} created correctly. id: ${recordName}${resultAfterUpdateOk ? `, afterUpdateOk: ${resultAfterUpdateOk.message}` : ''}`};
-                            });
+                if (sqlMotor.toChangesObject(m, baseModel).length > 0) {
+                    sql = sqlMotor.toUpdateSQL(m, baseModel);
+                    return connection.runSql(sql).then((responseUpdate) => {
+                        connection.close();
+                        if (responseUpdate.err){
+                            return {operationOk: false, message: `Error on ${m.metadata.tableName} modification. id: ${recordName}`};
+                        } else {
+                            if (hooks && hooks.afterUpdateOK){
+                                return hooks.afterUpdateOK(responseUpdate, m).then((resultAfterUpdateOk: any) => {
+                                    return {operationOk: true, message: `${m.metadata.tableName} created correctly. id: ${recordName}${resultAfterUpdateOk ? `, afterUpdateOk: ${resultAfterUpdateOk.message}` : ''}`};
+                                });
+                            }
+                            return {operationOk: true, message: `${m.metadata.tableName} updated correctly. id: ${recordName}`};
                         }
-                        return {operationOk: true, message: `${m.metadata.tableName} updated correctly. id: ${recordName}`};
+                    });
+                } else {
+                    // Main object has no changes, process the rest of the chain
+                    if (hooks && hooks.afterUpdateOK){
+                        return hooks.afterUpdateOK({}, m).then((resultAfterUpdateOk: any) => {
+                            return {operationOk: true, message: `${m.metadata.tableName} created correctly. id: ${recordName}${resultAfterUpdateOk ? `, afterUpdateOk: ${resultAfterUpdateOk.message}` : ''}`};
+                        });
                     }
-                });
+                    return {operationOk: true, message: `${m.metadata.tableName} updated correctly. id: ${recordName}`};
+                }
             });
         }
     };

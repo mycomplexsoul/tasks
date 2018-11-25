@@ -6,9 +6,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Notes / To Do / Roadmap]
 * Money
-    * Reports
-        * Create sql query listing balance and movements for shared movements
-        * Send an email with node
     * Balance
         * Balance new fields: comment, date_last_valid, swap charges-withdrawals legends
         * Display Average Balance on Balance page (using account daycheck information)
@@ -48,6 +45,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased / Work In Progress]
 
 <hr/>
+
+## v1.6.19 (2018-11-15)
+
+### Modified
+* [AppTasks] Fixed dates were posted as undefined to backend, now it is posted as null for better consistency.
+
+## v1.6.18 (2018-11-14)
+
+### Added
+* [AppCommon] `ApiModule.update()` fixed when main entity does not have changes, avoids update sql but still run registered hooks.
 
 ## v1.6.17 (2018-11-13)
 
