@@ -46,6 +46,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.6.21 (2018-11-19)
+
+### Added
+* [AppLogin] Added server route and user database validation.
+
+## v1.6.20 (2018-11-16)
+
+### Added
+* [AppDrinkWater] Basic UI to capture and notify on FE, no BE or localStorage either, data is lost on refresh.
+
 ## v1.6.19 (2018-11-15)
 
 ### Modified

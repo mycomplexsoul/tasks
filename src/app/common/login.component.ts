@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
+import { SyncAPI } from '../common/sync.api';
 // types
 
 // services
@@ -26,6 +28,7 @@ export class LoginComponent implements OnInit {
     } = {
         login: null
     };
+    public sync: SyncAPI;
     public model: {
         iterable: number
         , year: number
@@ -37,9 +40,13 @@ export class LoginComponent implements OnInit {
     };
 
     constructor(
-        loginService: LoginService
+        loginService: LoginService,
+        private titleService: Title,
+        syncService: SyncAPI
     ){
         this.services.login = loginService;
+        titleService.setTitle('Login');
+        this.sync = syncService;
     }
 
     ngOnInit(){
@@ -59,10 +66,19 @@ export class LoginComponent implements OnInit {
         }
 
         // Send to server
-        // this.sync.post({}).then()
-
-        // setup current identity
-        //this.identity.set(fUsername, auth_token);
-        //this.identity.get();
+        this.sync.post('/api/login', {
+            fUsername,
+            fPassword
+        }).then((response) => {
+            if (response.operationResult) {
+                this.services.login.setIdentity(response.identity);
+            } else {
+                this.viewData.error = true;
+                this.viewData.errorMessage = response.message;
+            }
+        }).catch((err) => {
+            this.viewData.error = true;
+            this.viewData.errorMessage = err.message;
+        });
     }
 }

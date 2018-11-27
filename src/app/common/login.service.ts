@@ -11,11 +11,17 @@ export class LoginService {
             list: '/api/login'
         }
     }
-    private apiRoot: string = '';
+    private identity: any = {};
 
     constructor(storage: StorageService){
         this.storage = storage;
-        // get api root
-        this.apiRoot = storage.getObject('Options')['optServerAddress'] || '';
+    }
+
+    setIdentity(identity: any) {
+        this.identity = identity;
+    }
+
+    getUsername() {
+        return this.identity.user;
     }
 }
