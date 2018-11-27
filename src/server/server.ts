@@ -9,6 +9,8 @@ import { iNode } from "./iNode";
 import * as Routes from './Routes';
 import { InstallModule } from './InstallModule';
 import EmailModule from './EmailModule';
+import { MoSQL } from './MoSQL';
+import { User } from '../crosscommon/entities/User';
 //import * as bodyParser from 'body-parser';
 const app = express();
 app.use(express.json());
@@ -118,6 +120,49 @@ app.get('/generator/database', (req, res) => {
 app.get('/email/test', (req, res) => {
     EmailModule.sendHTMLEmail('Test email', 'Hey! hello from somewhere in the <strong>world</strong>!', 'mycomplexsoul@gmail.com');
     res.end(JSON.stringify({ operationOK: true, message: 'Success!' }));
+});
+
+app.post('/api/login', async (req, res) => {
+    const {
+        fUsername,
+        fPassword
+    } = req.body;
+
+    const sqlMotor: MoSQL = new MoSQL(new User());
+    const sql = sqlMotor.toSelectSQL(encodeURIComponent(JSON.stringify({
+        gc: "AND",
+        cont: [{
+            f: "usr_id",
+            op: "eq",
+            val: fUsername
+        }]
+    })));
+
+    const connection: iConnection = ConnectionService.getConnection();
+    const {
+        rows: UserList
+    } = await connection.runSql(sql);
+    
+    if (!UserList.length) {
+        res.end(JSON.stringify({ operationResult: false, message: 'Authentication failed.' }));
+        return;
+    }
+    
+    const userDB: User = new User(UserList[0]);
+    
+    // validate password
+    // TODO: needs crypto methods to cypher passwords
+    
+    res.end(JSON.stringify({
+        operationResult: true,
+        message: 'Authentication ok.',
+        identity: {
+            auth_token: 'T123456',
+            user: fUsername,
+            email: userDB.usr_email
+        }
+    }));
+    return true;
 });
 
 app.use('/api', Routes.router);

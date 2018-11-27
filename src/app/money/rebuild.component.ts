@@ -1,14 +1,12 @@
 import { Component, OnInit, Renderer, transition } from '@angular/core';
 import { NgForm } from '@angular/forms';
 // types
-import { Catalog } from '../common/catalog.type';
-import { Entry } from './entry.type';
+import { Balance } from './balance.type';
 
 // services
-import { StorageService }  from '../common/storage.service';
 import { EntryService } from './entry.service';
 import { BalanceService } from './balance.service';
-import { Balance } from './balance.type';
+import { SyncAPI } from '../common/sync.api';
 
 @Component({
     selector: 'rebuild',
@@ -27,6 +25,7 @@ export class RebuildComponent implements OnInit {
         , balance: null
     };
     public user: string = 'anon';
+    private sync: SyncAPI = null;
     public model: {
         month: number
         , parsedYear: number
@@ -45,9 +44,11 @@ export class RebuildComponent implements OnInit {
     constructor(
         entryService: EntryService
         , balanceService: BalanceService
+        , syncService: SyncAPI
     ){
         this.services.entry = entryService;
         this.services.balance = balanceService;
+        this.sync = syncService;
     }
 
     ngOnInit(){
@@ -96,22 +97,42 @@ export class RebuildComponent implements OnInit {
 
     rebuild(){
         this.parseModel();
-        this.services.balance.rebuild(this.model.parsedYear, this.model.parsedMonth, this.user);
+        // this.services.balance.rebuild(this.model.parsedYear, this.model.parsedMonth, this.user);
+        this.sync.post('/api/balance/rebuild', {
+            year: this.model.parsedYear,
+            month: this.model.parsedMonth,
+            user: 'anon'
+        });
     }
     
     transfer(){
         this.parseModel();
-        this.services.balance.transfer(this.model.parsedYear, this.model.parsedMonth, this.user);
+        // this.services.balance.transfer(this.model.parsedYear, this.model.parsedMonth, this.user);
+        this.sync.post('/api/balance/transfer', {
+            year: this.model.parsedYear,
+            month: this.model.parsedMonth,
+            user: 'anon'
+        });
     }
     
     rebuildAndTransfer(){
         this.parseModel();
-        this.services.balance.rebuildAndTransfer(this.model.parsedYear, this.model.parsedMonth, this.user);
+        // this.services.balance.rebuildAndTransfer(this.model.parsedYear, this.model.parsedMonth, this.user);
+        this.sync.post('/api/balance/rebuild-and-transfer', {
+            year: this.model.parsedYear,
+            month: this.model.parsedMonth,
+            user: 'anon'
+        });
     }
     
     rebuildAndTransferUntilCurrentMonth(){
         this.parseModel();
-        let currentDate: Date = new Date();
-        this.services.balance.rebuildAndTransferRange(this.model.parsedYear, this.model.parsedMonth, currentDate.getFullYear(), currentDate.getMonth() + 1, this.user);
+        // let currentDate: Date = new Date();
+        // this.services.balance.rebuildAndTransferRange(this.model.parsedYear, this.model.parsedMonth, currentDate.getFullYear(), currentDate.getMonth() + 1, this.user);
+        this.sync.post('/api/balance/rebuild-and-transfer-range', {
+            year: this.model.parsedYear,
+            month: this.model.parsedMonth,
+            user: 'anon'
+        });
     }
 }

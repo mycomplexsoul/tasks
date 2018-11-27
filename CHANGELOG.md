@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
         * Tag filtering and grouping
 * Login
     * Login basic CSS.
-    * Login server routing and user validation.
+    * Login server user validation.
     * Login logged user identity service.
 * Common
     * Refactor database view generation for using joins on catalog instead of subqueries.
@@ -45,6 +45,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased / Work In Progress]
 
 <hr/>
+
+## v1.6.22 (2018-11-20)
+
+### Added
+* [AppMoney] Rebuild and Transfer Page now calls BE endpoints instead of FE.
 
 ## v1.6.21 (2018-11-19)
 
