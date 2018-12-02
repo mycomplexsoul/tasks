@@ -46,6 +46,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.6.23 (2018-11-21)
+
+### Added
+* [AppCommon] Added node engines information to package.json.
+### Modified
+* [AppMoney] Fixed Transfer sign in movements compact view.
+
 ## v1.6.22 (2018-11-20)
 
 ### Added

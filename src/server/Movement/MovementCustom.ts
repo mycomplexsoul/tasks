@@ -761,7 +761,7 @@ export class MovementCustom {
                 return `
                 <tr ${index % 2 !== 0 ? 'style="background-color: lightgrey"' : ''}>
                     <td>${DateUtils.formatDate(item.mov_date)}</td>
-                    <td ${styleAmount}>${currencyFormatHelper(item.mov_amount)}</td>
+                    <td ${styleAmount}>${currencyFormatHelper((item.mov_ctg_type === 1 || (item.mov_ctg_type === 3 && balance.bal_id_account === item.mov_id_account)) ? -1 * item.mov_amount : item.mov_amount)}</td>
                     <td>${item.mov_ctg_type === 3 ? 'TRANSFER' : item.mov_txt_place}</td>
                     <td>${item.mov_desc}</td>
                 </tr>`;
