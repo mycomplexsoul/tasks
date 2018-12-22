@@ -46,6 +46,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.6.24 (2018-11-22)
+
+### Modified
+* [AppCommon] Updated typescript version in local to ~3.2.2.
+* [AppCommon] Used local typescript to run scripts.
+
 ## v1.6.23 (2018-11-21)
 
 ### Added
