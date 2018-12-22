@@ -39,11 +39,20 @@ export class LastTimeServer {
 
         const hooks: any = {
             afterUpdateOK: (response: any, model: LastTime) => {
-                return this.generateHistory([model]).then(result => {
-                    if (result.operationOk) {
-                        return {message: `history: ${result.message}`};
-                    }
-                });
+                if (model.lst_ctg_status === 1) {
+                    return this.generateHistory([model]).then(result => {
+                        if (result.operationOk) {
+                            return {message: `history: ${result.message}`};
+                        } else {
+                            return {message: `not ok: ${result}`};
+                        }
+                    }).catch(err => {
+                        return {message: `error: ${err}`};
+                    });
+                } else {
+                    // cancel or archive
+                    return Promise.resolve(response);
+                }
             }
         };
 
@@ -97,5 +106,112 @@ export class LastTimeServer {
                 return {operationOk: false, message: `error ${reason}`};
             });
         });
+    }
+
+    async initializeDataFromBackup(node: iNode) {
+        const response: any = await this._initializeDataFromBackup();
+        node.response.end(JSON.stringify(response));
+    }
+
+    async backupLastTimeData(node: iNode) {
+        const response: any = await this._backupLastTimeData();
+        node.response.end(JSON.stringify(response));
+    }
+
+    async cleanUpData(node: iNode) {
+        const response: any = await this._cleanUpData();
+        node.response.end(JSON.stringify(response));
+    }
+
+    /**
+     * Copies initial data from backup to default db.
+     * - Deletes all lasttime records from default.
+     * - Inserts all lasttime records from backup into default.
+     */
+    _initializeDataFromBackup(){
+
+    }
+
+    /**
+     * Copies last time data from "default" to "backup" db.
+     * - If lasttime record from default exists in backup, updates it.
+     * - If lasttime record from default does not exists in backup, inserts it.
+     * - Inserts all lasttimehistory from default into backup.
+     * Note: run from laptop to PC, then from gear to PC. Clean up laptop, clean up gear.
+     */
+    async _backupLastTimeData() {
+        const defaultCon: iConnection = ConnectionService.getConnection();
+        const backupCon: iConnection = ConnectionService.getConnection('backup');
+
+        const LastTimeDefaultList: LastTime[] = await defaultCon.runSql('select * from lasttime').then(data => {
+            return data.rows.map((e: any) => new LastTime(e));
+        });
+        const LastTimeBackupList: LastTime[] = await backupCon.runSql('select * from lasttime').then(data => {
+            return data.rows.map((e: any) => new LastTime(e));
+        });
+
+        const sqlArray: string[] = [];
+        const sqlMotor: MoSQL = new MoSQL(new LastTime());
+        LastTimeDefaultList.forEach(defItem => {
+            const existentItem: LastTime = LastTimeBackupList.find(item => item.lst_id === defItem.lst_id);
+            if (existentItem) {
+                // update if different
+                if (sqlMotor.toChangesObject(existentItem, defItem).length) {
+                    // update
+                    sqlArray.push(sqlMotor.toUpdateSQL(defItem, existentItem));
+                } // else no changes => no update
+            } else {
+                // insert
+                sqlArray.push(sqlMotor.toInsertSQL(defItem));
+            }
+        });
+
+        const response: any[] = await Promise.all(backupCon.runSqlArray(sqlArray));
+
+        const max = (list: LastTimeHistory[]) => {
+            if (list.length) {
+                const sorted: LastTimeHistory[] = list.sort((a, b) => {
+                    return a.lth_num_sequential < b.lth_num_sequential ? 1 : -1;
+                });
+                return sorted[0];
+            }
+            return null;
+        };
+
+        const LastTimeHistoryBackupList: LastTimeHistory[] = await backupCon.runSql('select * from lasttimehistory').then(data => {
+            return data.rows.map((e: any) => new LastTimeHistory(e));
+        });
+        const LastTimeHistoryDefaultList: LastTimeHistory[] = await defaultCon.runSql('select * from lasttimehistory').then(data => {
+            return data.rows.map((e: any) => new LastTimeHistory(e));
+        }).then((defaultList: LastTimeHistory[]) => {
+            const newList: LastTimeHistory[] = [];
+            defaultList.forEach(item => {
+                const foundInNewList: LastTimeHistory = max(newList.filter(b => b.lth_id === item.lth_id));
+                if (foundInNewList) {
+                    item.lth_num_sequential = foundInNewList.lth_num_sequential + 1;
+                } else {
+                    const foundInDefault: LastTimeHistory = max(LastTimeHistoryBackupList.filter(b => b.lth_id === item.lth_id));
+                    if (foundInDefault) {
+                        item.lth_num_sequential = foundInDefault.lth_num_sequential + 1;
+                    }
+                }
+                newList.push(item);
+            });
+            return newList;
+        });
+
+        const historyResponse: any[] = await Promise.all(backupCon.runSqlArray(LastTimeHistoryDefaultList.map(item => sqlMotor.toInsertSQL(item))));
+
+        return [response, historyResponse];
+    }
+
+    /**
+     * Cleans up default db to continue using it.
+     * - Deletes all lasttimehistory records from default.
+     */
+    async _cleanUpData(){
+        const defaultCon: iConnection = ConnectionService.getConnection();
+        const response: any = await defaultCon.runSql('delete from lasttimehistory');
+        return response;
     }
 }

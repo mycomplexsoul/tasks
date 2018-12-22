@@ -31,4 +31,22 @@ router.post('/:lst_id', (req, res) => {
     server.update(node);
 });
 
+router.get('/backup', (req, res) => {
+    let server: LastTimeServer = new LastTimeServer();
+    let node: iNode = {
+        request: req
+        , response: res
+    };
+    server.backupLastTimeData(node);
+});
+
+router.get('/cleanup', (req, res) => {
+    let server: LastTimeServer = new LastTimeServer();
+    let node: iNode = {
+        request: req
+        , response: res
+    };
+    server.cleanUpData(node);
+});
+
 export { router };

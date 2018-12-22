@@ -36,6 +36,7 @@ export class LastTimeComponent implements OnInit {
     } = {
         id: null
     };
+    public listBackup: LastTime[] = [];
 
     constructor(
         lastTimeService: LastTimeService,
@@ -48,6 +49,7 @@ export class LastTimeComponent implements OnInit {
     ngOnInit(){
         this.services.lastTime.getAllForUser(this.user).then((list: Array<LastTime>) => {
             this.viewData.lastTime = list;
+            this.listBackup = [...this.viewData.lastTime]; // backup
 
             // calculate validity on each
             this.calculateValidityForAll();
@@ -145,10 +147,40 @@ export class LastTimeComponent implements OnInit {
             item.lst_value = newValue;
             item.lst_date_mod = DateUtils.newDateUpToSeconds();
             item['isEdited'] = true;
-    
+            
             this.services.lastTime.updateItem(item).then(response => {
                 this.calculateValidityForAll();
+                this.updateBackupItem(item);
             });
+        }
+    }
+    
+    archiveRecord(item: LastTime) {
+        item.lst_ctg_status = 3; // archived
+        item.lst_date_mod = DateUtils.newDateUpToSeconds();
+        item['isEdited'] = true;
+        
+        this.services.lastTime.updateItem(item).then(response => {
+            this.calculateValidityForAll();
+            this.updateBackupItem(item);
+        });
+    }
+    
+    updateBackupItem(item: LastTime) {
+        this.listBackup[this.listBackup.findIndex(i => i.lst_id === item.lst_id)] = item; // to keep backup list updated
+    }
+
+    filter(event: KeyboardEvent) {
+        const query: string = event.target['value'];
+
+        const criteria = (item: LastTime) => {
+            return item.lst_name.toLowerCase().indexOf(query.toLowerCase()) !== -1 || item.lst_tags.toLowerCase().indexOf(query.toLowerCase()) !== -1;
+        };
+
+        if (query) {
+            this.viewData.lastTime = this.listBackup.filter(i => criteria(i));
+        } else {
+            this.viewData.lastTime = this.listBackup;
         }
     }
 }

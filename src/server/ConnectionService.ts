@@ -1,20 +1,15 @@
-"use strict";
 import iConnection from "./iConnection";
-//import { Promise } from 'es6-promise';
 import * as mysql from 'mysql';
+import { configModule } from './ConfigModule';
 
 let ConnectionService = (function(){
-    function loadJSON(file: string){
-        let fs = require('fs');
-        let obj = JSON.parse(fs.readFileSync(file + '.json', 'utf8'));
-        return obj;
-    }
-    let getConnection = (): iConnection => {
-        let config = loadJSON(__dirname + '/../../cfg');
+    const getConnection = (label = 'default'): iConnection => {
+        //let config = loadJSON(__dirname + '/../../cfg');
+        const config = configModule.getConfigValue('db').find((item: any) => item.label === label);
         let connection: mysql.Connection;// = mysql.createConnection(config[0]);
 
         function handleDisconnect() {
-            connection = mysql.createConnection(config[0]); // Recreate the connection, since
+            connection = mysql.createConnection(config); // Recreate the connection, since
                                                             // the old one cannot be reused.
             
             connection.connect(function(err: any) {              // The server is either down
@@ -22,7 +17,7 @@ let ConnectionService = (function(){
                     console.log('error when connecting to db:', err);
                     setTimeout(handleDisconnect, 2000); // We introduce a delay before attempting to reconnect,
                 }                                     // to avoid a hot loop, and to allow our node script to
-                console.log('connected to <' + config[0].database + '> with id ' + connection.threadId);
+                console.log('connected to <' + config.database + '> with id ' + connection.threadId);
             });                                     // process asynchronous requests in the meantime.
                                                     // If you're also serving http, display a 503 error.
             connection.on('error', function(err: any) {
@@ -37,12 +32,12 @@ let ConnectionService = (function(){
 
         handleDisconnect();
         
-        let close = () => {
+        const close = () => {
             console.log(`ending connection with id ${connection.threadId}`);
             connection.end();
             console.log(`connection ${connection}`);
         };
-        let runSql = (sql: string): Promise<any> => {
+        const runSql = (sql: string): Promise<any> => {
             return new Promise<any>((resolve,reject) => {
                 connection.query(sql,(err: any, rows: any, fields: any[]) => {
                     if (err){
@@ -58,8 +53,8 @@ let ConnectionService = (function(){
                 });
             });
         };
-        let runSqlArray = (sqlArray: Array<string>): Array<Promise<any>> => {
-            let responseArray = sqlArray.map((sql: string) => runSql(sql));
+        const runSqlArray = (sqlArray: Array<string>): Array<Promise<any>> => {
+            const responseArray = sqlArray.map((sql: string) => runSql(sql));
             return responseArray;
         };
         const runSyncSql = (sql: string, callback: (err: any, rows: any, fields: any[]) => void): void => {

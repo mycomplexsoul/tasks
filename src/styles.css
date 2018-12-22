@@ -419,6 +419,7 @@ input[type="radio"] {
 
 .movement-badge-new,
 .movement-badge-edited,
+.lasttime-badge-archived,
 .lasttime-badge-new,
 .lasttime-badge-edited {
   border: 1px solid green;

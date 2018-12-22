@@ -16,7 +16,7 @@ class ConfigModule {
     }
 
     loadConfig = () => {
-        this.config = this.loadJSON('./cfg')[0];
+        this.config = this.loadJSON('./cfg');
     }
 
     getConfigValue = (match: string = null): any | string | null => {

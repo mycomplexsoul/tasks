@@ -35,6 +35,13 @@
     </div>
 </form>
 
+<div>
+    {{viewData.lastTime.length}} items.
+    <br/>
+    <label>Search</label>
+    <input (keyup)="filter($event)" placeholder="Filter" />
+</div>
+
 <div class="lasttime-list">
     <div *ngFor="let item of viewData.lastTime" class="lasttime-item-container">
         <span class="lasttime-name">{{item.lst_name}}:</span>
@@ -43,6 +50,9 @@
         <span [ngClass]="item.ageClass" class="lasttime-age" [title]="item.lst_date_mod | date: 'yyyy-MM-dd HH:mm'">
             {{item.ageSentence}}
         </span>
+        <span (click)="item.showOptions = !item.showOptions">
+            {{item.showOptions ? '-' : '+'}}
+        </span>
         <br/>
         <span class="lasttime-tags">
             #[{{item.lst_tags}}]
@@ -50,7 +60,12 @@
         <span class="lasttime-notes">
             {{item.lst_notes}}
         </span>
+        <span class="lasttime-badge-archived" *ngIf="item.lst_ctg_status === 3">archived</span>
         <span class="lasttime-badge-new" *ngIf="item.isNew">new</span>
         <span class="lasttime-badge-edited" *ngIf="item.isEdited">edited</span>
+        <br/>
+        <span *ngIf="item.showOptions">
+            <button (click)="archiveRecord(item)">archive</button>
+        </span>
     </div>
 </div>

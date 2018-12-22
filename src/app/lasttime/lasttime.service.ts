@@ -29,10 +29,19 @@ export class LastTimeService {
     }
 
     async getAll(){
+        const filter = {
+            gc: 'AND'
+            , cont: [{
+                f: 'lst_ctg_status'
+                , op: 'eq'
+                , val: 1
+            }]
+        };
+        const query = `?q=${JSON.stringify(filter)}`;
         const sort = ((a: LastTime, b: LastTime) => {
             return a.lst_date_mod.getTime() > b.lst_date_mod.getTime() ? 1 : -1;
         });
-        return this.sync.get(`${this.config.api.list}`).then(data => {
+        return this.sync.get(`${this.config.api.list}${query}`).then(data => {
             this.data = data.map((d: any): LastTime => new LastTime(d));
             this.data = this.data.sort(sort);
             return this.data;

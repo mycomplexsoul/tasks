@@ -46,6 +46,47 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.7.1 (2018-12-04)
+
+### Added
+* [AppLastTime] Listing now filters ACTIVE records.
+
+## v1.7.0 (2018-12-03)
+
+### Added
+* [Breaking][AppCommon] Config module now handles changes to cfg.json for two db configuration.
+* [Breaking][AppCommon] `ConnectionService` improvements to handle cfg.json and db selector.
+
+## v1.6.30 (2018-11-30)
+
+### Added
+* [AppLastTime] Routes for `/cleanup` and `/backup`.
+
+## v1.6.29 (2018-11-29)
+
+### Added
+* [AppLastTime] List item count.
+
+## v1.6.28 (2018-11-28)
+
+### Added
+* [AppLastTime] Search input and list filtering.
+
+## v1.6.27 (2018-11-27)
+
+### Added
+* [AppLastTime] Archive option toggle.
+
+## v1.6.26 (2018-11-26)
+
+### Added
+* [AppLastTime] Archive record button, request and handler.
+
+## v1.6.25 (2018-11-23)
+
+### Added
+* [AppLastTime] Added backup, cleanup and initialization routines.
+
 ## v1.6.24 (2018-11-22)
 
 ### Modified
