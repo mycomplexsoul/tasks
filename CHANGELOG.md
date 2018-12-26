@@ -22,9 +22,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
     * Option to show/hide Indicators
     * Clean up Indicators legacy section
     * Unset schedule, unset link
-* Last Time
-    * Basic Features
-        * Tag filtering and grouping
 * Login
     * Login basic CSS.
     * Login server user validation.
@@ -45,6 +42,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased / Work In Progress]
 
 <hr/>
+
+## v1.7.2 (2018-12-05)
+
+### Added
+* [AppLastTime] Edit notes button and request on UI.
 
 ## v1.7.1 (2018-12-04)
 

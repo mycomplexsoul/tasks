@@ -183,4 +183,20 @@ export class LastTimeComponent implements OnInit {
             this.viewData.lastTime = this.listBackup;
         }
     }
+
+    editNotes(item: LastTime) {
+        const currentValue: string = item.lst_notes;
+
+        const newValue: string = window.prompt(`${item.lst_name} - Notes`, currentValue);
+        if (currentValue !== newValue && newValue !== null) {
+            item.lst_notes = newValue;
+            item.lst_date_mod = DateUtils.newDateUpToSeconds();
+            item['isEdited'] = true;
+            
+            this.services.lastTime.updateItem(item).then(response => {
+                this.calculateValidityForAll();
+                this.updateBackupItem(item);
+            });
+        }
+    }
 }

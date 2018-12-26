@@ -1,6 +1,6 @@
 {
   "name": "tasks",
-  "version": "1.6.23",
+  "version": "1.7.2",
   "description": "Task manager and money manager web application",
   "scripts": {
     "build": "tsc -p src/",
@@ -20,6 +20,7 @@
     "lint": "tslint ./src/**/*.ts -t verbose",
     "start": "node ./node_modules/typescript/lib/tsc ./src/server/server.ts --lib es6 && node ./node_modules/typescript/lib/tsc -p ./src/ && node --inspect src/server/server.js",
     "build:node": "node_modules/.bin/tsc src/server/server.ts --lib es6 --module commonjs --outDir dist/",
+    "build:ng": "tsc -p src/ --outDir dist/",
     "servedist": "lite-server -c=dist-bs-config.json",
     "bundleapp": "node_modules/.bin/webpack --config webpack.config.js",
     "launch": "npm run build && npm run bundleapp && npm run servedist",
