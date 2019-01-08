@@ -31,10 +31,13 @@ router.post('/rebuild-and-transfer', (req, res) => {
     server.rebuildAndTransfer(req, res);
 });
 
-router.post('/rebuild-and-transfer-range', (req, res) => {
+/**
+ * /api/balance/rebuild-and-transfer-range?year=2018&month=12&user=anon
+ */
+router.get('/rebuild-and-transfer-range', (req, res) => {
     const server: BalanceServer = new BalanceServer();
 
-    server.rebuildAndTransfer(req, res);
+    server.rebuildAndTransferRange(req, res);
 });
 
 export { router };

@@ -92,8 +92,10 @@ export class BalanceComponent implements OnInit {
     reloadBalance(){
         this.parseIterable();
         this.viewData.monthBalance = this.filterMonthBalance();
-        this.model.selectedBalance = this.viewData.balance.find(b => b.bal_id_account === this.model.selectedBalance.bal_id_account && b.bal_year === this.model.year && b.bal_month === this.model.month);
-        this.renderMovements(this.model.selectedBalance, undefined);
+        if (this.model.selectedBalance) {
+            this.model.selectedBalance = this.viewData.balance.find(b => b.bal_id_account === this.model.selectedBalance.bal_id_account && b.bal_year === this.model.year && b.bal_month === this.model.month);
+            this.renderMovements(this.model.selectedBalance, undefined);
+        }
     }
 
     filterMonthBalance(){

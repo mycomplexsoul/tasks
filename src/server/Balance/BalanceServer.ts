@@ -63,11 +63,11 @@ export class BalanceServer {
             year,
             month,
             user
-        } = req.params; // TODO: validate params types and values
+        } = req.query; // TODO: validate params types and values
         const message: string = 'Rebuild process finished correctly.';
         const currentDate: Date = new Date();
 
-        balanceModule.rebuildAndTransferRange(year, month, currentDate.getFullYear(), currentDate.getMonth() + 1, user);
+        balanceModule.rebuildAndTransferRange(Number.parseInt(year), Number.parseInt(month), currentDate.getFullYear(), currentDate.getMonth() + 1, user);
         res.end(JSON.stringify({ operationResult: true, message }));
     }
 }

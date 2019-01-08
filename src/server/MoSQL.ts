@@ -187,13 +187,15 @@ export class MoSQL {
     toUpdateSQL(changes: iEntity | Array<any>, model?: iEntity): string {
         const m: iEntity = this.decideModel(model);
         let sql: string = '';
-        const c = { ...this.constants };
         
         let sqlChanges = "";
         const pkFields = this.getPK(m);
-        let field: FieldDefinition;
         
-        let changesArray: any[] = this.toChangesObject(m, changes);
+        const changesArray: any[] = this.toChangesObject(m, changes);
+        if (!changesArray.length) {
+            return null;
+        }
+
         changesArray.forEach((change: any) => { // { dbName, dbType, previousValue, value }
             // as a special case, if a change is detected on _date_add field, skip that field for sql
             //if (change.dbName !== `${model.metadata.prefix}_date_add`){

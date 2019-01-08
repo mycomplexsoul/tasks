@@ -184,7 +184,7 @@ export class MovementComponent implements OnInit {
 
             this.viewData.movements = this.viewData.movements
             .sort((a: Movement, b: Movement) => a.mov_date >= b.mov_date ? -1 : 1)
-            .slice(0,20);
+            .slice(0,40);
         });
         /* analysis */
         // const year = 2017;

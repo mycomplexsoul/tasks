@@ -18,6 +18,7 @@ import { ApiModule } from "../ApiModule";
 import { DateUtils } from "../../crosscommon/DateUtility";
 import EmailModule from "../EmailModule";
 import { configModule } from "../ConfigModule";
+import { Preset } from "../../crosscommon/entities/Preset";
 
 export class MovementCustom {
     findIn = <T>(arr: T[], findCriteria: (e: T) => boolean, returnField: string) => {
@@ -780,6 +781,43 @@ export class MovementCustom {
         EmailModule.sendHTMLEmail(subject, html, to);
 
         return Promise.resolve({operationResult: true, message: 'email sent'});
+    }
+
+    /**
+     * Copies initial data from backup to default db.
+     * [accounts, place, category, preset, movement, entry, balance]
+     * - Deletes all table records from default.
+     * - Inserts all table records from backup into default.
+     */
+    async initializeDataFromBackup(){
+        const tables: iEntity[] = [
+            new Account(),
+            new Place(),
+            new Category(),
+            new Preset(),
+            new Movement(),
+            new Entry(),
+            new Balance()
+        ];
+        const sqlMotor: MoSQL = new MoSQL();
+
+        const sqlSelect: string[] = tables.map(t => `select * from ${t.metadata.tableName}`);
+        const sqlDelete: string[] = tables.map(t => `delete from ${t.metadata.tableName}`);
+
+        const defaultCon: iConnection = ConnectionService.getConnection();
+        const backupCon: iConnection = ConnectionService.getConnection('backup');
+
+        const sqlInsert: string[] = await Promise.all(backupCon.runSqlArray(sqlSelect)).then((response: any) => {
+            const sqlList: string[] = [];
+            response.forEach((entResp: any, index: number) => {
+                sqlList.push(sqlMotor.toInsertSQL(Object.getPrototypeOf(tables[index]).prototype.constructor(entResp)));
+            });
+            return sqlList;
+        });
+        const deleteResponse: any = await defaultCon.runSqlArray(sqlDelete);
+        const insertResponse: any = await Promise.all(defaultCon.runSqlArray(sqlInsert));
+
+        return [deleteResponse, insertResponse];
     }
 
 }

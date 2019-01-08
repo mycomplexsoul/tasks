@@ -43,19 +43,37 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.7.6 (2018-12-12)
+
+* [AppMoney] Improved apply entries to balance routine when used in movements for previous month.
+* [AppMoney] Added base routine for initialization on remote for Money App.
+
+## v1.7.5 (2018-12-11)
+
+* [AppMoney] Improved transfer endpoint when used in range rebuild and transfer.
+
+## v1.7.4 (2018-12-10)
+
+* [AppMoney] Improved rebuild endpoint when used in range rebuild and transfer.
+
+## v1.7.4 (2018-12-10)
+
+* [AppCommon] `MoSQL.toChangesObject()` now returns null if no changes were found.
+
+## v1.7.3 (2018-12-06)
+
+* [AppMoney][fix] Balance, fixed error on balance month change if no account was selected.
+
 ## v1.7.2 (2018-12-05)
 
-### Added
 * [AppLastTime] Edit notes button and request on UI.
 
 ## v1.7.1 (2018-12-04)
 
-### Added
 * [AppLastTime] Listing now filters ACTIVE records.
 
 ## v1.7.0 (2018-12-03)
 
-### Added
 * [Breaking][AppCommon] Config module now handles changes to cfg.json for two db configuration.
 * [Breaking][AppCommon] `ConnectionService` improvements to handle cfg.json and db selector.
 
