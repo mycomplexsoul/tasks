@@ -555,8 +555,8 @@ export class MovementCustom {
     averageBalance = (node: iNode) => {
         const idAccount: string = node.request.query['account'];
         const useCheckDay: boolean = node.request.query['checkday'] === 'true';
-        const year: number = node.request.query['year'];
-        const month: number = node.request.query['month'];
+        const year: number = Number.parseInt(node.request.query['year']);
+        const month: number = Number.parseInt(node.request.query['month']);
 
         this.averageBalancePerAccount(idAccount, useCheckDay, year, month).then(result => {
             node.response.end(JSON.stringify(result));
@@ -599,14 +599,15 @@ export class MovementCustom {
             dailyBalance: []
         };
         let startingDate: Date = new Date(year, month-1, 1, 0, 0, 0);
+        const iterablePreviousMonth = DateUtils.getIterablePreviousMonth(year, month);
 
         // [SQL] get current initial balance, as well as account check day starting date if it's based on check day
         // if we're using check day we need to get initial balance from past month because we need to calculate balance at check day
         const sqlBalance: string = `select bal_initial, acc_check_day, acc_average_min_balance, acc_name from vibalance
             inner join account on (bal_id_account = acc_id)
             where bal_id_account = '${idAccount}'
-            and bal_year = ${year}
-            and bal_month = ${useCheckDay ? month - 1 : month}`;
+            and bal_year = ${iterablePreviousMonth.year}
+            and bal_month = ${useCheckDay ? iterablePreviousMonth.month : month}`;
 
         const connection = ConnectionService.getConnection();
         return connection.runSql(sqlBalance).then((balanceResponse) => {
@@ -626,12 +627,13 @@ export class MovementCustom {
             if (result.message){
                 return result;
             }
+            const iterableTwoMonthsBehind = DateUtils.getIterablePreviousMonth(iterablePreviousMonth.year, iterablePreviousMonth.month);
             if (useCheckDay) {
-                startingDate = new Date(year, month-2, checkDay+1, 0, 0, 0);
+                startingDate = new Date(iterableTwoMonthsBehind.year, iterableTwoMonthsBehind.month, checkDay+1, 0, 0, 0);
             }
             // final date should be in 1 month
             const finalDate: Date = DateUtils.addDays(DateUtils.addMonths(startingDate, 1), -1);
-            const previousMonthDayOne: Date = new Date(year, month-2, 1, 0, 0, 0);
+            const previousMonthDayOne: Date = new Date(iterableTwoMonthsBehind.year, iterableTwoMonthsBehind.month, 1, 0, 0, 0);
             // [SQL] Get total amount spent each day for this account within the range
             const sqlEntryAcumulation: string = `SELECT ent_date, SUM(CASE WHEN ent_ctg_type = 1
                 THEN -1 * ent_amount

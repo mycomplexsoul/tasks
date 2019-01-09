@@ -95,6 +95,30 @@ class DateUtility {
         const months: string[] = ['January','February','March','April','May','June','July','August','September','October','November','December'];
         return months[month - 1];
     }
+
+    getIterableNextMonth(year: number, month: number){
+        if (month === 12){
+            return this.getIterableCurrentMonth(year + 1, 1);
+        } else {
+            return this.getIterableCurrentMonth(year, month + 1);
+        }
+    }
+    
+    getIterablePreviousMonth(year: number, month: number){
+        if (month === 1){
+            return this.getIterableCurrentMonth(year - 1, 12);
+        } else {
+            return this.getIterableCurrentMonth(year, month - 1);
+        }
+    }
+
+    getIterableCurrentMonth(year: number, month: number){
+        return {
+            year,
+            month,
+            iterable: year * 100 + month
+        };
+    }
 }
 
 export let DateUtils = new DateUtility();

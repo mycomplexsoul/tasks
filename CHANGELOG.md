@@ -43,6 +43,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.7.8 (2018-12-14)
+
+* [AppMoney][fix] Avegare balance calculation for January was not calculating correctly previous months.
+
+## v1.7.7 (2018-12-13)
+
+* [AppCommon] Added methods to calculate year/month ahead and previous.
+
 ## v1.7.6 (2018-12-12)
 
 * [AppMoney] Improved apply entries to balance routine when used in movements for previous month.
