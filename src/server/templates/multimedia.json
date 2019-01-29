@@ -1,0 +1,112 @@
+{
+    "name": "Multimedia"
+    , "namespace": "common"
+    , "removeMeans": "CANCELATION"
+    , "authNeeded": false
+    , "displayOnMenu": false
+    , "prefix": "mma"
+    , "permissionsTemplate": "permissions_all"
+    , "specialFeatures": [
+        "AUTONUMERIC"
+        , "HEADERS(Multimedia,Multimedia)"
+        , "TABLE_NAME(MULTIMEDIA)"
+        , "VIEW_NAME(VIMULTIMEDIA)"
+    ]
+    , "fields": [
+        {
+            "templateId": "string"
+            , "dbName": "mma_id"
+            , "isPK": true
+            , "size": 32
+            , "minLength": 1
+            , "dbComment": "Id for the media"
+            , "entName": "MultimediaId"
+            , "captureRequired": true
+            , "specialRules": [
+                "DUPLICITY_ADD"
+            ]
+            , "displayName": "Multimedia Id"
+            , "isRecordName": true
+        },{
+            "templateId": "string"
+            , "dbName": "mma_title"
+            , "size": 300
+            , "minLength": 1
+            , "dbComment": "Title of the media"
+            , "entName": "Title"
+            , "captureRequired": true
+            , "specialRules": [
+                "DUPLICITY_ADD(MMA_ID)"
+                , "DUPLICITY_EDIT(MMA_ID)"
+            ]
+            , "displayName": "Title"
+            , "isRecordName": true
+        },{
+            "templateId": "integer"
+            , "dbName": "mma_ctg_media_type"
+            , "dbComment": "Media category indicator"
+            , "entName": "MediaType"
+            , "displayName": "Media Type"
+            , "catalogId": "MULTIMEDIA_MEDIA_TYPE"
+        },{
+            "templateId": "integer"
+            , "dbName": "mma_season"
+            , "dbComment": "Season number identifier"
+            , "entName": "Season"
+            , "displayName": "Season"
+            , "isRecordName": true
+        },{
+            "templateId": "integer"
+            , "dbName": "mma_year"
+            , "dbComment": "Year of release/production of media"
+            , "entName": "Year"
+            , "displayName": "Year"
+        },{
+            "templateId": "string"
+            , "dbName": "mma_current_ep"
+            , "size": 10
+            , "minLength": 1
+            , "dbComment": "Current episode id"
+            , "entName": "CurrentEpisodeId"
+            , "displayName": "Current Episode Id"
+        },{
+            "templateId": "string"
+            , "dbName": "mma_total_ep"
+            , "size": 10
+            , "minLength": 1
+            , "dbComment": "Total episodes or latest episode id"
+            , "entName": "TotalEpisodeId"
+            , "displayName": "Total Episode Id"
+        },{
+            "templateId": "string"
+            , "dbName": "mma_url"
+            , "size": 4000
+            , "allowNull": true
+            , "dbComment": "Url of a resource related to the media"
+            , "entName": "Url"
+            , "displayName": "Url"
+        },{
+            "templateId": "string"
+            , "dbName": "mma_id_user"
+            , "size": 50
+            , "dbComment": "User who watched/read/review this media"
+            , "entName": "User"
+            , "displayName": "User"
+        },{
+            "templateId": "creationDate"
+        },{
+            "templateId": "modificationDate"
+        },{
+            "templateId": "status"
+            , "catalogId": "RECORD_STATUS"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_media_type"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_status"
+        }
+    ]
+    , "view": [
+    ]
+}

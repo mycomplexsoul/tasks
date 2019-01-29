@@ -24,4 +24,13 @@ router.post('/create', (req, res) => {
     server.create(node);
 });
 
+router.post('/check', (req, res) => {
+    let server: TypeGeneratorServer = new TypeGeneratorServer();
+    let node: iNode = {
+        request: req
+        , response: res
+    };
+    server.check(node);
+});
+
 export { router };

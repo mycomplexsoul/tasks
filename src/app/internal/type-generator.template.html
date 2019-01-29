@@ -3,11 +3,14 @@
         <input type="checkbox" [id]="e" (click)="toggleSelection(e)" />
         <label [for]="e">{{e}}</label>
     </div>
-
+    
+    <hr/>
     <div>
         <input type="checkbox" id="all" (click)="toggleSelectAll($event)" />
         <label for="all">Select All</label>
     </div>
     
     <button (click)="generate()">Generate Types</button>
+    <br/><button (click)="check()">Check Definition</button>
+    <div id="generator-messages"></div>
 </div>

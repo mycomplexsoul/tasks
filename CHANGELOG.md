@@ -36,12 +36,28 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
     * [AppCommon] Angular build into `/dist` folder.
     * [AppCommon] Deploy BE + FE in `/dist` folder.
 * Multimedia
-    * Entity Definition
     * Listing and creation service endpoint
 
 ## [Unreleased / Work In Progress]
 
 <hr/>
+
+## v1.7.12 (2018-12-20)
+
+* [AppGenerator][new] UI consumes endpoint to check selected entities on the backend.
+
+## v1.7.11 (2018-12-19)
+
+* [AppGenerator][new] Endpoint to check selected entities on the backend, currently checks if entities have recordName fields.
+
+## v1.7.10 (2018-12-18)
+
+* [AppGenerator][new] UI consumes endpoint to generate selected entities on the backend.
+
+## v1.7.9 (2018-12-17)
+
+* [AppMultimedia][new] Entity definition templates for: multimedia, multimediadet and multimediaview.
+* [AppCommon][new] Login service can be asked for a user.
 
 ## v1.7.8 (2018-12-14)
 

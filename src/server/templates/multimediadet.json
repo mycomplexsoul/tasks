@@ -1,0 +1,96 @@
+{
+    "name": "MultimediaDet"
+    , "namespace": "common"
+    , "removeMeans": "DELETION"
+    , "authNeeded": false
+    , "displayOnMenu": false
+    , "prefix": "mmd"
+    , "permissionsTemplate": "permissions_all"
+    , "specialFeatures": [
+        "AUTONUMERIC"
+        , "HEADERS(Multimedia Detail,Multimedia Details)"
+        , "TABLE_NAME(MULTIMEDIADET)"
+        , "VIEW_NAME(VIMULTIMEDIADET)"
+    ]
+    , "fields": [
+        {
+            "templateId": "string"
+            , "dbName": "mmd_id"
+            , "isPK": true
+            , "size": 32
+            , "minLength": 1
+            , "dbComment": "Id for the media"
+            , "entName": "MultimediaId"
+            , "captureRequired": true
+            , "specialRules": [
+                "DUPLICITY_ADD"
+            ]
+            , "displayName": "Multimedia Id"
+            , "isRecordName": true
+        },{
+            "templateId": "string"
+            , "dbName": "mmd_id_ep"
+            , "size": 10
+            , "minLength": 1
+            , "dbComment": "Episode Id of the media"
+            , "entName": "EpisodeId"
+            , "captureRequired": true
+            , "specialRules": [
+                "DUPLICITY_ADD(MMD_ID)"
+                , "DUPLICITY_EDIT(MMD_ID)"
+            ]
+            , "displayName": "Episode Id"
+            , "isRecordName": true
+        },{
+            "templateId": "string"
+            , "dbName": "mmd_ep_title"
+            , "size": 500
+            , "allowNull": true
+            , "dbComment": "Title of the episode"
+            , "entName": "EpisodeTitle"
+            , "displayName": "Episode Title"
+            , "isRecordName": true
+        },{
+            "templateId": "string"
+            , "dbName": "mmd_ep_alt_title"
+            , "size": 500
+            , "allowNull": true
+            , "dbComment": "Alternative Title of the episode"
+            , "entName": "AlternativeEpisodeTitle"
+            , "displayName": "Alternative Episode Title"
+        },{
+            "templateId": "integer"
+            , "dbName": "mmd_year"
+            , "dbComment": "Year of release/production of media/episode"
+            , "entName": "Year"
+            , "displayName": "Year"
+        },{
+            "templateId": "string"
+            , "dbName": "mmd_url"
+            , "size": 4000
+            , "allowNull": true
+            , "dbComment": "Url of a resource related to the media"
+            , "entName": "Url"
+            , "displayName": "Url"
+        },{
+            "templateId": "string"
+            , "dbName": "mmd_id_user"
+            , "size": 50
+            , "dbComment": "User who watched/read/review this media episode"
+            , "entName": "User"
+            , "displayName": "User"
+        },{
+            "templateId": "creationDate"
+        },{
+            "templateId": "modificationDate"
+        },{
+            "templateId": "status"
+            , "catalogId": "RECORD_STATUS"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_status"
+        }
+    ]
+    , "view": [
+    ]
+}

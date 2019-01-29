@@ -70,6 +70,16 @@ export class TypeGeneratorComponent implements OnInit {
     }
 
     generate(){
-        console.log('selected for generating types', this.model.selectedEntityList);
+        this.services.typeGenerator.create({ entities: this.model.selectedEntityList }).then(response => {
+            const messagesContainer = document.getElementById('generator-messages');
+            messagesContainer.innerHTML = response.message;
+        });
+    }
+
+    check(){
+        this.services.typeGenerator.check({ entities: this.model.selectedEntityList }).then(response => {
+            const messagesContainer = document.getElementById('generator-messages');
+            messagesContainer.innerHTML = response.message;
+        });
     }
 }

@@ -144,6 +144,17 @@ export class InstallModule {
         addCatalog('TASK_REPETITION_FREQUENCY',4,'YEARS','INDICATES THIS TASK REPEATS ON A DAILY BASIS',8,new Date(),new Date(),1);
         
         addCatalog('CURRENCIES',1,'MXN','MEXICAN PESO',8,new Date(),new Date(),1);
+        
+        addCatalog('MULTIMEDIA_MEDIA_TYPE',1,'MOVIES','MOVIES',8,new Date(),new Date(),1);
+        addCatalog('MULTIMEDIA_MEDIA_TYPE',2,'TV SERIES','TV SERIES',8,new Date(),new Date(),1);
+        addCatalog('MULTIMEDIA_MEDIA_TYPE',3,'ANIME','ANIME',8,new Date(),new Date(),1);
+        addCatalog('MULTIMEDIA_MEDIA_TYPE',4,'BOOK','BOOK',8,new Date(),new Date(),1);
+
+        addCatalog('MULTIMEDIA_PLATFORM',1,'PC','PLATFORM OF MEDIA USED',8,new Date(),new Date(),1);
+        addCatalog('MULTIMEDIA_PLATFORM',2,'NETFLIX','PLATFORM OF MEDIA USED',8,new Date(),new Date(),1);
+        addCatalog('MULTIMEDIA_PLATFORM',3,'YOUTUBE','PLATFORM OF MEDIA USED',8,new Date(),new Date(),1);
+        addCatalog('MULTIMEDIA_PLATFORM',4,'PRIME VIDEO','PLATFORM OF MEDIA USED',8,new Date(),new Date(),1);
+        addCatalog('MULTIMEDIA_PLATFORM',5,'TV','PLATFORM OF MEDIA USED',8,new Date(),new Date(),1);
 
         inserts.forEach(i => {
             connection.runSyncSql(i,(err) => {

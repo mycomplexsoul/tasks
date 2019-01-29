@@ -11,14 +11,22 @@ export class LoginService {
             list: '/api/login'
         }
     }
-    private identity: any = {};
+    private identity: {
+        auth_token: string,
+        user: string,
+        email: string
+    } = {
+        auth_token: null,
+        user: null,
+        email: null
+    };
 
     constructor(storage: StorageService){
         this.storage = storage;
     }
 
     setIdentity(identity: any) {
-        this.identity = identity;
+        this.identity = identity; // { auth_token, user, email }
     }
 
     getUsername() {

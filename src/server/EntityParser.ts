@@ -198,7 +198,7 @@ export class EntityParser {
 
         t.view = baseTemplate.view;
 
-        console.log('entity definition is', t);
+        // console.log('entity definition is', t);
         // TODO: more assignments and validate
         return t;
     }

@@ -175,4 +175,19 @@ export class MoBasicGenerator {
         // write file
         this.saveToFile(`src/crosscommon/entities/${entityName}.ts`, str);
     }
+
+    __validateRecordName = (entity: EntityDefinition): boolean => {
+        return entity.fields.filter(f => f.isRecordName).length > 0;
+    }
+
+    checkEntityDefinition = (): string => {
+        let str: string = '';
+
+        // Verify recordName existence
+        if (!this.__validateRecordName(this.entity)) {
+            str += `[Warn] Entity ${this.entity.name} has NO recordName fields!! it is better to have at least one.`;
+        }
+
+        return str;
+    }
 }

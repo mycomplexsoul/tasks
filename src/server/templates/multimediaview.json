@@ -1,0 +1,117 @@
+{
+    "name": "MultimediaView"
+    , "namespace": "common"
+    , "removeMeans": "DELETION"
+    , "authNeeded": false
+    , "displayOnMenu": false
+    , "prefix": "mmv"
+    , "permissionsTemplate": "permissions_all"
+    , "specialFeatures": [
+        "AUTONUMERIC"
+        , "HEADERS(Multimedia View,Multimedia Views)"
+        , "TABLE_NAME(MULTIMEDIAVIEW)"
+        , "VIEW_NAME(VIMULTIMEDIAVIEW)"
+    ]
+    , "fields": [
+        {
+            "templateId": "string"
+            , "dbName": "mmv_id"
+            , "isPK": true
+            , "size": 32
+            , "minLength": 1
+            , "dbComment": "Id for the media"
+            , "entName": "MultimediaId"
+            , "captureRequired": true
+            , "specialRules": [
+                "DUPLICITY_ADD"
+            ]
+            , "displayName": "Multimedia Id"
+            , "isRecordName": true
+        },{
+            "templateId": "string"
+            , "dbName": "mmv_id_ep"
+            , "size": 10
+            , "minLength": 1
+            , "dbComment": "Episode Id of the media"
+            , "entName": "EpisodeId"
+            , "captureRequired": true
+            , "specialRules": [
+                "DUPLICITY_ADD(MMD_ID)"
+                , "DUPLICITY_EDIT(MMD_ID)"
+            ]
+            , "displayName": "Episode Id"
+            , "isRecordName": true
+        },{
+            "templateId": "string"
+            , "dbName": "mmv_ep_summary"
+            , "size": 4000
+            , "allowNull": true
+            , "dbComment": "Summary of the episode"
+            , "entName": "Summary"
+            , "displayName": "Summary"
+        },{
+            "templateId": "datetime"
+            , "dbName": "mmv_date_viewed"
+            , "dbComment": "Date and time when this episode was reviewed"
+            , "entName": "DateViewed"
+            , "displayName": "Date Viewed"
+        },{
+            "templateId": "integer"
+            , "dbName": "mmv_num_rating"
+            , "dbComment": "A number indicating the calification of this episode"
+            , "entName": "Rating"
+            , "displayName": "Rating"
+        },{
+            "templateId": "integer"
+            , "dbName": "mmv_ctg_platform"
+            , "dbComment": "Platform used to review the episode"
+            , "entName": "Platform"
+            , "displayName": "Platform"
+            , "catalogId": "MULTIMEDIA_PLATFORM"
+        },{
+            "templateId": "string"
+            , "dbName": "mmv_notes"
+            , "size": 500
+            , "allowNull": true
+            , "dbComment": "Notes"
+            , "entName": "Notes"
+            , "displayName": "Notes"
+        },{
+            "templateId": "string"
+            , "dbName": "mmv_id_user"
+            , "size": 50
+            , "dbComment": "User who reviewed this media episode"
+            , "entName": "User"
+            , "displayName": "User"
+        },{
+            "templateId": "creationDate"
+        },{
+            "templateId": "modificationDate"
+        },{
+            "templateId": "status"
+            , "catalogId": "RECORD_STATUS"
+        },{
+            "templateId": "table"
+            , "dbName": "mmv_txt_media_title"
+            , "size": 300
+            , "originTable": "MULTIMEDIA"
+            , "linkedField": "mma_title"
+            , "isRecordName": true
+        },{
+            "templateId": "table"
+            , "dbName": "mmv_txt_ep_title"
+            , "size": 500
+            , "originTable": "MULTIMEDIADET"
+            , "linkedField": "mmd_ep_title"
+            , "isRecordName": true
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_platform"
+        },{
+            "templateId": "catalog"
+            , "linkedField": "_ctg_status"
+        }
+    ]
+    , "view": [
+    ]
+}

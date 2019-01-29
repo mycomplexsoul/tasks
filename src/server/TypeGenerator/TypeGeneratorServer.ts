@@ -9,6 +9,7 @@ export class TypeGeneratorServer {
         ,'Task','TaskTimeTracking','TaskSchedule'
         ,'Account','Category','Place','Movement','Entry','Balance', 'Preset'
         ,'LastTime','LastTimeHistory'
+        ,'Multimedia','MultimediaDet','MultimediaView'
     ];
     
     config = (node: iNode) => {
@@ -20,12 +21,28 @@ export class TypeGeneratorServer {
 
     create = (node: iNode) => {
         let gen: Generator.MoBasicGenerator;
-        let message: string = this.entities.join(', ');
+        const entities = node.request.body.entities || this.entities;
+
+        const message: string = entities.join(', ');
     
-        this.entities.forEach((entity: string) => {
+        entities.forEach((entity: string) => {
             gen = new Generator.MoBasicGenerator(entity);
             gen.createTypeFile();
         });
         node.response.end(JSON.stringify({ operationOK: true, message: `Successfully generated File types for the entities: ${message}` }));
+    };
+
+    check = (node: iNode) => {
+        let gen: Generator.MoBasicGenerator;
+        const entities = node.request.body.entities || this.entities;
+
+        const entitiesStr: string = entities.join(', ');
+        let message = `Checked the following entities: ${entitiesStr}`;
+    
+        entities.forEach((entity: string) => {
+            gen = new Generator.MoBasicGenerator(entity);
+            message += "<br/>" + gen.checkEntityDefinition();
+        });
+        node.response.end(JSON.stringify({ operationOK: true, message }));
     };
 }

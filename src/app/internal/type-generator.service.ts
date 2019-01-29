@@ -10,7 +10,8 @@ export class TypeGeneratorService {
         , defaultUser: 'anon'
         , api: {
             config: '/api/type-generator/config',
-            type: '/api/type-generator/type'
+            create: '/api/type-generator/create',
+            check: '/api/type-generator/check'
         }
     };
 
@@ -23,5 +24,13 @@ export class TypeGeneratorService {
             this.data = data;
             return this.data;
         });
+    }
+
+    create(item: any): Promise<any>{
+        return this.sync.post(`${this.config.api.create}`, item);
+    }
+
+    check(item: any): Promise<any>{
+        return this.sync.post(`${this.config.api.check}`, item);
     }
 }
