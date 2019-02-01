@@ -81,7 +81,7 @@ export class Account implements iEntity {
 				]
 				, displayName: 'Account Id'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 0
 				, orderOnNew: 0
 				, orderOnDetails: 0
@@ -112,7 +112,7 @@ export class Account implements iEntity {
 				]
 				, displayName: 'Name'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 1
 				, orderOnNew: 1
 				, orderOnDetails: 1
@@ -298,7 +298,7 @@ export class Account implements iEntity {
 				]
 				, displayName: 'User'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 7
 				, orderOnNew: 7
 				, orderOnDetails: 7

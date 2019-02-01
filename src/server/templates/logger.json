@@ -23,6 +23,7 @@
                 "DUPLICITY_ADD"
             ]
             , "displayName": "Log Id"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "log_id_screen"
@@ -42,12 +43,14 @@
             , "dbComment": "Text of the log"
             , "entName": "Text"
             , "displayName": "Text"
+            , "isRecordName": true
         },{
             "templateId": "datetime"
             , "dbName": "log_date"
             , "dbComment": "Date of the log"
             , "entName": "LogDate"
             , "displayName": "Date"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "log_id_user"
@@ -55,6 +58,7 @@
             , "dbComment": "User who created this log"
             , "entName": "User"
             , "displayName": "User"
+            , "isRecordName": true
         }
     ]
     , "view": [

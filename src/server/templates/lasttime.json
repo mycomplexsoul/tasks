@@ -25,6 +25,7 @@
                 "DUPLICITY_ADD"
             ]
             , "displayName": "Last Time Id"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "lst_name"
@@ -33,6 +34,7 @@
             , "dbComment": "Name or description for the last time thing"
             , "entName": "Name"
             , "displayName": "Name"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "lst_value"
@@ -41,6 +43,7 @@
             , "dbComment": "Value of the last time user does this thing"
             , "entName": "Value"
             , "displayName": "Value"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "lst_validity"
@@ -70,6 +73,7 @@
             , "dbComment": "User who this last time record belongs to"
             , "entName": "User"
             , "displayName": "User"
+            , "isRecordName": true
         },{
             "templateId": "creationDate"
         },{

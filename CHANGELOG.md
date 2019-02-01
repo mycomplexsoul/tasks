@@ -42,6 +42,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.7.13 (2018-12-21)
+
+* [AppGenerator][fix] Added `isRecordName` flag to fields of entities that does not have set any field as record name.
+
 ## v1.7.12 (2018-12-20)
 
 * [AppGenerator][new] UI consumes endpoint to check selected entities on the backend.

@@ -73,7 +73,7 @@ export class Logger implements iEntity {
 				]
 				, displayName: 'Log Id'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 0
 				, orderOnNew: 0
 				, orderOnDetails: 0
@@ -166,7 +166,7 @@ export class Logger implements iEntity {
 				]
 				, displayName: 'Text'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 3
 				, orderOnNew: 3
 				, orderOnDetails: 3
@@ -197,7 +197,7 @@ export class Logger implements iEntity {
 				]
 				, displayName: 'Date'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 4
 				, orderOnNew: 4
 				, orderOnDetails: 4
@@ -228,7 +228,7 @@ export class Logger implements iEntity {
 				]
 				, displayName: 'User'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 5
 				, orderOnNew: 5
 				, orderOnDetails: 5

@@ -91,7 +91,7 @@ export class User implements iEntity {
 				]
 				, displayName: 'User Id'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 0
 				, orderOnNew: 0
 				, orderOnDetails: 0

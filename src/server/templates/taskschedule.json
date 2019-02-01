@@ -23,6 +23,7 @@
             , "entName": "TaskId"
             , "captureRequired": true
             , "displayName": "Task Id"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "tss_num_secuential"
@@ -33,6 +34,7 @@
             ]
             , "entName": "Secuential"
             , "displayName": "Secuential"
+            , "isRecordName": true
         },{
             "templateId": "datetime"
             , "dbName": "tss_date_start"
@@ -40,6 +42,7 @@
             , "entName": "StartDate"
             , "captureRequired": true
             , "displayName": "Start Date"
+            , "isRecordName": true
         },{
             "templateId": "datetime"
             , "dbName": "tss_date_end"
@@ -47,6 +50,7 @@
             , "entName": "EndDate"
             , "captureRequired": true
             , "displayName": "End Date"
+            , "isRecordName": true
         },{
             "templateId": "creationDate"
         },{

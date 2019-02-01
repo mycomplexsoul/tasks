@@ -41,7 +41,10 @@ export class TypeGeneratorServer {
     
         entities.forEach((entity: string) => {
             gen = new Generator.MoBasicGenerator(entity);
-            message += "<br/>" + gen.checkEntityDefinition();
+            const msg = gen.checkEntityDefinition();
+            if (msg) {
+                message += "<br/>" + msg
+            }
         });
         node.response.end(JSON.stringify({ operationOK: true, message }));
     };

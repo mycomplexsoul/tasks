@@ -25,6 +25,7 @@
                 "DUPLICITY_ADD(ent_sequential)"
             ]
             , "displayName": "Movement Id"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "ent_sequential"
@@ -35,6 +36,7 @@
                 "DUPLICITY_ADD(ent_id)"
             ]
             , "displayName": "Sequential"
+            , "isRecordName": true
         },{
             "templateId": "datetime"
             , "dbName": "ent_date"
@@ -42,6 +44,7 @@
             , "entName": "ApplicationDate"
             , "captureRequired": true
             , "displayName": "Date of Application"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "ent_ctg_currency"
@@ -56,6 +59,7 @@
             , "entName": "Amount"
             , "captureRequired": true
             , "displayName": "Amount"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "ent_id_account"
@@ -65,6 +69,7 @@
             , "entName": "Account"
             , "captureRequired": true
             , "displayName": "Account"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "ent_ctg_type"
@@ -73,6 +78,7 @@
             , "captureRequired": true
             , "displayName": "Movement Type"
             , "catalogId": "MOVEMENT_TYPES"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "ent_budget"
@@ -124,6 +130,7 @@
             , "dbComment": "User who this entry belongs to"
             , "entName": "User"
             , "displayName": "User"
+            , "isRecordName": true
         },{
             "templateId": "creationDate"
         },{

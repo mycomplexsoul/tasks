@@ -80,7 +80,7 @@ export class LastTimeHistory implements iEntity {
 				]
 				, displayName: 'Last Time Id'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 0
 				, orderOnNew: 0
 				, orderOnDetails: 0
@@ -112,7 +112,7 @@ export class LastTimeHistory implements iEntity {
 				]
 				, displayName: 'Secuential'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 1
 				, orderOnNew: 1
 				, orderOnDetails: 1
@@ -143,7 +143,7 @@ export class LastTimeHistory implements iEntity {
 				]
 				, displayName: 'Name'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 2
 				, orderOnNew: 2
 				, orderOnDetails: 2
@@ -174,7 +174,7 @@ export class LastTimeHistory implements iEntity {
 				]
 				, displayName: 'Value'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 3
 				, orderOnNew: 3
 				, orderOnDetails: 3
@@ -298,7 +298,7 @@ export class LastTimeHistory implements iEntity {
 				]
 				, displayName: 'User'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 7
 				, orderOnNew: 7
 				, orderOnDetails: 7

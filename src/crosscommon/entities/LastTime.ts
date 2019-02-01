@@ -79,7 +79,7 @@ export class LastTime implements iEntity {
 				]
 				, displayName: 'Last Time Id'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 0
 				, orderOnNew: 0
 				, orderOnDetails: 0
@@ -110,7 +110,7 @@ export class LastTime implements iEntity {
 				]
 				, displayName: 'Name'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 1
 				, orderOnNew: 1
 				, orderOnDetails: 1
@@ -141,7 +141,7 @@ export class LastTime implements iEntity {
 				]
 				, displayName: 'Value'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 2
 				, orderOnNew: 2
 				, orderOnDetails: 2
@@ -265,7 +265,7 @@ export class LastTime implements iEntity {
 				]
 				, displayName: 'User'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 6
 				, orderOnNew: 6
 				, orderOnDetails: 6

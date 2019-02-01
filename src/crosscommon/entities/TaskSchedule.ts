@@ -73,7 +73,7 @@ export class TaskSchedule implements iEntity {
 				]
 				, displayName: 'Task Id'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 0
 				, orderOnNew: 0
 				, orderOnDetails: 0
@@ -105,7 +105,7 @@ export class TaskSchedule implements iEntity {
 				]
 				, displayName: 'Secuential'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 1
 				, orderOnNew: 1
 				, orderOnDetails: 1
@@ -136,7 +136,7 @@ export class TaskSchedule implements iEntity {
 				]
 				, displayName: 'Start Date'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 2
 				, orderOnNew: 2
 				, orderOnDetails: 2
@@ -167,7 +167,7 @@ export class TaskSchedule implements iEntity {
 				]
 				, displayName: 'End Date'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 3
 				, orderOnNew: 3
 				, orderOnDetails: 3

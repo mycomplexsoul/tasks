@@ -75,7 +75,7 @@ export class Category implements iEntity {
 				]
 				, displayName: 'Category Id'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 0
 				, orderOnNew: 0
 				, orderOnDetails: 0
@@ -106,7 +106,7 @@ export class Category implements iEntity {
 				]
 				, displayName: 'Name'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 1
 				, orderOnNew: 1
 				, orderOnDetails: 1
@@ -137,7 +137,7 @@ export class Category implements iEntity {
 				]
 				, displayName: 'User'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 2
 				, orderOnNew: 2
 				, orderOnDetails: 2

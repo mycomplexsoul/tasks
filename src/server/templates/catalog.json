@@ -26,6 +26,7 @@
                 "DUPLICITY_ADD"
             ]
             , "displayName": "Catalog Id"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "ctg_sequential"
@@ -37,6 +38,7 @@
                 "AUTONUM(CTG_ID)"
             ]
             , "displayName": "Sequential Number"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "ctg_name"
@@ -50,6 +52,7 @@
                 , "DUPLICITY_EDIT(CTG_ID)"
             ]
             , "displayName": "Name"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "ctg_description"

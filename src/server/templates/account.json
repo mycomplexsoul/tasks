@@ -25,6 +25,7 @@
                 "DUPLICITY_ADD"
             ]
             , "displayName": "Account Id"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "acc_name"
@@ -33,6 +34,7 @@
             , "dbComment": "Name for the account, appears on balance"
             , "entName": "Name"
             , "displayName": "Name"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "acc_ctg_type"
@@ -74,6 +76,7 @@
             , "dbComment": "User who this account belongs to"
             , "entName": "User"
             , "displayName": "User"
+            , "isRecordName": true
         },{
             "templateId": "creationDate"
         },{

@@ -26,6 +26,7 @@
                 "DUPLICITY_ADD"
             ]
             , "displayName": "User Id"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "usr_pwd"

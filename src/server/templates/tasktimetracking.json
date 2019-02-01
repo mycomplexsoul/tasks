@@ -23,6 +23,7 @@
             , "entName": "TaskId"
             , "captureRequired": true
             , "displayName": "Task Id"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "tsh_num_secuential"
@@ -33,6 +34,7 @@
             ]
             , "entName": "Secuential"
             , "displayName": "Secuential"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "tsh_name"
@@ -41,6 +43,7 @@
             , "dbComment": "Name of the task, meaning the task itself"
             , "entName": "Name"
             , "displayName": "Name"
+            , "isRecordName": true
         },{
             "templateId": "datetime"
             , "dbName": "tsh_date_start"
@@ -48,6 +51,7 @@
             , "entName": "StartDate"
             , "captureRequired": true
             , "displayName": "Start Date"
+            , "isRecordName": true
         },{
             "templateId": "datetime"
             , "dbName": "tsh_date_end"
@@ -55,6 +59,7 @@
             , "entName": "EndDate"
             , "captureRequired": true
             , "displayName": "End Date"
+            , "isRecordName": true
         },{
             "templateId": "long"
             , "dbName": "tsh_time_spent"
@@ -65,6 +70,7 @@
             "templateId": "user"
             , "dbName": "tsh_id_user"
             , "dbComment": "User who attended this task time entry"
+            , "isRecordName": true
         },{
             "templateId": "creationDate"
         },{

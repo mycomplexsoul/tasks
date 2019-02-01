@@ -83,7 +83,7 @@ export class Balance implements iEntity {
 				]
 				, displayName: 'Year'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 0
 				, orderOnNew: 0
 				, orderOnDetails: 0
@@ -115,7 +115,7 @@ export class Balance implements iEntity {
 				]
 				, displayName: 'Month'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 1
 				, orderOnNew: 1
 				, orderOnDetails: 1
@@ -178,7 +178,7 @@ export class Balance implements iEntity {
 				]
 				, displayName: 'Account'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 3
 				, orderOnNew: 3
 				, orderOnDetails: 3
@@ -302,7 +302,7 @@ export class Balance implements iEntity {
 				]
 				, displayName: 'Final'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 7
 				, orderOnNew: 7
 				, orderOnDetails: 7
@@ -333,7 +333,7 @@ export class Balance implements iEntity {
 				]
 				, displayName: 'User'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 8
 				, orderOnNew: 8
 				, orderOnDetails: 8

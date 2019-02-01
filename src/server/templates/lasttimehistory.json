@@ -25,6 +25,7 @@
                 "DUPLICITY_ADD"
             ]
             , "displayName": "Last Time Id"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "lth_num_sequential"
@@ -35,6 +36,7 @@
             ]
             , "entName": "Secuential"
             , "displayName": "Secuential"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "lth_name"
@@ -43,6 +45,7 @@
             , "dbComment": "Name or description for the last time thing"
             , "entName": "Name"
             , "displayName": "Name"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "lth_value"
@@ -51,6 +54,7 @@
             , "dbComment": "Value of the last time user does this thing"
             , "entName": "Value"
             , "displayName": "Value"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "lth_validity"
@@ -80,6 +84,7 @@
             , "dbComment": "User who this last time record belongs to"
             , "entName": "User"
             , "displayName": "User"
+            , "isRecordName": true
         },{
             "templateId": "creationDate"
         },{

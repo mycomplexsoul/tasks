@@ -25,6 +25,7 @@
                 "DUPLICITY_ADD"
             ]
             , "displayName": "Category Id"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "mct_name"
@@ -33,6 +34,7 @@
             , "dbComment": "Name for the category"
             , "entName": "Name"
             , "displayName": "Name"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "mct_id_user"
@@ -40,6 +42,7 @@
             , "dbComment": "User who this category belongs to"
             , "entName": "User"
             , "displayName": "User"
+            , "isRecordName": true
         },{
             "templateId": "creationDate"
         },{

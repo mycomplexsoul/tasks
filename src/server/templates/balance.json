@@ -22,6 +22,7 @@
                 "DUPLICITY_ADD(bal_year,bal_month,bal_ctg_currency,bal_id_account)"
             ]
             , "displayName": "Year"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "bal_month"
@@ -32,6 +33,7 @@
                 "DUPLICITY_ADD(bal_year,bal_month,bal_ctg_currency,bal_id_account)"
             ]
             , "displayName": "Month"
+            , "isRecordName": true
         },{
             "templateId": "integer"
             , "dbName": "bal_ctg_currency"
@@ -51,6 +53,7 @@
             , "dbComment": "Name for the account"
             , "entName": "Account"
             , "displayName": "Account"
+            , "isRecordName": true
         },{
             "templateId": "double"
             , "dbName": "bal_initial"
@@ -75,6 +78,7 @@
             , "dbComment": "Final balance of the record"
             , "entName": "Final"
             , "displayName": "Final"
+            , "isRecordName": true
         },{
             "templateId": "string"
             , "dbName": "bal_id_user"
@@ -82,6 +86,7 @@
             , "dbComment": "User who this balance record belongs to"
             , "entName": "User"
             , "displayName": "User"
+            , "isRecordName": true
         },{
             "templateId": "creationDate"
         },{

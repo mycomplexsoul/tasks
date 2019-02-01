@@ -90,7 +90,7 @@ export class Entry implements iEntity {
 				]
 				, displayName: 'Movement Id'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 0
 				, orderOnNew: 0
 				, orderOnDetails: 0
@@ -122,7 +122,7 @@ export class Entry implements iEntity {
 				]
 				, displayName: 'Sequential'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 1
 				, orderOnNew: 1
 				, orderOnDetails: 1
@@ -153,7 +153,7 @@ export class Entry implements iEntity {
 				]
 				, displayName: 'Date of Application'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 2
 				, orderOnNew: 2
 				, orderOnDetails: 2
@@ -215,7 +215,7 @@ export class Entry implements iEntity {
 				]
 				, displayName: 'Amount'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 4
 				, orderOnNew: 4
 				, orderOnDetails: 4
@@ -246,7 +246,7 @@ export class Entry implements iEntity {
 				]
 				, displayName: 'Account'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 5
 				, orderOnNew: 5
 				, orderOnDetails: 5
@@ -277,7 +277,7 @@ export class Entry implements iEntity {
 				]
 				, displayName: 'Movement Type'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 6
 				, orderOnNew: 6
 				, orderOnDetails: 6
@@ -463,7 +463,7 @@ export class Entry implements iEntity {
 				]
 				, displayName: 'User'
 				, tooltip: ''
-				, isRecordName: false
+				, isRecordName: true
 				, gridOrder: 12
 				, orderOnNew: 12
 				, orderOnDetails: 12
