@@ -42,6 +42,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.7.14 (2019-01-02)
+
+* [AppMultimedia][fix] Fix PK of multimedia tables, added installation of those tables.
+
 ## v1.7.13 (2018-12-21)
 
 * [AppGenerator][fix] Added `isRecordName` flag to fields of entities that does not have set any field as record name.

@@ -3,12 +3,15 @@ import ConnectionService from './ConnectionService';
 import { MoSQL } from './MoSQL';
 import { MoInstallSQL } from './MoInstallSQL';
 import { iEntity } from '../crosscommon/iEntity';
+
 import { Catalog } from '../crosscommon/entities/Catalog';
 import { User } from '../crosscommon/entities/User';
 import { Logger } from '../crosscommon/entities/Logger';
+
 import { Task } from '../crosscommon/entities/Task';
 import { TaskTimeTracking } from '../crosscommon/entities/TaskTimeTracking';
 import { TaskSchedule } from '../crosscommon/entities/TaskSchedule';
+
 import { Account } from '../crosscommon/entities/Account';
 import { Category } from '../crosscommon/entities/Category';
 import { Place } from '../crosscommon/entities/Place';
@@ -18,6 +21,10 @@ import { Balance } from '../crosscommon/entities/Balance';
 import { LastTime } from '../crosscommon/entities/LastTime';
 import { LastTimeHistory } from '../crosscommon/entities/LastTimeHistory';
 import { Preset } from '../crosscommon/entities/Preset';
+
+import { Multimedia } from '../crosscommon/entities/Multimedia';
+import { MultimediaDet } from '../crosscommon/entities/MultimediaDet';
+import { MultimediaView } from '../crosscommon/entities/MultimediaView';
 
 export class InstallModule {
     install = () => {
@@ -29,6 +36,7 @@ export class InstallModule {
             , new Task(), new TaskTimeTracking(), new TaskSchedule()
             , new Account(), new Category(), new Place(), new Movement(), new Entry(), new Balance(), new Preset()
             , new LastTime(), new LastTimeHistory()
+            , new Multimedia(), new MultimediaDet(), new MultimediaView()
         ];
         const method = (msgOk: string) => {
             return (err: any) => {
@@ -195,7 +203,7 @@ export class InstallModule {
         addUser('dummy','dummypwd','Dummy','D.','Doe',1,'dummy@dummy.com',1,0,null,null,1,1,null,new Date(),new Date(),1);
         addUser('admin','admin','Admin','-','-',2,'admin@domain.com',1,0,null,null,1,1,null,new Date(),new Date(),1);
         addUser('mycomplexsoul','*','Daniel','-','-',2,'mycomplexsoul@gmail.com',1,0,null,null,1,1,null,new Date(),new Date(),1);
-        
+
         inserts.forEach(i => {
             connection.runSyncSql(i,(err) => {
                 if (err){

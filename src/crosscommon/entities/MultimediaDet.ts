@@ -93,7 +93,7 @@ export class MultimediaDet implements iEntity {
 				, dbName: 'mmd_id_ep'
 				, dbType: 'string'
 				, isTableField: true
-				, isPK: false
+				, isPK: true
 				, size: 10
 				, decimal: 0
 				, minLength: 1

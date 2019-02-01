@@ -30,6 +30,7 @@
         },{
             "templateId": "string"
             , "dbName": "mmd_id_ep"
+            , "isPK": true
             , "size": 10
             , "minLength": 1
             , "dbComment": "Episode Id of the media"

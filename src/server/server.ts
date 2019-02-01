@@ -91,25 +91,6 @@ app.get('/task/list', (req, res) => {
     });
 });
 
-app.get('/generator/type', (req, res) => {
-    const entities = [
-        'Catalog'
-        ,'User'
-        ,'Logger'
-        ,'Task','TaskTimeTracking','TaskSchedule'
-        ,'Account','Category','Place','Movement','Entry','Balance', 'Preset'
-        ,'LastTime','LastTimeHistory'
-    ];
-    let gen: Generator.MoBasicGenerator;
-    let message: string = entities.join(', ');
-
-    entities.forEach((entity: string) => {
-        gen = new Generator.MoBasicGenerator(entity);
-        gen.createTypeFile();
-    });
-    res.end(JSON.stringify({ operationOK: true, message: `Successfully generated File types for the entities: ${message}` }));
-});
-
 app.get('/generator/database', (req, res) => {
     let sqlMotor: InstallModule = new InstallModule();
     sqlMotor.install();

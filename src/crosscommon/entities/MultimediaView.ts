@@ -97,7 +97,7 @@ export class MultimediaView implements iEntity {
 				, dbName: 'mmv_id_ep'
 				, dbType: 'string'
 				, isTableField: true
-				, isPK: false
+				, isPK: true
 				, size: 10
 				, decimal: 0
 				, minLength: 1
@@ -534,6 +534,15 @@ export class MultimediaView implements iEntity {
 			}
 		]
 		, view: [
+			{
+				joinType: 'INNER'
+				, joinTable: 'MULTIMEDIA'
+				, joinStatement: 'mmv_id = mma_id and mmv_id_user = mma_id_user'
+			}, {
+				joinType: 'INNER'
+				, joinTable: 'MULTIMEDIADET'
+				, joinStatement: 'mmv_id = mmd_id and mmv_id_ep = mmd_id_ep and mmv_id_user = mmd_id_user'
+			}
 		]
 	};
 
