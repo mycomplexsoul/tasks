@@ -3,6 +3,10 @@ import { Task } from "../../crosscommon/entities/Task";
 import { iNode } from "../iNode";
 import { TaskCustom } from "../Task/TaskCustom";
 import { iEntity } from "../../crosscommon/iEntity";
+import { Multimedia } from "../../crosscommon/entities/Multimedia";
+import { MultimediaCustom } from "../Multimedia/MultimediaCustom";
+import { ApiModule } from "../ApiModule";
+import { Catalog } from "../../crosscommon/entities/Catalog";
 
 class syncItem {
     action: string
@@ -59,6 +63,20 @@ export class SyncCustom {
                 case 'Task': {
                     q.construct = (base: any) => new Task(base);
                     q.server = new TaskCustom();
+                    break;
+                }
+                case 'Multimedia': {
+                    q.construct = (base: any) => new Multimedia(base);
+                    q.server = new MultimediaCustom();
+                    break;
+                }
+                default: {
+                    q.result = {
+                        operationOk: false,
+                        message: `sync failed due to entity ${q.entity} is not supported`,
+                        pk: q.pk
+                    };
+                    return false;
                 }
             }
 
@@ -100,6 +118,55 @@ export class SyncCustom {
                 result: queue.map((q: syncItem) => q.result)
             };
     
+            node.response.end(JSON.stringify(response));
+        });
+    };
+
+    _list = (node: iNode) => {
+        const { entity, q } = node.request.query;
+        let construct;
+        let result;
+
+        switch(entity) {
+            case 'Task': {
+                construct = (base: any) => new Task(base);
+                break;
+            }
+            case 'Multimedia': {
+                construct = (base: any) => new Multimedia(base);
+                break;
+            }
+            case 'Catalog': {
+                construct = (base: any) => new Catalog(base);
+                break;
+            }
+            default: {
+                const final: iEntity[] = [];
+                result = {
+                    operationOk: false,
+                    message: `sync listing failed due to entity ${entity} is not supported`,
+                    list: final
+                };
+                return Promise.resolve(result);
+            }
+        }
+
+        const model: iEntity = construct({});
+        const ApiMotor: ApiModule = new ApiModule(model);
+
+        return ApiMotor.list({ q, model }).then(list => {
+            return {
+                operationOk: true,
+                message: `sync listing success`,
+                list
+            };
+        });
+    };
+
+    list = (node: iNode) => {
+        let response;
+        this._list(node).then(data => {
+            response = data;
             node.response.end(JSON.stringify(response));
         });
     };

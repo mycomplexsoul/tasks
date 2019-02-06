@@ -1,0 +1,61 @@
+<form #newForm="ngForm" (ngSubmit)="newItem(newForm)">
+    <button type="button" (click)="handleNewItem(newForm)">
+        {{(viewData.showCreateForm ? 'Hide Form' : 'New Item')}}
+    </button>
+
+    <div *ngIf="viewData.showCreateForm">
+        <div>
+            <span class="field" *ngIf="model.id">
+                <label for="id" class="label-left">Id</label>
+                <span type="text" name="id" id="id" class="multimedia-input-id">{{model.id}}</span>
+            </span>
+            <span class="field">
+                <label for="fTitle" class="label-left">Title</label>
+                <input type="text" name="fTitle" id="fTitle" class="field-input multimedia-input-title" ngModel>
+            </span>
+            <span class="field">
+                <label for="fMediaType" class="label-left">Media Type</label>
+                <select name="fMediaType" id="fMediaType" class="field-select" [(ngModel)]="model.fMediaType">
+                    <option *ngFor="let opt of viewData.mediaTypeList" [value]="opt.ctg_sequential" [selected]="opt.ctg_sequential === newForm.value.fMediaType">{{opt.ctg_name}}</option>
+                </select>
+            </span>
+            <span class="field">
+                <label for="fSeason" class="label-left">Season</label>
+                <input type="number" name="fSeason" id="fSeason" class="field-input multimedia-input-season" step="1" [(ngModel)]="model.fSeason">
+            </span>
+            <span class="field">
+                <label for="fYear" class="label-left">Year</label>
+                <input type="number" name="fYear" id="fYear" class="field-input multimedia-input-year" step="1" [(ngModel)]="model.fYear">
+            </span>
+            <span class="field">
+                <label for="fCurrentEp" class="label-left">Current Episode</label>
+                <input type="text" name="fCurrentEp" id="fCurrentEp" class="field-input multimedia-input-currentep" [(ngModel)]="model.fCurrentEp">
+            </span>
+            <span class="field">
+                <label for="fTotalEp" class="label-left">Total Episodes</label>
+                <input type="text" name="fTotalEp" id="fTotalEp" class="field-input multimedia-input-totalep" ngModel>
+            </span>
+            <span class="field">
+                <label for="fUrl" class="label-left">Url</label>
+                <input type="text" name="fUrl" id="fUrl" class="field-input multimedia-input-url" ngModel>
+            </span>
+            
+            <button type="submit">Save</button>
+        </div>
+    </div>
+</form>
+
+<table>
+    <tr>
+        <th class="padding-all-5 width-80">#</th>
+        <th class="padding-all-5 width-100">Title</th>
+        <th class="padding-all-5">Episode</th>
+        <th class="padding-all-5">Last Viewed</th>
+    </tr>
+    <tr class="multimedia-listing-row" *ngFor="let item of viewData.multimediaList; let i = index">
+        <td class="padding-all-5 text-align-right">{{i + 1}}</td>
+        <td class="padding-all-5">{{item.mma_title + ' T' + item.mma_season}}</td>
+        <td class="padding-all-5">{{item.mma_current_ep + '/' + item.mma_total_ep}}</td>
+        <td class="padding-all-5">{{item.mma_date_mod | date: 'yyyy-MM-dd'}}</td>
+    </tr>
+</table>

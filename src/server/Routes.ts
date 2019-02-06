@@ -9,6 +9,7 @@ import * as PlaceRoute from './Place/PlaceRoute';
 import * as PresetRoute from './Preset/PresetRoute';
 import * as TaskRoute from './Task/TaskRoute';
 import * as LastTimeRoute from './LastTime/LastTimeRoute';
+import * as MultimediaRoute from './Multimedia/MultimediaRoute';
 import * as SyncRoute from './Sync/SyncRoute';
 
 // Internal
@@ -26,6 +27,7 @@ router.use('/places', PlaceRoute.router);
 router.use('/presets', PresetRoute.router);
 router.use('/tasks', TaskRoute.router);
 router.use('/lasttime', LastTimeRoute.router);
+router.use('/multimedia', MultimediaRoute.router);
 
 router.use('/sync', SyncRoute.router);
 

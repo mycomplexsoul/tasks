@@ -32,4 +32,8 @@ export class LoginService {
     getUsername() {
         return this.identity.user;
     }
+
+    isLoggedIn() {
+        return !!this.identity.user;
+    }
 }

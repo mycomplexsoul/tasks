@@ -2,9 +2,6 @@ import { iEntity } from "../crosscommon/iEntity";
 import iConnection from "./iConnection";
 import { MoSQL } from "./MoSQL";
 import ConnectionService from './ConnectionService';
-import { Movement } from "../crosscommon/entities/Movement";
-import { Category } from "../crosscommon/entities/Category";
-import { Place } from "../crosscommon/entities/Place";
 
 export class ApiModule {
     model: iEntity;

@@ -19,6 +19,9 @@ router.post('/rebuild', (req, res) => {
     server.rebuild(req, res);
 });
 
+/**
+ * /api/balance/transfer?year=2019&month=1&user=anon
+ */
 router.post('/transfer', (req, res) => {
     const server: BalanceServer = new BalanceServer();
 

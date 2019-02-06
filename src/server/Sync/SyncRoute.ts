@@ -13,4 +13,13 @@ router.post('/', (req, res) => {
     server.syncAll(node);
 });
 
+router.get('/', (req, res) => {
+    let server: SyncCustom = new SyncCustom();
+    let node: iNode = {
+        request: req
+        , response: res
+    };
+    server.list(node);
+});
+
 export { router };

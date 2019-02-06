@@ -15,6 +15,8 @@ import { RebuildComponent }  from './money/rebuild.component';
 
 import { LastTimeComponent }  from './lasttime/lasttime.component';
 
+import { MultimediaComponent }  from './multimedia/multimedia.component';
+
 import { StorageService }  from './common/storage.service';
 import { EntryService }  from './money/entry.service';
 import { DateCommon } from './common/date.common';
@@ -57,6 +59,10 @@ const appRoutes: Routes = [
         component: LastTimeComponent,
         data: { title: 'Last Time' }
     },{
+        path: 'multimedia',
+        component: MultimediaComponent,
+        data: { title: 'Multimedia' }
+    },{
         path: 'type-generator',
         component: TypeGeneratorComponent,
         data: { title: 'Type Generator' }
@@ -87,6 +93,7 @@ const appRoutes: Routes = [
     RebuildComponent,
     LoginComponent,
     LastTimeComponent,
+    MultimediaComponent,
     TypeGeneratorComponent
   ], // parent & child components
   bootstrap: [ AppComponent ], // only parent components
