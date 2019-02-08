@@ -40,6 +40,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.7.22 (2019-01-14)
+
+* [AppMultimedia][new] Added listing, create and update methods for MultimediaDet, reachable through Sync (list) and through `/multimediadet` (create, update).
+
 ## v1.7.21 (2019-01-11)
 
 * [AppMultimedia][new] Added catalog loading, submit form, connection with Sync API to multimedia methods.

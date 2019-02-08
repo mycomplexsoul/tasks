@@ -7,6 +7,7 @@ import { Multimedia } from "../../crosscommon/entities/Multimedia";
 import { MultimediaCustom } from "../Multimedia/MultimediaCustom";
 import { ApiModule } from "../ApiModule";
 import { Catalog } from "../../crosscommon/entities/Catalog";
+import { MultimediaDet } from "../../crosscommon/entities/MultimediaDet";
 
 class syncItem {
     action: string
@@ -59,25 +60,15 @@ export class SyncCustom {
                 return false;
             }
 
-            switch(q.entity) {
-                case 'Task': {
-                    q.construct = (base: any) => new Task(base);
-                    q.server = new TaskCustom();
-                    break;
-                }
-                case 'Multimedia': {
-                    q.construct = (base: any) => new Multimedia(base);
-                    q.server = new MultimediaCustom();
-                    break;
-                }
-                default: {
-                    q.result = {
-                        operationOk: false,
-                        message: `sync failed due to entity ${q.entity} is not supported`,
-                        pk: q.pk
-                    };
-                    return false;
-                }
+            try {
+                q = Object.assign(q, this.parseEntity(q.entity));
+            } catch(e) {
+                q.result = {
+                    operationOk: false,
+                    message: `sync failed due to entity ${q.entity} is not supported`,
+                    pk: q.pk
+                };
+                return false;
             }
 
             if (!q.server[q.action]) {
@@ -127,28 +118,16 @@ export class SyncCustom {
         let construct;
         let result;
 
-        switch(entity) {
-            case 'Task': {
-                construct = (base: any) => new Task(base);
-                break;
-            }
-            case 'Multimedia': {
-                construct = (base: any) => new Multimedia(base);
-                break;
-            }
-            case 'Catalog': {
-                construct = (base: any) => new Catalog(base);
-                break;
-            }
-            default: {
-                const final: iEntity[] = [];
-                result = {
-                    operationOk: false,
-                    message: `sync listing failed due to entity ${entity} is not supported`,
-                    list: final
-                };
-                return Promise.resolve(result);
-            }
+        try {
+            construct = this.parseEntity(entity).construct;
+        } catch(e) {
+            const final: iEntity[] = [];
+            result = {
+                operationOk: false,
+                message: `sync failed due to entity ${entity} is not supported`,
+                list: final
+            };
+            return Promise.resolve(result);
         }
 
         const model: iEntity = construct({});
@@ -170,4 +149,40 @@ export class SyncCustom {
             node.response.end(JSON.stringify(response));
         });
     };
+
+    parseEntity(entity: string): {construct: (b: any) => iEntity, server: any} {
+        let construct;
+        let server;
+        
+        switch(entity) {
+            case 'Task': {
+                construct = (base: any) => new Task(base);
+                server = new TaskCustom();
+                break;
+            }
+            case 'Multimedia': {
+                construct = (base: any) => new Multimedia(base);
+                server = new MultimediaCustom();
+                break;
+            }
+            case 'MultimediaDet': {
+                construct = (base: any) => new MultimediaDet(base);
+                // server = new MultimediaDetCustom();
+                break;
+            }
+            case 'Catalog': {
+                construct = (base: any) => new Catalog(base);
+                //server = new CatalogCustom();
+                break;
+            }
+            default: {
+                throw new Error(`sync failed due to entity ${entity} is not supported`);
+            }
+        }
+
+        return {
+            construct,
+            server
+        };
+    }
 }

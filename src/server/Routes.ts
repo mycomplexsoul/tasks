@@ -10,6 +10,7 @@ import * as PresetRoute from './Preset/PresetRoute';
 import * as TaskRoute from './Task/TaskRoute';
 import * as LastTimeRoute from './LastTime/LastTimeRoute';
 import * as MultimediaRoute from './Multimedia/MultimediaRoute';
+import * as MultimediaDetRoute from './MultimediaDet/MultimediaDetRoute';
 import * as SyncRoute from './Sync/SyncRoute';
 
 // Internal
@@ -28,6 +29,7 @@ router.use('/presets', PresetRoute.router);
 router.use('/tasks', TaskRoute.router);
 router.use('/lasttime', LastTimeRoute.router);
 router.use('/multimedia', MultimediaRoute.router);
+router.use('/multimediadet', MultimediaDetRoute.router);
 
 router.use('/sync', SyncRoute.router);
 

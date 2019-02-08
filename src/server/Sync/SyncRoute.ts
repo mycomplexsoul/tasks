@@ -13,6 +13,9 @@ router.post('/', (req, res) => {
     server.syncAll(node);
 });
 
+/**
+ * /api/sync?entity=Catalog
+ */
 router.get('/', (req, res) => {
     let server: SyncCustom = new SyncCustom();
     let node: iNode = {
