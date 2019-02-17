@@ -88,7 +88,7 @@ export class MultimediaService {
             , mma_ctg_status: 1
         });
 
-        this.sync.request(this.config.api.create
+        this.sync.request('create'
             , Utils.entityToRawTableFields(newItem)
             , Utils.getPKFromEntity(newItem)
             , 'Multimedia'
@@ -100,5 +100,26 @@ export class MultimediaService {
         );
 
         return newItem;
+    }
+    
+    asUpdateSyncQueue(item: Multimedia) {
+        const updateLocal = () => {
+            const index = this.data.findIndex(e => e.mma_id === item.mma_id);
+            if (index !== -1){
+                this.data[index] = item;
+            }
+        };
+
+        return this.sync.asSyncQueue('update'
+            , Utils.entityToRawTableFields(item)
+            , Utils.getPKFromEntity(item)
+            , 'Multimedia'
+            , () => {
+                item['not_sync'] = false; // means it's synced
+                updateLocal();
+            }
+            , item.recordName
+            , (item) => item.mma_id === item.mma_id
+        );
     }
 }

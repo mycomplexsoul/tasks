@@ -40,6 +40,33 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <hr/>
 
+## v1.7.28 (2019-01-22)
+
+* [AppMultimedia][new] Integrate form with MultimediaDet, MultimediaView and Multimedia endpoints as a single Sync API call.
+* [AppMultimedia][new] Update handler compatible to work with Sync API.
+
+## v1.7.27 (2019-01-21)
+
+* [AppMultimedia][new] MultimediaDet service to integrate with backend endpoint using Sync API.
+* [AppMultimedia][new] MultimediaView service to integrate with backend endpoint using Sync API.
+
+## v1.7.26 (2019-01-18)
+
+* [AppMultimedia][new] MultimediaDet / Multimedia View creation form.
+
+## v1.7.25 (2019-01-17)
+
+* [AppCommon][new] SyncCustom support for `MultimediaView`.
+
+## v1.7.24 (2019-01-16)
+
+* [AppCommon][new] SyncAPI `asSyncQueue` and `requestQueue` methods.
+* [AppCommon][new] `SyncQueue` interface extracted to an individual file.
+
+## v1.7.23 (2019-01-15)
+
+* [AppCommon][fix] `Utility.getPKFromEntity()` was not returning pk, now it does.
+
 ## v1.7.22 (2019-01-14)
 
 * [AppMultimedia][new] Added listing, create and update methods for MultimediaDet, reachable through Sync (list) and through `/multimediadet` (create, update).

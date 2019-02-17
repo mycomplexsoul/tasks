@@ -60,6 +60,7 @@ class Utility {
         entity.metadata.fields.filter(f => f.isPK).forEach(f => {
             pk[f.dbName] = entity[f.dbName];
         });
+        return pk;
     }
 }
 

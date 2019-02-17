@@ -5,9 +5,15 @@ import { Multimedia } from '../../crosscommon/entities/Multimedia';
 
 // services
 import { MultimediaService } from './multimedia.service';
+import { MultimediaDetService } from './multimediadet.service';
+import { MultimediaViewService } from './multimediaview.service';
 import { LoginService } from '../common/login.service';
 import { SyncAPI } from '../common/sync.api';
 import { Catalog } from '../../crosscommon/entities/Catalog';
+import { MultimediaView } from '../../crosscommon/entities/MultimediaView';
+import { MultimediaDet } from '../../crosscommon/entities/MultimediaDet';
+import { DateUtils } from '../../crosscommon/DateUtility';
+import { SyncQueue } from '../common/SyncQueue';
 
 @Component({
     selector: 'multimedia',
@@ -15,6 +21,8 @@ import { Catalog } from '../../crosscommon/entities/Catalog';
     styleUrls: ['./multimedia.css'],
     providers: [
         MultimediaService
+        , MultimediaDetService
+        , MultimediaViewService
         , LoginService
         , SyncAPI
     ]
@@ -22,19 +30,31 @@ import { Catalog } from '../../crosscommon/entities/Catalog';
 export class MultimediaComponent implements OnInit {
     public viewData: {
         multimediaList: Multimedia[],
+        multimediaDetList: MultimediaDet[],
+        multimediaViewList: MultimediaView[],
         mediaTypeList: Catalog[],
-        showCreateForm: boolean
+        platformList: Catalog[],
+        showCreateForm: boolean,
+        showCreateEpForm: boolean
     } = {
         multimediaList: [],
+        multimediaDetList: [],
+        multimediaViewList: [],
         mediaTypeList: [],
-        showCreateForm: false
+        platformList: [],
+        showCreateForm: false,
+        showCreateEpForm: false
     };
     public services: {
         multimediaService: MultimediaService
+        , multimediaDetService: MultimediaDetService
+        , multimediaViewService: MultimediaViewService
         , loginService: LoginService
         , syncService: SyncAPI
     } = {
         multimediaService: null
+        , multimediaDetService: null
+        , multimediaViewService: null
         , loginService: null
         , syncService: null
     };
@@ -51,18 +71,43 @@ export class MultimediaComponent implements OnInit {
         fYear: (new Date()).getFullYear(),
         fCurrentEp: '1'
     };
+    public epModel: {
+        id: string,
+        epId: string,
+        fTitle: string,
+        fYear: number,
+        isViewed: boolean,
+        fDateViewed: Date
+    } = {
+        id: null,
+        epId: null,
+        fTitle: null,
+        fYear: null,
+        isViewed: false,
+        fDateViewed: new Date()
+    };
 
     constructor(
         multimediaService: MultimediaService
+        , multimediaDetService: MultimediaDetService
+        , multimediaViewService: MultimediaViewService
         , loginService: LoginService
         , syncService: SyncAPI
     ){
         this.services.multimediaService = multimediaService;
+        this.services.multimediaDetService = multimediaDetService;
+        this.services.multimediaViewService = multimediaViewService;
         this.services.loginService = loginService;
         this.services.syncService = syncService;
 
         this.services.multimediaService.getAllForUser(this.services.loginService.getUsername() || 'anon').then(data => {
             this.viewData.multimediaList = data;
+        });
+        this.services.multimediaDetService.getAllForUser(this.services.loginService.getUsername() || 'anon').then((data: MultimediaDet[]) => {
+            this.viewData.multimediaDetList = data;
+        });
+        this.services.multimediaViewService.getAllForUser(this.services.loginService.getUsername() || 'anon').then((data: MultimediaView[]) => {
+            this.viewData.multimediaViewList = data;
         });
         const mediaTypes: string = JSON.stringify({
             gc: 'AND'
@@ -74,6 +119,18 @@ export class MultimediaComponent implements OnInit {
         })
         this.services.syncService.get(`/api/sync?entity=Catalog&q=${mediaTypes}`).then(data => {
             this.viewData.mediaTypeList = data.list;
+        });
+
+        const platformQuery: string = JSON.stringify({
+            gc: 'AND'
+            , cont: [{
+                f: 'ctg_id'
+                , op: 'eq'
+                , val: 'MULTIMEDIA_PLATFORM' // TODO: fix database length for field ctg_name
+            }]
+        })
+        this.services.syncService.get(`/api/sync?entity=Catalog&q=${platformQuery}`).then(data => {
+            this.viewData.platformList = data.list;
         });
     }
 
@@ -102,5 +159,76 @@ export class MultimediaComponent implements OnInit {
         );
 
         this.viewData.multimediaList.push(item);
+    }
+
+    showNewEpForm(id: string, epId: string, title: string) {
+        this.viewData.showCreateEpForm = true;
+        this.epModel.id = id;
+        this.epModel.epId = epId;
+        this.epModel.fTitle = title;
+    }
+    
+    hideNewEpForm() {
+        this.viewData.showCreateEpForm = false;
+    }
+
+    newEpItem(form: NgForm) {
+        let values = form.value;
+
+        const queue: SyncQueue[] = [];
+
+        const item: MultimediaDet = this.services.multimediaDetService.newItem(
+            this.epModel.id,
+            this.epModel.epId,
+            values.fEpTitle,
+            values.fAltEpTitle,
+            values.fYear,
+            values.fUrl,
+            this.services.loginService.getUsername() || 'anon'
+        );
+
+        this.viewData.multimediaDetList.push(item);
+        queue.push(this.services.multimediaDetService.asSyncQueue(item));
+        
+        if (values.fIsViewed) {
+            const item2: MultimediaView = this.services.multimediaViewService.newItem(
+                this.epModel.id,
+                this.epModel.epId,
+                values.fSummary,
+                values.fDateViewed,
+                values.fRating,
+                values.fPlatform,
+                values.fNotes,
+                this.services.loginService.getUsername() || 'anon'
+            );
+            
+            this.viewData.multimediaViewList.push(item2);
+            queue.push(this.services.multimediaViewService.asSyncQueue(item2));
+
+            const media = this.viewData.multimediaList.find(item => item.mma_id === this.epModel.id);
+            media.mma_current_ep = this.calculateNextEp(media.mma_current_ep);
+            media.mma_date_mod = new Date();
+            queue.push(this.services.multimediaService.asUpdateSyncQueue(media));
+        }
+        
+        this.services.syncService.multipleRequest(queue);
+    }
+
+    calculateNextEp(currentEp: string) :string {
+        if (DateUtils.isDate(currentEp)) {
+            const asDate: Date = new Date(currentEp);
+            return DateUtils.formatDate(DateUtils.addDays(asDate, 7));
+        }
+
+        const asInteger: number = Number.parseInt(currentEp);
+        const asFloat: number = Number.parseFloat(currentEp);
+
+        if (asInteger - asFloat < 0.1) {
+            // as integer
+            return String(asInteger + 1);
+        } else {
+            // as float
+            return String(Math.ceil(asFloat));
+        }
     }
 }

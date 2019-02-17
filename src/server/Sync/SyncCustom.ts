@@ -8,6 +8,8 @@ import { MultimediaCustom } from "../Multimedia/MultimediaCustom";
 import { ApiModule } from "../ApiModule";
 import { Catalog } from "../../crosscommon/entities/Catalog";
 import { MultimediaDet } from "../../crosscommon/entities/MultimediaDet";
+import { MultimediaDetCustom } from "../MultimediaDet/MultimediaDetCustom";
+import { MultimediaView } from "../../crosscommon/entities/MultimediaView";
 
 class syncItem {
     action: string
@@ -167,7 +169,21 @@ export class SyncCustom {
             }
             case 'MultimediaDet': {
                 construct = (base: any) => new MultimediaDet(base);
-                // server = new MultimediaDetCustom();
+                server = new MultimediaDetCustom();
+                break;
+            }
+            case 'MultimediaView': {
+                construct = (base: any) => new MultimediaView(base);
+                server = {
+                    create: (body: any): Promise<any> => {
+                        const api: ApiModule = new ApiModule(new MultimediaView());
+
+                        return api.create({ body }, {});
+                    },
+                    update: () => {
+
+                    }
+                };
                 break;
             }
             case 'Catalog': {

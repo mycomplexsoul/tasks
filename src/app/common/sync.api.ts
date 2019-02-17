@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Http, Headers, RequestOptions } from '@angular/http';
+import { SyncQueue } from "./SyncQueue";
 
 @Injectable()
 export class SyncAPI {
@@ -47,6 +48,30 @@ export class SyncAPI {
         };
         this.handleRequest([queueItem]);
     }
+    
+    /**
+     * creates a SyncQueue object to use later with multipleRequest method.
+     */
+    asSyncQueue(action: string, model: any, pk: any, entity: string, callback: Function, recordName: (e: any) => string, matchMethod: (val: any) => boolean){
+        const queueItem: SyncQueue = {
+            action,
+            model,
+            pk,
+            entity,
+            callback,
+            recordName,
+            matchMethod,
+            status: 'queue' // this is ignored
+        };
+        return queueItem;
+    }
+
+    /**
+     * 
+     */
+    requestQueue(queueItem: SyncQueue) {
+        this.handleRequest([queueItem]);
+    }
 
     /**
      * Adds multiple requests to the queue and process them when server is reachable.
@@ -90,7 +115,7 @@ export class SyncAPI {
         let foundIndex: number = -1;
 
         if (matchMethod){
-            foundIndex = this.queue.findIndex((val: SyncQueue) => matchMethod(val.model) && (val.status === 'queue' || val.status === 'error'));
+            foundIndex = this.queue.findIndex((val: SyncQueue) => matchMethod(val.model) && (val.status === 'queue' || val.status === 'error') && val.entity === queueItem.entity);
         }
 
         if (foundIndex !== -1) { // if record has a match, replace model only
@@ -214,15 +239,4 @@ export class SyncAPI {
         return this.http.get(url, this.options)
             .toPromise().then((data) => data.json());
     }
-}
-
-interface SyncQueue {
-    action: string
-    , model: any
-    , pk: any
-    , entity: string
-    , status: string
-    , callback: Function
-    , recordName?: Function
-    , matchMethod?: Function
 }

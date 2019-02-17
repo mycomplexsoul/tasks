@@ -55,7 +55,95 @@
     <tr class="multimedia-listing-row" *ngFor="let item of viewData.multimediaList; let i = index">
         <td class="padding-all-5 text-align-right">{{i + 1}}</td>
         <td class="padding-all-5">{{item.mma_title + ' T' + item.mma_season}}</td>
-        <td class="padding-all-5">{{item.mma_current_ep + '/' + item.mma_total_ep}}</td>
+        <td class="padding-all-5">
+            {{item.mma_current_ep + '/' + item.mma_total_ep}}
+            <button type="button" (click)="showNewEpForm(item.mma_id, item.mma_current_ep, item.mma_title)">+</button>
+        </td>
         <td class="padding-all-5">{{item.mma_date_mod | date: 'yyyy-MM-dd'}}</td>
     </tr>
 </table>
+
+<!--
+    <table>
+        <tr>
+            <th class="padding-all-5 width-80">Episode Id</th>
+            <th class="padding-all-5 width-100">Episode Title</th>
+    
+            <th class="padding-all-5">Date Viewed</th>
+            <th class="padding-all-5">Rating</th>
+            <th class="padding-all-5">Notes</th>
+        </tr>
+        <tr class="multimedia-listing-row" *ngFor="let item of viewData.multimediaList; let i = index">
+            <td class="padding-all-5 text-align-right">{{i + 1}}</td>
+            <td class="padding-all-5">{{item.mma_title + ' T' + item.mma_season}}</td>
+            <td class="padding-all-5">{{item.mma_current_ep + '/' + item.mma_total_ep}}</td>
+            <td class="padding-all-5">{{item.mma_date_mod | date: 'yyyy-MM-dd'}}</td>
+        </tr>
+    </table>
+-->
+
+<form #newEpForm="ngForm" (ngSubmit)="newEpItem(newEpForm)">
+    <div *ngIf="viewData.showCreateEpForm">
+        <button type="button" (click)="hideNewEpForm()">
+            Hide Ep Form
+        </button>
+        <div>
+            <span class="field">
+                <label for="fTitle" class="label-left">Title</label>
+                <input type="text" name="fTitle" id="fTitle" class="field-input multimedia-input-title" disabled [(ngModel)]="epModel.fTitle">
+            </span>
+            <span class="field">
+                <label for="id" class="label-left">Id</label>
+                <span type="text" name="id" id="id" class="multimedia-input-id">{{epModel.epId}}</span>
+            </span>
+            <span class="field">
+                <label for="fEpTitle" class="label-left">Episode Title</label>
+                <input type="text" name="fEpTitle" id="fEpTitle" class="field-input multimedia-input-eptitle" ngModel>
+            </span>
+            <span class="field">
+                <label for="fAltEpTitle" class="label-left">Alternative Title</label>
+                <input type="text" name="fAltEpTitle" id="fAltEpTitle" class="field-input multimedia-input-alteptitle" ngModel>
+            </span>
+            <span class="field">
+                <label for="fYear" class="label-left">Year</label>
+                <input type="number" name="fYear" id="fYear" class="field-input multimedia-input-year" step="1" [(ngModel)]="epModel.fYear">
+            </span>
+            <span class="field">
+                <label for="fUrl" class="label-left">Url</label>
+                <input type="text" name="fUrl" id="fUrl" class="field-input multimedia-input-url" ngModel>
+            </span>
+
+            <span class="field">
+                <hr>
+                <label for="fIsViewed" class="label-left">Viewed</label>
+                <input type="checkbox" name="fIsViewed" id="fIsViewed" [(ngModel)]="epModel.isViewed">
+            </span>
+            <span *ngIf="epModel.isViewed">
+                <span class="field">
+                    <label for="fSummary" class="label-left">Summary</label>
+                    <input type="text" name="fSummary" id="fSummary" class="field-input multimedia-input-summary" ngModel>
+                </span>
+                <span class="field">
+                    <label for="fDateViewed" class="label-left">Date Viewed</label>
+                    <input type="date" name="fDateViewed" [(ngModel)]="epModel.fDateViewed">
+                </span>
+                <span class="field">
+                    <label for="fRating" class="label-left">Rating</label>
+                    <input type="number" name="fRating" id="fRating" class="field-input multimedia-input-rating" step="1" ngModel>
+                </span>
+                <span class="field">
+                    <label for="fPlatform" class="label-left">Platform</label>
+                    <select name="fPlatform" id="fPlatform" class="field-select" ngModel>
+                        <option *ngFor="let opt of viewData.platformList" [value]="opt.ctg_sequential" [selected]="opt.ctg_sequential === newEpForm.value.fPlatform">{{opt.ctg_name}}</option>
+                    </select>
+                </span>
+                <span class="field">
+                    <label for="fNotes" class="label-left">Notes</label>
+                    <input type="text" name="fNotes" id="fNotes" class="field-input multimedia-input-notes" ngModel>
+                </span>
+            </span>
+            
+            <button type="submit">Save</button>
+        </div>
+    </div>
+</form>

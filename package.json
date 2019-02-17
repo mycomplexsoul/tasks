@@ -1,6 +1,6 @@
 {
   "name": "tasks",
-  "version": "1.7.22",
+  "version": "1.7.28",
   "description": "Task manager and money manager web application",
   "scripts": {
     "build": "tsc -p src/",
@@ -83,7 +83,7 @@
     "karma-jasmine": "^1.0.2",
     "karma-jasmine-html-reporter": "^0.2.2",
     "lite-server": "^2.2.2",
-    "lodash": "^4.16.4",
+    "lodash": "^4.17.11",
     "protractor": "~4.0.14",
     "rimraf": "^2.6.2",
     "tslint": "^5.9.1",
