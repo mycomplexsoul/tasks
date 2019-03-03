@@ -76,15 +76,29 @@ export class MultimediaComponent implements OnInit {
         epId: string,
         fTitle: string,
         fYear: number,
+        fEpTitle: string,
+        fAltEpTitle: string,
+        fUrl: string,
         isViewed: boolean,
-        fDateViewed: Date
+        fDateViewed: Date,
+        fSummary: string,
+        fRating: number,
+        fPlatform: number,
+        fNotes: string
     } = {
         id: null,
         epId: null,
         fTitle: null,
         fYear: null,
+        fEpTitle: null,
+        fAltEpTitle: null,
+        fUrl: null,
         isViewed: false,
-        fDateViewed: new Date()
+        fDateViewed: new Date(),
+        fSummary: null,
+        fRating: 0,
+        fPlatform: 0,
+        fNotes: null
     };
 
     constructor(
@@ -166,6 +180,26 @@ export class MultimediaComponent implements OnInit {
         this.epModel.id = id;
         this.epModel.epId = epId;
         this.epModel.fTitle = title;
+
+        // see if we have data for this ep in order to populate form
+        const detFound = this.services.multimediaDetService.list().find(item => item.mmd_id === id && item.mmd_id_ep === epId);
+        if (detFound) {
+            this.epModel.fEpTitle = detFound.mmd_ep_title;
+            this.epModel.fAltEpTitle = detFound.mmd_ep_alt_title;
+            this.epModel.fYear = detFound.mmd_year;
+            this.epModel.fUrl = detFound.mmd_url;
+        }
+
+        this.epModel.isViewed = false;
+        const viewFound = this.services.multimediaViewService.list().find(item => item.mmv_id === id && item.mmv_id_ep === epId);
+        if (viewFound) {
+            this.epModel.isViewed = true;
+            this.epModel.fSummary = viewFound.mmv_ep_summary;
+            this.epModel.fDateViewed = viewFound.mmv_date_viewed;
+            this.epModel.fRating = viewFound.mmv_num_rating;
+            this.epModel.fPlatform = viewFound.mmv_ctg_platform;
+            this.epModel.fNotes = viewFound.mmv_notes;
+        }
     }
     
     hideNewEpForm() {
@@ -230,5 +264,11 @@ export class MultimediaComponent implements OnInit {
             // as float
             return String(Math.ceil(asFloat));
         }
+    }
+
+    showDetListing(id: string) {
+        this.services.multimediaDetService.getAllForUser('anon').then(data => {
+            this.viewData.multimediaDetList = data.filter(item => item.mmd_id === id);
+        });
     }
 }

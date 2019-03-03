@@ -1,9 +1,10 @@
 {
   "name": "tasks",
-  "version": "1.7.28",
+  "version": "1.7.31",
   "description": "Task manager and money manager web application",
   "scripts": {
-    "build": "tsc -p src/",
+    "_build": "tsc -p src/",
+    "build": "node ./node_modules/typescript/lib/tsc ./iis-server.ts --lib es6 && node ./node_modules/typescript/lib/tsc -p ./src/",
     "build:watch": "node_modules/.bin/tsc -p src/ -w",
     "build:e2e": "tsc -p e2e/",
     "serve": "lite-server -c=bs-config.json",
@@ -18,7 +19,7 @@
     "pretest:once": "npm run build",
     "test:once": "karma start karma.conf.js --single-run",
     "lint": "tslint ./src/**/*.ts -t verbose",
-    "start": "node ./node_modules/typescript/lib/tsc ./src/server/server.ts --lib es6 && node ./node_modules/typescript/lib/tsc -p ./src/ && node --inspect src/server/server.js",
+    "start": "node --inspect iis-server.js",
     "build:node": "node_modules/.bin/tsc src/server/server.ts --lib es6 --module commonjs --outDir dist/",
     "build:ng": "tsc -p src/ --outDir dist/",
     "servedist": "lite-server -c=dist-bs-config.json",

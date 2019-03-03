@@ -37,8 +37,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
     * [AppCommon] Deploy BE + FE in `/dist` folder.
 
 ## [Unreleased / Work In Progress]
+* [AppMultimedia][new] Be able to edit ep id in form in order to create or edit posterior episodes.
 
 <hr/>
+
+## v1.7.31 (2019-01-25)
+
+* [AppCommon][new] Config for azure deploy.
+
+## v1.7.30 (2019-01-24)
+
+* [AppMultimedia][new] Load details into form on selecting a MultimediaDet record.
+
+## v1.7.29 (2019-01-23)
+
+* [AppMultimedia][new] MultimediaDet listing on selecting Multimedia record.
 
 ## v1.7.28 (2019-01-22)
 
